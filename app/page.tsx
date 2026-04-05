@@ -1,131 +1,189 @@
-import { Suspense } from "react";
-import { searchCompanies, listCompanies, creditColor } from "@/lib/edinetdb";
-import SearchForm from "@/components/SearchForm";
 import Link from "next/link";
 
-interface Props {
-  searchParams: Promise<{ q?: string; industry?: string; page?: string }>;
-}
+const CATEGORIES = [
+  {
+    group: "データベース",
+    items: [
+      {
+        href: "/search",
+        title: "企業検索",
+        description: "EDINET DB APIで上場企業の財務データ・信用スコアを検索",
+        source: "EDINET",
+        color: "from-blue-500 to-blue-600",
+      },
+      {
+        href: "/startups",
+        title: "スタートアップ",
+        description:
+          "500万社以上の法人データから非上場企業・スタートアップを検索",
+        source: "gBizINFO",
+        color: "from-purple-500 to-purple-600",
+      },
+      {
+        href: "/weekly",
+        title: "株主名検索",
+        description:
+          "投資ファンド・事業会社の保有銘柄を横断検索（大量保有報告書）",
+        source: "EDINET",
+        color: "from-indigo-500 to-indigo-600",
+      },
+      {
+        href: "/news",
+        title: "M&A ニュース",
+        description:
+          "8カテゴリのRSSからM&A・買収・合併の最新ニュースを自動集約",
+        source: "Google News",
+        color: "from-amber-500 to-orange-500",
+      },
+    ],
+  },
+  {
+    group: "ネットワーク",
+    items: [
+      {
+        href: "/people",
+        title: "人物DB",
+        description:
+          "M&A関連の著名人物・アドバイザー・投資家56名のデータベース",
+        source: "厳選DB",
+        color: "from-violet-500 to-purple-500",
+      },
+      {
+        href: "/communities",
+        title: "コミュニティ",
+        description: "全国66の経営者コミュニティ・業界団体を網羅",
+        source: "厳選DB",
+        color: "from-pink-500 to-rose-500",
+      },
+    ],
+  },
+];
 
-const PAGE_SIZE = 30;
-
-async function Results({ q, industry, page }: { q?: string; industry?: string; page: number }) {
-  const apiKey = process.env.EDINET_API_KEY;
-  if (!apiKey) {
-    return (
-      <div className="bg-amber-50 border border-amber-300 rounded-lg p-6 text-amber-800 space-y-3">
-        <h3 className="font-bold">⚠️ EDINET DB API キーが設定されていません</h3>
-        <p className="text-sm">
-          プロジェクトの <code className="bg-amber-100 px-1 rounded">.env.local</code> に
-          <code className="bg-amber-100 px-1 rounded ml-1">EDINET_API_KEY=your_key</code> を追加してください。
+export default function DashboardPage() {
+  return (
+    <div className="space-y-10">
+      {/* Hero */}
+      <div className="text-center py-6">
+        <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
+          M&amp;A 総合データベース
+        </h2>
+        <p className="text-slate-500 mt-2 max-w-2xl mx-auto">
+          買手・売手情報からニュース、人物ネットワークまで M&amp;A
+          に関する情報を一元管理。 法律・論文・セミナー等は右下の AI
+          アシスタントに質問できます。
         </p>
       </div>
-    );
-  }
 
-  if (q) {
-    const companies = await searchCompanies(q);
-    return (
-      <div className="space-y-3">
-        <p className="text-sm text-gray-500">「{q}」の検索結果: {companies.length} 件</p>
-        <CompanyGrid companies={companies} />
-      </div>
-    );
-  }
+      {/* Category Groups */}
+      {CATEGORIES.map((group) => (
+        <section key={group.group}>
+          <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+            {group.group}
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {group.items.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="card-hover group relative bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden"
+              >
+                <div className={`h-1.5 bg-gradient-to-r ${item.color}`} />
+                <div className="p-5">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
+                      {item.title}
+                    </h4>
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 shrink-0">
+                      {item.source}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                    {item.description}
+                  </p>
+                  <div className="mt-3 flex items-center text-xs font-medium text-blue-600 group-hover:text-blue-700 transition-colors">
+                    開く
+                    <svg
+                      className="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition-transform"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
 
-  const result = await listCompanies({ industry, limit: PAGE_SIZE, page });
-  const total = result.meta?.pagination?.total || 0;
-  const totalPages = result.meta?.pagination?.total_pages || 1;
-
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-gray-500">全 {total.toLocaleString()} 社 — {page}/{totalPages} ページ</p>
-      <CompanyGrid companies={result.data} />
-      <Pagination page={page} totalPages={totalPages} industry={industry} />
-    </div>
-  );
-}
-
-function CompanyGrid({ companies }: { companies: ReturnType<typeof searchCompanies> extends Promise<infer T> ? T : never }) {
-  if (!companies.length) {
-    return <div className="text-center py-16 text-gray-400 bg-white rounded-lg border border-gray-200">該当企業なし</div>;
-  }
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-      {companies.map((c) => (
-        <Link
-          key={c.edinet_code}
-          href={`/company/${c.edinet_code}`}
-          className="bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-400 hover:shadow-sm transition-all"
-        >
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="font-semibold text-gray-800 truncate">{c.name}</p>
-              <p className="text-xs text-gray-400 mt-0.5">{c.edinet_code} {c.sec_code ? `/ ${c.sec_code}` : ""}</p>
-              <p className="text-xs text-gray-500 mt-1">{c.industry}</p>
-            </div>
-            <div className="flex flex-col items-end gap-1 shrink-0">
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${creditColor(c.credit_rating)}`}>
-                {c.credit_rating}
-              </span>
-              <span className="text-xs text-gray-400">{c.credit_score}点</span>
+      {/* AI Assistant highlight */}
+      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-200/40 p-6">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-lg shrink-0 shadow-lg shadow-blue-500/20">
+            AI
+          </div>
+          <div>
+            <h3 className="font-semibold text-slate-800">AI アシスタント</h3>
+            <p className="text-sm text-slate-600 mt-1">
+              右下のチャットアイコンから、M&A に関するあらゆる質問に AI
+              が回答します。
+              企業情報・法律（73法令）・論文・セミナー・YouTube・人物DB・コミュニティなど
+              <span className="font-semibold">全10データソース</span>
+              を横断検索して回答します。
+            </p>
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {[
+                "企業財務",
+                "大量保有報告",
+                "法律・規制",
+                "学術論文",
+                "ニュース",
+                "セミナー",
+                "YouTube",
+                "人物DB",
+                "コミュニティ",
+                "gBizINFO",
+              ].map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[10px] px-2 py-0.5 rounded-full bg-white/80 text-slate-500 border border-slate-200/60"
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
+        </div>
+      </section>
 
-function Pagination({ page, totalPages, industry }: { page: number; totalPages: number; industry?: string }) {
-  const base = industry ? `/?industry=${encodeURIComponent(industry)}` : "/";
-  const pages = [];
-  for (let i = Math.max(1, page - 2); i <= Math.min(totalPages, page + 2); i++) pages.push(i);
-
-  return (
-    <div className="flex items-center justify-center gap-2">
-      {page > 1 && (
-        <Link href={`${base}&page=${page - 1}`} className="px-3 py-1.5 border rounded text-sm hover:bg-gray-50">← 前</Link>
-      )}
-      {pages.map((p) => (
-        <Link
-          key={p}
-          href={`${base}&page=${p}`}
-          className={`px-3 py-1.5 border rounded text-sm ${p === page ? "bg-blue-600 text-white border-blue-600" : "hover:bg-gray-50"}`}
-        >
-          {p}
-        </Link>
-      ))}
-      {page < totalPages && (
-        <Link href={`${base}&page=${page + 1}`} className="px-3 py-1.5 border rounded text-sm hover:bg-gray-50">次 →</Link>
-      )}
-    </div>
-  );
-}
-
-export default async function Home({ searchParams }: Props) {
-  const params = await searchParams;
-  const page = Math.max(1, parseInt(params.page || "1", 10));
-
-  return (
-    <div className="space-y-6">
-      {/* Search */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-        <Suspense>
-          <SearchForm defaultQ={params.q} defaultIndustry={params.industry} />
-        </Suspense>
-      </div>
-
-      {/* Results */}
-      <Suspense
-        fallback={
-          <div className="text-center py-16 text-gray-400 bg-white rounded-lg border border-gray-200">
-            データを取得中...
+      {/* Stats */}
+      <section>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-sm">
+            <p className="text-2xl font-bold text-blue-600">10</p>
+            <p className="text-xs text-slate-500 mt-1">データソース</p>
           </div>
-        }
-      >
-        <Results q={params.q} industry={params.industry} page={page} />
-      </Suspense>
+          <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-sm">
+            <p className="text-2xl font-bold text-purple-600">500万+</p>
+            <p className="text-xs text-slate-500 mt-1">法人データ</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-sm">
+            <p className="text-2xl font-bold text-emerald-600">73</p>
+            <p className="text-xs text-slate-500 mt-1">M&A法令</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-sm">
+            <p className="text-2xl font-bold text-amber-600">AI</p>
+            <p className="text-xs text-slate-500 mt-1">横断検索アシスタント</p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
