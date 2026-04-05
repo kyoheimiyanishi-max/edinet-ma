@@ -43,6 +43,35 @@ export interface CompanyDetail extends Company {
   latest_financials: Financials | null;
   latest_earnings: Earnings | null;
   data_notes?: string[];
+  listing_category?: string;
+  market_cap?: number | null;
+}
+
+export interface FinancialHistory {
+  fiscal_year: number;
+  revenue: number | null;
+  operating_income: number | null;
+  net_income: number | null;
+  total_assets: number | null;
+  equity: number | null;
+  cash: number | null;
+  equity_ratio_official: number | null;
+  eps: number | null;
+  bps: number | null;
+  roe?: number | null;
+  roa?: number | null;
+  market_cap?: number | null;
+  avg_annual_salary?: number | null;
+}
+
+export interface Officer {
+  name: string;
+  position: string;
+  birth_date?: string;
+  shares_held?: number;
+  is_outside?: boolean;
+  is_representative?: boolean;
+  career?: string;
 }
 
 export interface Financials {
@@ -107,7 +136,9 @@ export interface ShareholderReport {
 
 export async function searchCompanies(query: string): Promise<Company[]> {
   if (!query) return [];
-  const data = await apiFetch<{ data: Company[] }>(`/search?q=${encodeURIComponent(query)}`);
+  const data = await apiFetch<{ data: Company[] }>(
+    `/search?q=${encodeURIComponent(query)}`,
+  );
   return data.data || [];
 }
 
@@ -115,7 +146,17 @@ export async function listCompanies(params?: {
   industry?: string;
   limit?: number;
   page?: number;
-}): Promise<{ data: Company[]; meta: { pagination: { total: number; total_pages: number; page: number; per_page: number } } }> {
+}): Promise<{
+  data: Company[];
+  meta: {
+    pagination: {
+      total: number;
+      total_pages: number;
+      page: number;
+      per_page: number;
+    };
+  };
+}> {
   const qs = new URLSearchParams();
   if (params?.industry) qs.set("industry", params.industry);
   if (params?.limit) qs.set("per_page", String(params.limit));
@@ -124,22 +165,26 @@ export async function listCompanies(params?: {
 }
 
 export async function getCompany(edinetCode: string): Promise<CompanyDetail> {
-  const data = await apiFetch<{ data: CompanyDetail }>(`/companies/${edinetCode}`);
+  const data = await apiFetch<{ data: CompanyDetail }>(
+    `/companies/${edinetCode}`,
+  );
   return data.data;
 }
 
 export async function getCompanyShareholders(
-  edinetCode: string
+  edinetCode: string,
 ): Promise<ShareholderReport[]> {
   const data = await apiFetch<{ data: ShareholderReport[] }>(
-    `/companies/${edinetCode}/shareholders`
+    `/companies/${edinetCode}/shareholders`,
   );
   return data.data || [];
 }
 
-export async function searchShareholders(holderName: string): Promise<ShareholderReport[]> {
+export async function searchShareholders(
+  holderName: string,
+): Promise<ShareholderReport[]> {
   const data = await apiFetch<{ data: ShareholderReport[] }>(
-    `/shareholders/search?q=${encodeURIComponent(holderName)}`
+    `/shareholders/search?q=${encodeURIComponent(holderName)}`,
   );
   return data.data || [];
 }
@@ -175,8 +220,10 @@ export async function screenerStartups(params: {
   limit?: number;
 }): Promise<ScreenerResult> {
   const qs = new URLSearchParams();
-  if (params.revenueLte != null) qs.set("revenue_lte", String(params.revenueLte));
-  if (params.revenueGte != null) qs.set("revenue_gte", String(params.revenueGte));
+  if (params.revenueLte != null)
+    qs.set("revenue_lte", String(params.revenueLte));
+  if (params.revenueGte != null)
+    qs.set("revenue_gte", String(params.revenueGte));
   if (params.rndGte != null) qs.set("rnd_expenses_gte", String(params.rndGte));
   if (params.sortBy) qs.set("sort_by", params.sortBy);
   qs.set("sort_order", "desc");
@@ -237,4 +284,32 @@ export function formatChange(n: number | null | undefined): string {
 
 export function getEdinetUrl(docId: string): string {
   return `https://disclosure2.edinet-fsa.go.jp/WZEK0040.aspx?${docId}`;
+}
+
+// ---- Additional API functions ----
+
+export async function getCompanyFinancials(
+  edinetCode: string,
+): Promise<FinancialHistory[]> {
+  try {
+    const data = await apiFetch<{ data: FinancialHistory[] }>(
+      `/companies/${edinetCode}/financials`,
+    );
+    return data.data || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getCompanyOfficers(
+  edinetCode: string,
+): Promise<Officer[]> {
+  try {
+    const data = await apiFetch<{ data: Officer[] }>(
+      `/companies/${edinetCode}/officers`,
+    );
+    return data.data || [];
+  } catch {
+    return [];
+  }
 }

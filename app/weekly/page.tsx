@@ -135,17 +135,6 @@ export default async function ShareholderSearchPage({ searchParams }: Props) {
           <Results q={q} />
         </Suspense>
       )}
-
-      {!q && (
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200/60 rounded-2xl p-6 text-sm text-blue-700">
-          <p className="font-semibold mb-1">使い方</p>
-          <p className="text-blue-600">
-            ファンド名や企業名で保有銘柄を検索できます。 例:
-            「村上ファンド」「ブラックロック」「物言う株主」など M&amp;A
-            関連投資家を調査するのに活用できます。
-          </p>
-        </div>
-      )}
     </div>
   );
 }

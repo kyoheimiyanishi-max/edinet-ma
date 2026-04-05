@@ -1,0 +1,21 @@
+[
+  {
+    "name": "Go",
+    "email": "test@test.com",
+    "department": "M&Aアドバイザリー部",
+    "position": "担当",
+    "phone": "",
+    "id": "45f219dd-0089-46a1-bbb4-de43d26d1341",
+    "createdAt": "2026-04-05T10:18:42.621Z",
+    "assignments": [
+      {
+        "companyCode": "E03006",
+        "companyName": "あいホールディングス株式会社",
+        "role": "主担当",
+        "status": "アクティブ",
+        "note": "",
+        "assignedAt": "2026-04-05T10:20:17.480Z"
+      }
+    ]
+  }
+]

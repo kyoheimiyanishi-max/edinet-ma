@@ -1,6 +1,8 @@
 import {
   getCompany,
   getCompanyShareholders,
+  getCompanyFinancials,
+  getCompanyOfficers,
   formatYen,
   formatPct,
   formatSharePct,
@@ -9,7 +11,11 @@ import {
   formatChange,
   getEdinetUrl,
 } from "@/lib/edinetdb";
+import type { FinancialHistory, Officer } from "@/lib/edinetdb";
 import { searchNews, formatPubDate } from "@/lib/news";
+import CompanyEmployeeSection from "@/components/CompanyEmployeeSection";
+import { FinancialCharts } from "@/components/FinancialCharts";
+import type { FinancialChartData } from "@/components/FinancialCharts";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -145,14 +151,53 @@ export default async function CompanyPage({ params }: Props) {
   const { code } = await params;
 
   try {
-    const [company, shareholders] = await Promise.all([
+    const [company, shareholders, financials, officers] = await Promise.all([
       getCompany(code),
       getCompanyShareholders(code),
+      getCompanyFinancials(code),
+      getCompanyOfficers(code),
     ]);
 
     const f = company.latest_financials;
     const e = company.latest_earnings;
     const secCode = company.sec_code?.replace(/0$/, ""); // Remove trailing 0 for Yahoo Finance
+
+    // Build chart data: use historical financials, or fallback to latest year
+    const chartData: FinancialChartData[] =
+      financials.length > 0
+        ? financials.map((fh: FinancialHistory) => ({
+            fiscal_year: fh.fiscal_year,
+            revenue: fh.revenue,
+            operating_income: fh.operating_income,
+            net_income: fh.net_income,
+            total_assets: fh.total_assets,
+            equity: fh.equity,
+            cash: fh.cash,
+            equity_ratio_official: fh.equity_ratio_official,
+            eps: fh.eps,
+            bps: fh.bps,
+            roe: fh.roe,
+            roa: fh.roa,
+            market_cap: fh.market_cap,
+          }))
+        : f
+          ? [
+              {
+                fiscal_year: f.fiscal_year,
+                revenue: f.revenue,
+                operating_income: f.operating_income,
+                net_income: f.net_income,
+                total_assets: f.total_assets,
+                equity: f.equity,
+                cash: f.cash,
+                equity_ratio_official: f.equity_ratio_official,
+                eps: f.eps,
+                bps: f.bps,
+                roe: f.roe,
+                roa: f.roa,
+              },
+            ]
+          : [];
 
     // Shareholder analysis
     const byHolder = new Map<string, (typeof shareholders)[0]>();
@@ -219,6 +264,11 @@ export default async function CompanyPage({ params }: Props) {
                 <span className="text-xs px-2 py-1 bg-blue-50 rounded-lg text-blue-600">
                   {company.industry}
                 </span>
+                {company.listing_category && (
+                  <span className="text-xs px-2 py-1 bg-emerald-50 rounded-lg text-emerald-600">
+                    {company.listing_category}
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex flex-col items-end gap-2">
@@ -227,6 +277,11 @@ export default async function CompanyPage({ params }: Props) {
               >
                 {company.credit_rating} ({company.credit_score}pt)
               </span>
+              {company.market_cap != null && (
+                <span className="text-xs text-slate-500">
+                  時価総額: {formatYen(company.market_cap)}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -265,12 +320,34 @@ export default async function CompanyPage({ params }: Props) {
           </div>
         )}
 
+        {/* Assigned Employees */}
+        <SectionCard title="担当社員" badge="社員管理">
+          <CompanyEmployeeSection
+            companyCode={company.edinet_code}
+            companyName={company.name}
+          />
+        </SectionCard>
+
         {/* M&A Summary / News */}
         <SectionCard title="M&A 関連ニュース" badge="自動検索">
           <Suspense fallback={<div className="shimmer h-32 rounded-xl" />}>
             <MaNewsSection companyName={company.name} />
           </Suspense>
         </SectionCard>
+
+        {/* Financial Charts */}
+        {chartData.length > 0 && (
+          <SectionCard
+            title="財務推移"
+            badge={
+              chartData.length > 1
+                ? `${chartData[0].fiscal_year}〜${chartData[chartData.length - 1].fiscal_year}年`
+                : `${chartData[0].fiscal_year}年`
+            }
+          >
+            <FinancialCharts data={chartData} />
+          </SectionCard>
+        )}
 
         {/* Financial Summary - P&L */}
         {f && (
@@ -383,6 +460,62 @@ export default async function CompanyPage({ params }: Props) {
                     : undefined
                 }
               />
+            </div>
+          </SectionCard>
+        )}
+
+        {/* Officers */}
+        {officers.length > 0 && (
+          <SectionCard title="役員一覧" badge={`${officers.length}名`}>
+            <div className="overflow-x-auto -mx-6 px-6">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
+                    <th className="pb-3 pr-4 font-medium">役職</th>
+                    <th className="pb-3 pr-4 font-medium">氏名</th>
+                    <th className="pb-3 pr-4 font-medium text-right">
+                      所有株式数
+                    </th>
+                    <th className="pb-3 font-medium">区分</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {officers.map((o: Officer, i: number) => (
+                    <tr key={`officer-${i}`} className="hover:bg-blue-50/50">
+                      <td className="py-3 pr-4 text-slate-700 font-medium text-xs">
+                        {o.position}
+                      </td>
+                      <td className="py-3 pr-4 text-slate-800 font-medium">
+                        {o.name}
+                      </td>
+                      <td className="py-3 pr-4 text-right font-mono text-xs text-slate-600">
+                        {o.shares_held != null
+                          ? o.shares_held.toLocaleString()
+                          : "-"}
+                      </td>
+                      <td className="py-3">
+                        <div className="flex gap-1.5">
+                          {o.is_representative && (
+                            <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded font-medium">
+                              代表
+                            </span>
+                          )}
+                          {o.is_outside && (
+                            <span className="text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded font-medium">
+                              社外
+                            </span>
+                          )}
+                          {!o.is_representative && !o.is_outside && (
+                            <span className="text-[10px] text-slate-400">
+                              -
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </SectionCard>
         )}

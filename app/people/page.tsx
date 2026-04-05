@@ -182,15 +182,6 @@ export default async function PeoplePage({ searchParams }: Props) {
           ))}
         </div>
       )}
-
-      {!q && !category && (
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/60 rounded-2xl p-6 text-sm text-amber-700">
-          <p className="font-semibold mb-1">使い方</p>
-          <p className="text-amber-600">
-            名前・組織名・ディール名で検索するか、カテゴリで絞り込んでください。M&A業界のキーパーソンを一覧できます。
-          </p>
-        </div>
-      )}
     </div>
   );
 }

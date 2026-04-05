@@ -57,6 +57,25 @@ const CATEGORIES = [
       },
     ],
   },
+  {
+    group: "専門家・金融機関",
+    items: [
+      {
+        href: "/tax-advisors",
+        title: "税理士・会計士",
+        description: "M&A・事業承継に対応する税理士法人・会計事務所・FASを検索",
+        source: "厳選DB",
+        color: "from-teal-500 to-emerald-500",
+      },
+      {
+        href: "/banks",
+        title: "銀行・金融機関",
+        description: "メガバンクから地銀・信金まで M&A 対応金融機関を網羅",
+        source: "厳選DB",
+        color: "from-sky-500 to-blue-500",
+      },
+    ],
+  },
 ];
 
 export default function DashboardPage() {
@@ -122,68 +141,6 @@ export default function DashboardPage() {
           </div>
         </section>
       ))}
-
-      {/* AI Assistant highlight */}
-      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-200/40 p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-lg shrink-0 shadow-lg shadow-blue-500/20">
-            AI
-          </div>
-          <div>
-            <h3 className="font-semibold text-slate-800">AI アシスタント</h3>
-            <p className="text-sm text-slate-600 mt-1">
-              右下のチャットアイコンから、M&A に関するあらゆる質問に AI
-              が回答します。
-              企業情報・法律（73法令）・論文・セミナー・YouTube・人物DB・コミュニティなど
-              <span className="font-semibold">全10データソース</span>
-              を横断検索して回答します。
-            </p>
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {[
-                "企業財務",
-                "大量保有報告",
-                "法律・規制",
-                "学術論文",
-                "ニュース",
-                "セミナー",
-                "YouTube",
-                "人物DB",
-                "コミュニティ",
-                "gBizINFO",
-              ].map((tag) => (
-                <span
-                  key={tag}
-                  className="text-[10px] px-2 py-0.5 rounded-full bg-white/80 text-slate-500 border border-slate-200/60"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-          <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-sm">
-            <p className="text-2xl font-bold text-blue-600">10</p>
-            <p className="text-xs text-slate-500 mt-1">データソース</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-sm">
-            <p className="text-2xl font-bold text-purple-600">500万+</p>
-            <p className="text-xs text-slate-500 mt-1">法人データ</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-sm">
-            <p className="text-2xl font-bold text-emerald-600">73</p>
-            <p className="text-xs text-slate-500 mt-1">M&A法令</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-slate-200/60 shadow-sm">
-            <p className="text-2xl font-bold text-amber-600">AI</p>
-            <p className="text-xs text-slate-500 mt-1">横断検索アシスタント</p>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

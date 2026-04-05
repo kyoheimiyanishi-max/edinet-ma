@@ -22,6 +22,9 @@ const NAV_ITEMS = [
   { href: "/news", label: "ニュース" },
   { href: "/people", label: "人物DB" },
   { href: "/communities", label: "コミュニティ" },
+  { href: "/tax-advisors", label: "税理士・会計士" },
+  { href: "/banks", label: "銀行・金融機関" },
+  { href: "/settings", label: "設定" },
 ];
 
 export default function RootLayout({

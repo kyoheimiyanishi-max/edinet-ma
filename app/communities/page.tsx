@@ -190,15 +190,6 @@ export default async function CommunitiesPage({ searchParams }: Props) {
           ))}
         </div>
       )}
-
-      {!q && !prefecture && (
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200/60 rounded-2xl p-6 text-sm text-blue-700">
-          <p className="font-semibold mb-1">使い方</p>
-          <p className="text-blue-600">
-            キーワードや都道府県でM&A関連コミュニティを検索できます。経営者団体、業界団体、勉強会など種別ごとにグループ表示されます。
-          </p>
-        </div>
-      )}
     </div>
   );
 }
