@@ -2,7 +2,6 @@ import {
   getCompany,
   getCompanyShareholders,
   getCompanyFinancials,
-  getCompanyOfficers,
   formatYen,
   formatPct,
   formatSharePct,
@@ -11,7 +10,8 @@ import {
   formatChange,
   getEdinetUrl,
 } from "@/lib/edinetdb";
-import type { FinancialHistory, Officer } from "@/lib/edinetdb";
+import type { FinancialHistory } from "@/lib/edinetdb";
+import { fetchMarketSegment } from "@/lib/market";
 import { searchNews, formatPubDate } from "@/lib/news";
 import CompanyEmployeeSection from "@/components/CompanyEmployeeSection";
 import { FinancialCharts } from "@/components/FinancialCharts";
@@ -152,12 +152,12 @@ export default async function CompanyPage({ params }: Props) {
   const { code } = await params;
 
   try {
-    const [company, shareholders, financials, officers] = await Promise.all([
+    const [company, shareholders, financials] = await Promise.all([
       getCompany(code),
       getCompanyShareholders(code),
       getCompanyFinancials(code),
-      getCompanyOfficers(code),
     ]);
+    const marketSegment = await fetchMarketSegment(company.sec_code);
 
     const f = company.latest_financials;
     const e = company.latest_earnings;
@@ -265,7 +265,12 @@ export default async function CompanyPage({ params }: Props) {
                 <span className="text-xs px-2 py-1 bg-blue-50 rounded-lg text-blue-600">
                   {company.industry}
                 </span>
-                {company.listing_category && (
+                {marketSegment && (
+                  <span className="text-xs px-2 py-1 bg-emerald-50 rounded-lg text-emerald-600 font-medium">
+                    {marketSegment}
+                  </span>
+                )}
+                {company.listing_category && !marketSegment && (
                   <span className="text-xs px-2 py-1 bg-emerald-50 rounded-lg text-emerald-600">
                     {company.listing_category}
                   </span>
@@ -286,130 +291,6 @@ export default async function CompanyPage({ params }: Props) {
             </div>
           </div>
         </div>
-
-        {/* Company Overview */}
-        <SectionCard title="会社概要" badge={company.industry}>
-          <div className="space-y-6">
-            {/* Basic Info Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              <MetricCard label="企業名" value={company.name} />
-              {company.name_en && (
-                <MetricCard label="英語名" value={company.name_en} />
-              )}
-              <MetricCard label="業種" value={company.industry} />
-              {company.listing_category && (
-                <MetricCard label="市場区分" value={company.listing_category} />
-              )}
-              {company.accounting_standard && (
-                <MetricCard
-                  label="会計基準"
-                  value={company.accounting_standard}
-                />
-              )}
-              <MetricCard
-                label="信用格付け"
-                value={`${company.credit_rating}（${company.credit_score}pt）`}
-              />
-              {company.market_cap != null && (
-                <MetricCard
-                  label="時価総額"
-                  value={formatYen(company.market_cap)}
-                />
-              )}
-              {f && (
-                <>
-                  <MetricCard label="売上高" value={formatYen(f.revenue)} sub={`${f.fiscal_year}年度`} />
-                  <MetricCard label="純利益" value={formatYen(f.net_income)} sub={`${f.fiscal_year}年度`} />
-                  {f.avg_annual_salary != null && (
-                    <MetricCard
-                      label="平均年収"
-                      value={formatYen(f.avg_annual_salary)}
-                      sub={f.avg_age != null ? `平均年齢 ${f.avg_age}歳` : undefined}
-                    />
-                  )}
-                </>
-              )}
-              <MetricCard
-                label="EDINETコード"
-                value={company.edinet_code}
-              />
-              {company.sec_code && (
-                <MetricCard label="証券コード" value={company.sec_code} />
-              )}
-            </div>
-
-            {/* Officers within Overview */}
-            {officers.length > 0 && (
-              <div>
-                <h4 className="text-sm font-semibold text-slate-600 mb-3 flex items-center gap-2">
-                  役員一覧
-                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
-                    {officers.length}名
-                  </span>
-                </h4>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
-                        <th className="pb-3 pr-4 font-medium">役職</th>
-                        <th className="pb-3 pr-4 font-medium">氏名</th>
-                        <th className="pb-3 pr-4 font-medium text-right">
-                          所有株式数
-                        </th>
-                        <th className="pb-3 pr-4 font-medium">区分</th>
-                        <th className="pb-3 font-medium">経歴</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      {officers.map((o: Officer, i: number) => (
-                        <tr key={`overview-officer-${i}`} className="hover:bg-blue-50/50">
-                          <td className="py-3 pr-4 text-slate-700 font-medium text-xs whitespace-nowrap">
-                            {o.position}
-                          </td>
-                          <td className="py-3 pr-4 text-slate-800 font-medium whitespace-nowrap">
-                            {o.name}
-                            {o.birth_date && (
-                              <span className="text-[10px] text-slate-400 ml-1">
-                                ({o.birth_date})
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-3 pr-4 text-right font-mono text-xs text-slate-600">
-                            {o.shares_held != null
-                              ? o.shares_held.toLocaleString()
-                              : "-"}
-                          </td>
-                          <td className="py-3 pr-4">
-                            <div className="flex gap-1.5">
-                              {o.is_representative && (
-                                <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded font-medium">
-                                  代表
-                                </span>
-                              )}
-                              {o.is_outside && (
-                                <span className="text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded font-medium">
-                                  社外
-                                </span>
-                              )}
-                              {!o.is_representative && !o.is_outside && (
-                                <span className="text-[10px] text-slate-400">
-                                  -
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="py-3 text-xs text-slate-500 max-w-md">
-                            {o.career || "-"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </div>
-        </SectionCard>
 
         {/* Tabs: Quick Links */}
         {company.sec_code && (
@@ -460,8 +341,8 @@ export default async function CompanyPage({ params }: Props) {
           </Suspense>
         </SectionCard>
 
-        {/* AI Analysis: Overview, M&A History, Strategy, Predictions */}
-        <CompanyAnalysis edinetCode={company.edinet_code} />
+        {/* AI Analysis: Overview, Business Model, Officers, M&A, Strategy */}
+        <CompanyAnalysis edinetCode={company.edinet_code} companyName={company.name} />
 
         {/* Financial Charts */}
         {chartData.length > 0 && (
