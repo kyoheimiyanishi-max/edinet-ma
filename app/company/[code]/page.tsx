@@ -18,6 +18,7 @@ import { FinancialCharts } from "@/components/FinancialCharts";
 import type { FinancialChartData } from "@/components/FinancialCharts";
 import Link from "next/link";
 import { Suspense } from "react";
+import CompanyAnalysis from "@/components/CompanyAnalysis";
 
 interface Props {
   params: Promise<{ code: string }>;
@@ -334,6 +335,9 @@ export default async function CompanyPage({ params }: Props) {
             <MaNewsSection companyName={company.name} />
           </Suspense>
         </SectionCard>
+
+        {/* AI Analysis: Overview, M&A History, Strategy, Predictions */}
+        <CompanyAnalysis edinetCode={company.edinet_code} />
 
         {/* Financial Charts */}
         {chartData.length > 0 && (

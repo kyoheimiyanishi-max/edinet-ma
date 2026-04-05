@@ -1,21 +1,77 @@
 import { Suspense } from "react";
 import { searchCompanies, listCompanies, creditColor } from "@/lib/edinetdb";
-import SearchForm from "@/components/SearchForm";
+import SearchForm, { INDUSTRY_CATEGORIES } from "@/components/SearchForm";
 import Link from "next/link";
 
 interface Props {
-  searchParams: Promise<{ q?: string; industry?: string; page?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    industry?: string;
+    rating?: string;
+    page?: string;
+  }>;
 }
 
 const PAGE_SIZE = 30;
 
+const CATEGORY_ICONS: Record<string, string> = {
+  製造業: "🏭",
+  "金融・保険": "🏦",
+  "情報・通信": "💻",
+  "運輸・物流": "🚚",
+  "商業・流通": "🛒",
+  "インフラ・資源": "⚡",
+  "建設・不動産": "🏗️",
+  サービス: "🎯",
+};
+
+// Industry categories landing page
+function IndustryLanding() {
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-2">
+        <span className="inline-flex items-center gap-1.5 text-sm text-slate-500">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          業種カテゴリから探す
+        </span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Object.entries(INDUSTRY_CATEGORIES).map(([cat, industries]) => (
+          <div
+            key={cat}
+            className="bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-2xl">{CATEGORY_ICONS[cat] || "📁"}</span>
+              <h3 className="font-semibold text-slate-800">{cat}</h3>
+            </div>
+            <div className="space-y-1">
+              {industries.map((ind) => (
+                <Link
+                  key={ind}
+                  href={`/search?industry=${encodeURIComponent(ind)}`}
+                  className="block text-sm text-slate-600 hover:text-blue-600 hover:bg-blue-50/50 rounded-lg px-2 py-1 transition-colors"
+                >
+                  {ind}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 async function Results({
   q,
   industry,
+  rating,
   page,
 }: {
   q?: string;
   industry?: string;
+  rating?: string;
   page: number;
 }) {
   const apiKey = process.env.EDINET_API_KEY;
@@ -38,8 +94,28 @@ async function Results({
     );
   }
 
+  // No search/filter → show industry categories
+  if (!q && !industry && !rating) {
+    return <IndustryLanding />;
+  }
+
   if (q) {
-    const companies = await searchCompanies(q);
+    let companies = await searchCompanies(q);
+
+    // If exact search returns nothing, try fuzzy variants
+    if (companies.length === 0) {
+      const variants = generateFuzzyVariants(q);
+      for (const variant of variants) {
+        companies = await searchCompanies(variant);
+        if (companies.length > 0) break;
+      }
+    }
+
+    // Client-side rating filter
+    if (rating) {
+      companies = companies.filter((c) => c.credit_rating === rating);
+    }
+
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-2">
@@ -58,14 +134,31 @@ async function Results({
   }
 
   const result = await listCompanies({ industry, limit: PAGE_SIZE, page });
+  let companies = result.data;
   const total = result.meta?.pagination?.total || 0;
   const totalPages = result.meta?.pagination?.total_pages || 1;
 
+  // Client-side rating filter
+  if (rating) {
+    companies = companies.filter((c) => c.credit_rating === rating);
+  }
+
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <span className="inline-flex items-center gap-1.5 text-sm text-slate-500">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />全{" "}
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          {industry && (
+            <span className="inline-block px-2 py-0.5 bg-blue-50 rounded-full text-blue-600 text-xs font-medium mr-1">
+              {industry}
+            </span>
+          )}
+          {rating && (
+            <span className="inline-block px-2 py-0.5 bg-slate-100 rounded-full text-slate-600 text-xs font-medium mr-1">
+              格付け: {rating}
+            </span>
+          )}
+          全{" "}
           <span className="font-semibold text-slate-700">
             {total.toLocaleString()}
           </span>{" "}
@@ -73,10 +166,50 @@ async function Results({
           {page}/{totalPages} ページ
         </span>
       </div>
-      <CompanyGrid companies={result.data} />
-      <Pagination page={page} totalPages={totalPages} industry={industry} />
+      <CompanyGrid companies={companies} />
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        industry={industry}
+        rating={rating}
+      />
     </div>
   );
+}
+
+// Fuzzy search: generate katakana/hiragana/partial variants
+function generateFuzzyVariants(q: string): string[] {
+  const variants: string[] = [];
+
+  // Katakana to Hiragana
+  const hiragana = q.replace(/[\u30A1-\u30F6]/g, (ch) =>
+    String.fromCharCode(ch.charCodeAt(0) - 0x60),
+  );
+  if (hiragana !== q) variants.push(hiragana);
+
+  // Hiragana to Katakana
+  const katakana = q.replace(/[\u3041-\u3096]/g, (ch) =>
+    String.fromCharCode(ch.charCodeAt(0) + 0x60),
+  );
+  if (katakana !== q) variants.push(katakana);
+
+  // Try with 株式会社 prefix/suffix
+  if (!q.includes("株式会社")) {
+    variants.push(`株式会社${q}`);
+    variants.push(`${q}株式会社`);
+  }
+
+  // Remove 株式会社
+  if (q.includes("株式会社")) {
+    variants.push(q.replace(/株式会社/g, "").trim());
+  }
+
+  // Partial: first 2-3 chars (for short names like エフコード)
+  if (q.length >= 3) {
+    variants.push(q.slice(0, Math.ceil(q.length * 0.7)));
+  }
+
+  return variants;
 }
 
 function CompanyGrid({
@@ -137,14 +270,17 @@ function Pagination({
   page,
   totalPages,
   industry,
+  rating,
 }: {
   page: number;
   totalPages: number;
   industry?: string;
+  rating?: string;
 }) {
-  const base = industry
-    ? `/search?industry=${encodeURIComponent(industry)}`
-    : "/search";
+  const params = new URLSearchParams();
+  if (industry) params.set("industry", industry);
+  if (rating) params.set("rating", rating);
+  const base = `/search?${params}`;
   const pages = [];
   for (let i = Math.max(1, page - 2); i <= Math.min(totalPages, page + 2); i++)
     pages.push(i);
@@ -193,7 +329,11 @@ export default async function Home({ searchParams }: Props) {
       {/* Hero search */}
       <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6">
         <Suspense>
-          <SearchForm defaultQ={params.q} defaultIndustry={params.industry} />
+          <SearchForm
+            defaultQ={params.q}
+            defaultIndustry={params.industry}
+            defaultRating={params.rating}
+          />
         </Suspense>
       </div>
 
@@ -210,7 +350,12 @@ export default async function Home({ searchParams }: Props) {
           </div>
         }
       >
-        <Results q={params.q} industry={params.industry} page={page} />
+        <Results
+          q={params.q}
+          industry={params.industry}
+          rating={params.rating}
+          page={page}
+        />
       </Suspense>
     </div>
   );
