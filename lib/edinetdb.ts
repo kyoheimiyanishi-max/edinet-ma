@@ -144,6 +144,56 @@ export async function searchShareholders(holderName: string): Promise<Shareholde
   return data.data || [];
 }
 
+export interface ScreenerCompany {
+  edinetCode: string;
+  filerName: string;
+  secCode: string;
+  industry: string;
+  name_en: string | null;
+  fiscalYear: number;
+  accountingStandard: string;
+  revenue?: number;
+  "rnd-expenses"?: number;
+  business_tags?: string[];
+}
+
+export interface ScreenerResult {
+  companies: ScreenerCompany[];
+  total: number;
+  showing: number;
+  conditions: { metric: string; operator: string; value: number }[];
+  sort_by: string;
+  sort_order: string;
+}
+
+export async function screenerStartups(params: {
+  revenueLte?: number;
+  revenueGte?: number;
+  rndGte?: number;
+  industry?: string;
+  sortBy?: string;
+  limit?: number;
+}): Promise<ScreenerResult> {
+  const qs = new URLSearchParams();
+  if (params.revenueLte != null) qs.set("revenue_lte", String(params.revenueLte));
+  if (params.revenueGte != null) qs.set("revenue_gte", String(params.revenueGte));
+  if (params.rndGte != null) qs.set("rnd_expenses_gte", String(params.rndGte));
+  if (params.sortBy) qs.set("sort_by", params.sortBy);
+  qs.set("sort_order", "desc");
+  qs.set("limit", String(params.limit ?? 50));
+
+  const data = await apiFetch<{ data: ScreenerResult }>(`/screener?${qs}`);
+  return data.data;
+}
+
+// Screener units are 百万円 (millions of JPY)
+export function formatYenM(n: number | null | undefined): string {
+  if (n == null) return "-";
+  if (n >= 100000) return `${(n / 100000).toFixed(1)}兆円`;
+  if (n >= 100) return `${(n / 100).toFixed(1)}億円`;
+  return `${n.toFixed(0)}百万円`;
+}
+
 // ---- Helpers ----
 
 export function formatYen(n: number | null | undefined): string {

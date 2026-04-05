@@ -30,12 +30,18 @@ export default function RootLayout({
               EDINET DB API — 大量保有報告書・財務データで M&amp;A を分析
             </p>
           </div>
-          <nav className="flex gap-2 mt-3">
+          <nav className="flex gap-1 mt-3">
             <Link
               href="/"
               className="text-sm px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
             >
               企業検索
+            </Link>
+            <Link
+              href="/startups"
+              className="text-sm px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              スタートアップ
             </Link>
             <Link
               href="/weekly"
