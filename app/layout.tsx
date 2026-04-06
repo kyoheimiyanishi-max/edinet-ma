@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 const NAV_ITEMS = [
   { href: "/", label: "ダッシュボード", exact: true },
   { href: "/search", label: "企業検索" },
-  { href: "/startups", label: "スタートアップ" },
   { href: "/weekly", label: "株主名検索" },
+  { href: "/deals", label: "案件一覧" },
   { href: "/news", label: "ニュース" },
   { href: "/people", label: "人物DB" },
   { href: "/communities", label: "コミュニティ" },

@@ -1,0 +1,167 @@
+[
+  {
+    "id": "d001",
+    "date": "2023-12-18",
+    "buyer": "日本産業パートナーズ（JIP）連合",
+    "target": "東芝",
+    "amount": 2000000000000,
+    "currency": "JPY",
+    "category": "MBO",
+    "status": "完了",
+    "summary": "東芝の非公開化。JIP連合がTOBにより全株式取得、上場廃止"
+  },
+  {
+    "id": "d002",
+    "date": "2023-06-26",
+    "buyer": "JICキャピタル（産業革新投資機構）",
+    "target": "JSR",
+    "amount": 904000000000,
+    "currency": "JPY",
+    "category": "TOB",
+    "status": "完了",
+    "summary": "半導体材料大手JSRの非公開化。1株4,350円でTOB実施"
+  },
+  {
+    "id": "d003",
+    "date": "2024-04-08",
+    "buyer": "ルネサスエレクトロニクス",
+    "target": "Altium（豪州）",
+    "amount": 880000000000,
+    "currency": "JPY",
+    "category": "クロスボーダー",
+    "status": "完了",
+    "summary": "PCB設計ソフト大手Altiumを約59億豪ドルで買収"
+  },
+  {
+    "id": "d004",
+    "date": "2024-12-19",
+    "buyer": "日本製鉄",
+    "target": "USスチール（米国）",
+    "amount": 2200000000000,
+    "currency": "JPY",
+    "category": "クロスボーダー",
+    "status": "審査中",
+    "summary": "米USスチールを約149億ドルで買収提案。米政府の審査が焦点"
+  },
+  {
+    "id": "d005",
+    "date": "2024-09-09",
+    "buyer": "アリマンタシォン・クシュタール（加）",
+    "target": "セブン＆アイ・ホールディングス",
+    "amount": 7000000000000,
+    "currency": "JPY",
+    "category": "クロスボーダー",
+    "status": "交渉中",
+    "summary": "カナダのコンビニ大手がセブン&アイに買収提案。約7兆円規模"
+  },
+  {
+    "id": "d006",
+    "date": "2024-03-28",
+    "buyer": "JICキャピタル",
+    "target": "新光電気工業",
+    "amount": 680000000000,
+    "currency": "JPY",
+    "category": "TOB",
+    "status": "完了",
+    "summary": "半導体パッケージ基板大手の新光電気工業をTOBで非公開化"
+  },
+  {
+    "id": "d007",
+    "date": "2024-02-06",
+    "buyer": "第一生命ホールディングス",
+    "target": "ベネフィット・ワン",
+    "amount": 290700000000,
+    "currency": "JPY",
+    "category": "TOB",
+    "status": "完了",
+    "summary": "福利厚生代行大手ベネフィット・ワンをTOBで完全子会社化"
+  },
+  {
+    "id": "d008",
+    "date": "2024-06-11",
+    "buyer": "KKR（米投資ファンド）",
+    "target": "富士ソフト",
+    "amount": 558500000000,
+    "currency": "JPY",
+    "category": "MBO",
+    "status": "進行中",
+    "summary": "独立系SIer富士ソフトへのTOB。ベインキャピタルとの争奪戦"
+  },
+  {
+    "id": "d009",
+    "date": "2023-10-04",
+    "buyer": "ニデック（日本電産）",
+    "target": "TAKISAWAi",
+    "amount": 21700000000,
+    "currency": "JPY",
+    "category": "敵対的TOB",
+    "status": "完了",
+    "summary": "工作機械メーカーTAKISAWAへの同意なきTOBを実施・成立"
+  },
+  {
+    "id": "d010",
+    "date": "2024-08-14",
+    "buyer": "大正製薬ホールディングス",
+    "target": "大正製薬HD（MBO）",
+    "amount": 710000000000,
+    "currency": "JPY",
+    "category": "MBO",
+    "status": "完了",
+    "summary": "創業家によるMBOで非公開化。1株8,620円でTOB実施"
+  },
+  {
+    "id": "d011",
+    "date": "2024-11-15",
+    "buyer": "カナデビア（旧日立造船）",
+    "target": "JFEエンジニアリング",
+    "amount": 235000000000,
+    "currency": "JPY",
+    "category": "M&A 買収",
+    "status": "完了",
+    "summary": "JFEエンジニアリングの株式取得による環境事業統合"
+  },
+  {
+    "id": "d012",
+    "date": "2024-05-13",
+    "buyer": "ソニーグループ",
+    "target": "Paramount Global（米国）",
+    "amount": 3600000000000,
+    "currency": "JPY",
+    "category": "クロスボーダー",
+    "status": "検討中",
+    "summary": "米パラマウント・グローバルの買収を検討。約260億ドル規模"
+  },
+  {
+    "id": "d013",
+    "date": "2024-01-23",
+    "buyer": "住友化学",
+    "target": "住友ファーマ（追加出資）",
+    "amount": 300000000000,
+    "currency": "JPY",
+    "category": "M&A 買収",
+    "status": "完了",
+    "summary": "住友ファーマの完全子会社化に向けた追加支援・出資"
+  },
+  {
+    "id": "d014",
+    "date": "2025-02-04",
+    "buyer": "ベインキャピタル",
+    "target": "キリンビバレッジ（一部事業）",
+    "amount": 150000000000,
+    "currency": "JPY",
+    "category": "事業譲渡",
+    "status": "交渉中",
+    "summary": "キリンの飲料事業の一部を取得検討"
+  },
+  {
+    "id": "d015",
+    "date": "2024-10-07",
+    "buyer": "ローム",
+    "target": "東芝デバイス＆ストレージ（パワー半導体事業）",
+    "amount": 300000000000,
+    "currency": "JPY",
+    "category": "事業譲渡",
+    "status": "進行中",
+    "summary": "東芝のパワー半導体事業の共同運営・統合に向けた出資"
+  }
+]

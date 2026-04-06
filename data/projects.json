@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "name": "A社買収",
+    "description": "",
+    "status": "企画中",
+    "priority": "中",
+    "relatedCompanies": [],
+    "assignedEmployeeIds": [],
+    "startDate": "",
+    "targetDate": "",
+    "id": "1792c766-4d94-468d-948e-2c58dab131fa",
+    "createdAt": "2026-04-06T02:38:45.326Z",
+    "updatedAt": "2026-04-06T02:38:45.326Z"
+  }
+]

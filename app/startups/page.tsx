@@ -302,36 +302,29 @@ export default async function StartupsPage({ searchParams }: Props) {
         </Suspense>
       </div>
 
-      {name ? (
-        <Suspense
-          fallback={
-            <div className="space-y-4">
-              <div className="shimmer h-6 w-48 rounded-lg" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="shimmer h-36 rounded-2xl" />
-                ))}
-              </div>
+      <Suspense
+        fallback={
+          <div className="space-y-4">
+            <div className="shimmer h-6 w-48 rounded-lg" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="shimmer h-36 rounded-2xl" />
+              ))}
             </div>
-          }
-        >
-          <ResultList
-            name={name}
-            year={year}
-            capitalTo={capitalTo}
-            employeesTo={employeesTo}
-            prefecture={prefecture}
-            subsidy={subsidy}
-            patent={patent}
-            page={page}
-          />
-        </Suspense>
-      ) : (
-        <div className="text-center py-20 text-slate-400 bg-white rounded-2xl border border-slate-200/60 shadow-sm">
-          <div className="text-3xl mb-2">🔍</div>
-          企業名を入力して検索してください
-        </div>
-      )}
+          </div>
+        }
+      >
+        <ResultList
+          name={name}
+          year={year ?? CURRENT_YEAR - 5}
+          capitalTo={capitalTo}
+          employeesTo={employeesTo}
+          prefecture={prefecture}
+          subsidy={subsidy}
+          patent={patent}
+          page={page}
+        />
+      </Suspense>
     </div>
   );
 }
