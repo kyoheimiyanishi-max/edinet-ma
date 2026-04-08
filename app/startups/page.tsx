@@ -46,7 +46,7 @@ async function ResultList({
 }) {
   const data = await searchCompanies({
     name,
-    founded_year: year,
+    founded_year_from: year,
     capital_stock_to: capitalTo,
     employee_number_to: employeesTo,
     prefecture,

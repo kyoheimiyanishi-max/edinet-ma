@@ -132,12 +132,23 @@ export interface GBizDetailResponse {
 
 export interface SearchParams {
   name?: string;
-  founded_year?: number;
+  /** 設立年 下限 (YYYY) */
+  founded_year_from?: number;
+  /** 設立年 上限 (YYYY) */
+  founded_year_to?: number;
+  capital_stock_from?: number;
   capital_stock_to?: number;
+  employee_number_from?: number;
   employee_number_to?: number;
   prefecture?: string;
   subsidy?: boolean;
   patent?: boolean;
+  commendation?: boolean;
+  finance?: boolean;
+  /** 存続中法人のみ (true → 閉鎖除外) */
+  exist_flg?: boolean;
+  /** 事業項目の部分一致 */
+  business_item?: string;
   page?: number;
   limit?: number;
 }
@@ -147,14 +158,25 @@ export async function searchCompanies(
 ): Promise<GBizResponse> {
   const qs = new URLSearchParams();
   if (params.name) qs.set("name", params.name);
-  if (params.founded_year) qs.set("founded_year", String(params.founded_year));
+  if (params.founded_year_from)
+    qs.set("founded_year", String(params.founded_year_from));
+  if (params.founded_year_to)
+    qs.set("founded_year_to", String(params.founded_year_to));
+  if (params.capital_stock_from)
+    qs.set("capital_stock_from", String(params.capital_stock_from));
   if (params.capital_stock_to)
     qs.set("capital_stock_to", String(params.capital_stock_to));
+  if (params.employee_number_from)
+    qs.set("employee_number_from", String(params.employee_number_from));
   if (params.employee_number_to)
     qs.set("employee_number_to", String(params.employee_number_to));
   if (params.prefecture) qs.set("prefecture", params.prefecture);
   if (params.subsidy) qs.set("subsidy", "true");
   if (params.patent) qs.set("patent", "true");
+  if (params.commendation) qs.set("commendation", "true");
+  if (params.finance) qs.set("finance", "true");
+  if (params.exist_flg) qs.set("exist_flg", "true");
+  if (params.business_item) qs.set("business_item", params.business_item);
   qs.set("page", String(params.page ?? 1));
   qs.set("limit", String(params.limit ?? 100));
 

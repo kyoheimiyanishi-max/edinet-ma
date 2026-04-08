@@ -45,6 +45,85 @@ export interface NewsItem {
   category: string;
 }
 
+export const NEWS_CATEGORIES = [
+  "M&A 買収",
+  "合併 統合",
+  "事業承継 売却",
+  "TOB 公開買付",
+  "大量保有 株式取得",
+  "アクティビスト",
+  "MBO 経営陣買収",
+  "クロスボーダーM&A",
+] as const;
+export type NewsCategory = (typeof NEWS_CATEGORIES)[number];
+
+export const NEWS_DATE_RANGES = [
+  { value: "today", label: "今日" },
+  { value: "week", label: "1週間" },
+  { value: "month", label: "1ヶ月" },
+  { value: "quarter", label: "3ヶ月" },
+  { value: "year", label: "1年" },
+] as const;
+export type NewsDateRange = (typeof NEWS_DATE_RANGES)[number]["value"];
+
+export interface NewsFilters {
+  query?: string;
+  category?: NewsCategory | string;
+  dateRange?: NewsDateRange;
+  source?: string;
+}
+
+export function filterNews(
+  items: NewsItem[],
+  filters: NewsFilters,
+): NewsItem[] {
+  let result = items;
+  if (filters.category) {
+    result = result.filter((n) => n.category === filters.category);
+  }
+  if (filters.source) {
+    const s = filters.source.toLowerCase();
+    result = result.filter((n) => n.source.toLowerCase().includes(s));
+  }
+  if (filters.dateRange) {
+    const cutoff = dateRangeCutoff(filters.dateRange);
+    if (cutoff) {
+      result = result.filter((n) => {
+        const t = new Date(n.pubDate).getTime();
+        return Number.isFinite(t) && t >= cutoff;
+      });
+    }
+  }
+  return result;
+}
+
+function dateRangeCutoff(range: NewsDateRange): number | null {
+  const now = Date.now();
+  const day = 86400000;
+  switch (range) {
+    case "today":
+      return now - day;
+    case "week":
+      return now - day * 7;
+    case "month":
+      return now - day * 30;
+    case "quarter":
+      return now - day * 90;
+    case "year":
+      return now - day * 365;
+    default:
+      return null;
+  }
+}
+
+export function uniqueNewsSources(items: NewsItem[]): string[] {
+  const set = new Set<string>();
+  for (const item of items) {
+    if (item.source) set.add(item.source);
+  }
+  return Array.from(set).sort();
+}
+
 // ---- Fetch ----
 
 export async function searchNews(query?: string): Promise<NewsItem[]> {

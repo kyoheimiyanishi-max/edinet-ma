@@ -22,6 +22,9 @@ export async function GET(_req: Request, ctx: Ctx) {
 export async function PUT(req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
   const body = (await req.json()) as Partial<ProjectInput>;
+  if ("sellerId" in body && !body.sellerId) {
+    body.sellerId = undefined;
+  }
   const project = updateProject(id, body);
   if (!project) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

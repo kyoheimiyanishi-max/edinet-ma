@@ -182,9 +182,14 @@ export async function getCompanyShareholders(
 
 export async function searchShareholders(
   holderName: string,
+  limit = 100,
 ): Promise<ShareholderReport[]> {
+  const qs = new URLSearchParams({
+    q: holderName,
+    limit: String(limit),
+  });
   const data = await apiFetch<{ data: ShareholderReport[] }>(
-    `/shareholders/search?q=${encodeURIComponent(holderName)}`,
+    `/shareholders/search?${qs}`,
   );
   return data.data || [];
 }

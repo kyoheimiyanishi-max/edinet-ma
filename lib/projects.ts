@@ -11,6 +11,7 @@ export interface Project {
   priority: ProjectPriority;
   relatedCompanies: RelatedCompany[];
   assignedEmployeeIds: string[];
+  sellerId?: string;
   startDate: string;
   targetDate: string;
   createdAt: string;
@@ -120,6 +121,25 @@ export function deleteProject(id: string): boolean {
   if (filtered.length === projects.length) return false;
   writeAll(filtered);
   return true;
+}
+
+export function getProjectsBySellerId(sellerId: string): Project[] {
+  return readAll().filter((p) => p.sellerId === sellerId);
+}
+
+export function clearSellerFromProjects(sellerId: string): number {
+  const projects = readAll();
+  let changed = 0;
+  const now = new Date().toISOString();
+  for (const p of projects) {
+    if (p.sellerId === sellerId) {
+      p.sellerId = undefined;
+      p.updatedAt = now;
+      changed++;
+    }
+  }
+  if (changed > 0) writeAll(projects);
+  return changed;
 }
 
 // ---- Search ----

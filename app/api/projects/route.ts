@@ -26,6 +26,7 @@ export async function POST(req: Request) {
     priority: body.priority ?? "中",
     relatedCompanies: body.relatedCompanies ?? [],
     assignedEmployeeIds: body.assignedEmployeeIds ?? [],
+    sellerId: body.sellerId || undefined,
     startDate: body.startDate ?? "",
     targetDate: body.targetDate ?? "",
   });

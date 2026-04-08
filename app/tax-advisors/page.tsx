@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import {
   searchAdvisors,
   getAllTypes,
+  getAllSpecialties,
+  getAllSizes,
   type TaxAdvisor,
   type AdvisorType,
 } from "@/lib/tax-advisors";
@@ -10,7 +12,13 @@ import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
 
 interface Props {
-  searchParams: Promise<{ q?: string; type?: string; prefecture?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    type?: string;
+    prefecture?: string;
+    specialty?: string;
+    size?: string;
+  }>;
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -26,10 +34,14 @@ function TypeFilter({
   current,
   searchQ,
   prefecture,
+  specialty,
+  size,
 }: {
   current?: string;
   searchQ?: string;
   prefecture?: string;
+  specialty?: string;
+  size?: string;
 }) {
   const types = getAllTypes();
   const buildHref = (type?: string) => {
@@ -37,6 +49,8 @@ function TypeFilter({
     if (searchQ) params.set("q", searchQ);
     if (type) params.set("type", type);
     if (prefecture) params.set("prefecture", prefecture);
+    if (specialty) params.set("specialty", specialty);
+    if (size) params.set("size", size);
     return `/tax-advisors?${params}`;
   };
 
@@ -141,7 +155,17 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
   const q = params.q;
   const type = params.type as AdvisorType | undefined;
   const prefecture = params.prefecture;
-  const advisors = searchAdvisors(q, type, prefecture);
+  const specialty = params.specialty;
+  const size = params.size;
+  const advisors = searchAdvisors({
+    query: q,
+    type,
+    prefecture,
+    specialty,
+    size,
+  });
+  const allSpecialties = getAllSpecialties();
+  const allSizes = getAllSizes();
 
   return (
     <div className="space-y-6">
@@ -164,15 +188,101 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
             defaultValue={q ?? ""}
           />
         </Suspense>
-        <TypeFilter current={type} searchQ={q} prefecture={prefecture} />
+        <TypeFilter
+          current={type}
+          searchQ={q}
+          prefecture={prefecture}
+          specialty={specialty}
+          size={size}
+        />
         <Suspense>
           <PrefectureSelect
             prefectures={PREFECTURES}
             current={prefecture}
             basePath="/tax-advisors"
-            extraParams={{ ...(q ? { q } : {}), ...(type ? { type } : {}) }}
+            extraParams={{
+              ...(q ? { q } : {}),
+              ...(type ? { type } : {}),
+              ...(specialty ? { specialty } : {}),
+              ...(size ? { size } : {}),
+            }}
           />
         </Suspense>
+
+        {/* Specialty + Size */}
+        <form
+          action="/tax-advisors"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+        >
+          {q && <input type="hidden" name="q" value={q} />}
+          {type && <input type="hidden" name="type" value={type} />}
+          {prefecture && (
+            <input type="hidden" name="prefecture" value={prefecture} />
+          )}
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-500">
+              専門分野
+            </label>
+            <select
+              name="specialty"
+              defaultValue={specialty || ""}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="">すべて</option>
+              {allSpecialties.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-500">
+              事務所規模
+            </label>
+            <select
+              name="size"
+              defaultValue={size || ""}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="">すべて</option>
+              {allSizes.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+            >
+              絞り込み適用
+            </button>
+          </div>
+        </form>
+
+        {(specialty || size) && (
+          <a
+            href={`/tax-advisors${
+              q || type || prefecture
+                ? "?" +
+                  new URLSearchParams({
+                    ...(q ? { q } : {}),
+                    ...(type ? { type } : {}),
+                    ...(prefecture ? { prefecture } : {}),
+                  }).toString()
+                : ""
+            }`}
+            className="inline-block text-xs font-medium text-rose-600 hover:bg-rose-50 px-3 py-1.5 rounded-lg"
+          >
+            詳細フィルターをクリア
+          </a>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
@@ -185,6 +295,10 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
           {prefecture && (
             <span className="text-slate-400 ml-1">/ {prefecture}</span>
           )}
+          {specialty && (
+            <span className="text-slate-400 ml-1">/ {specialty}</span>
+          )}
+          {size && <span className="text-slate-400 ml-1">/ {size}</span>}
         </span>
       </div>
 

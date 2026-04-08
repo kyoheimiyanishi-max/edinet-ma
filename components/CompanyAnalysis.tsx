@@ -1,141 +1,29 @@
-"use client";
+import {
+  getCompanyAnalysis,
+  type CompanyAnalysisData,
+} from "@/lib/company-analysis";
 
-import { useState, useEffect, useCallback } from "react";
-
-interface OfficerInfo {
-  position: string;
-  name: string;
-  career: string;
-}
-
-interface MaAcquisition {
-  date: string;
-  target: string;
-  amount: string;
-  purpose: string;
-}
-
-interface NextTarget {
-  type: string;
-  scale: string;
-  rationale: string;
-}
-
-interface AnalysisData {
-  marketSegment: string;
-  companyOverview: string;
-  businessModel: string;
-  stockCharacteristics: string;
-  officers: OfficerInfo[];
-  maAcquisitions: MaAcquisition[];
-  corporateStrategy: string;
-  maStrategy: string;
-  nextTargets: NextTarget[];
-}
-
-export default function CompanyAnalysis({
+export default async function CompanyAnalysis({
   edinetCode,
-  companyName,
 }: {
   edinetCode: string;
-  companyName: string;
+  companyName?: string;
 }) {
-  const [data, setData] = useState<AnalysisData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const result = await getCompanyAnalysis(edinetCode);
 
-  const runAnalysis = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ edinetCode }),
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || `分析に失敗しました (${res.status})`);
-      }
-
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("ストリームが取得できません");
-
-      const decoder = new TextDecoder();
-      let fullText = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        fullText += decoder.decode(value, { stream: true });
-      }
-
-      // Parse JSON - strip markdown fences if present
-      let jsonStr = fullText.trim();
-      // Remove markdown code fences
-      jsonStr = jsonStr.replace(/^```(?:json)?\s*\n?/m, "").replace(/\n?```\s*$/m, "");
-      jsonStr = jsonStr.trim();
-
-      const parsed = JSON.parse(jsonStr) as AnalysisData;
-      setData(parsed);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "分析中にエラーが発生しました";
-      if (msg.includes("ANTHROPIC_API_KEY") || msg.includes("API key")) {
-        setError(
-          "ANTHROPIC_API_KEY が設定されていません。.env.local に追加してください。",
-        );
-      } else {
-        setError(msg);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [edinetCode]);
-
-  // Auto-run on mount
-  useEffect(() => {
-    runAnalysis();
-  }, [runAnalysis]);
-
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <section className="bg-white rounded-2xl border border-slate-200/60 p-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm text-slate-600 font-medium">
-              {companyName} のAI分析を実行中...
-            </span>
-          </div>
-          <div className="mt-4 space-y-3">
-            <div className="shimmer h-4 w-3/4 rounded" />
-            <div className="shimmer h-4 w-1/2 rounded" />
-            <div className="shimmer h-4 w-2/3 rounded" />
-            <div className="shimmer h-20 rounded-xl mt-4" />
-          </div>
-        </section>
-      </div>
-    );
-  }
-
-  if (error) {
+  if (!result.ok) {
     return (
       <section className="bg-amber-50 border border-amber-200/60 rounded-2xl p-6">
         <h3 className="font-semibold text-amber-800 mb-1">AI分析</h3>
-        <p className="text-sm text-amber-700">{error}</p>
-        <button
-          onClick={runAnalysis}
-          className="mt-3 text-sm text-amber-600 underline hover:text-amber-800"
-        >
-          再試行
-        </button>
+        <p className="text-sm text-amber-700">{result.error}</p>
       </section>
     );
   }
 
-  if (!data) return null;
+  return <CompanyAnalysisDisplay data={result.data} />;
+}
 
+function CompanyAnalysisDisplay({ data }: { data: CompanyAnalysisData }) {
   return (
     <div className="space-y-6">
       {/* Company Overview */}
@@ -160,9 +48,7 @@ export default function CompanyAnalysis({
       {/* Business Model & Stock Characteristics */}
       <section className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h3 className="font-semibold text-slate-700">
-            事業モデル・銘柄特徴
-          </h3>
+          <h3 className="font-semibold text-slate-700">事業モデル・銘柄特徴</h3>
         </div>
         <div className="p-6 space-y-4">
           <div>

@@ -5,11 +5,14 @@
     "status": "企画中",
     "priority": "中",
     "relatedCompanies": [],
-    "assignedEmployeeIds": [],
+    "assignedEmployeeIds": [
+      "45f219dd-0089-46a1-bbb4-de43d26d1341"
+    ],
     "startDate": "",
     "targetDate": "",
     "id": "1792c766-4d94-468d-948e-2c58dab131fa",
     "createdAt": "2026-04-06T02:38:45.326Z",
-    "updatedAt": "2026-04-06T02:38:45.326Z"
+    "updatedAt": "2026-04-08T03:58:04.929Z",
+    "sellerId": "a1f2c3d4-0003-4a10-9f11-000000000003"
   }
 ]

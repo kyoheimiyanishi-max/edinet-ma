@@ -2,14 +2,24 @@ import { Suspense } from "react";
 import {
   searchCommunities,
   COMMUNITY_TYPES,
+  getAllFocusAreas,
   type Community,
+  type CommunityType,
 } from "@/lib/communities";
 import { PREFECTURES } from "@/lib/gbiz";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
 
 interface Props {
-  searchParams: Promise<{ q?: string; prefecture?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    prefecture?: string;
+    type?: string;
+    focusArea?: string;
+    minMembers?: string;
+    estFrom?: string;
+    estTo?: string;
+  }>;
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -108,7 +118,24 @@ export default async function CommunitiesPage({ searchParams }: Props) {
   const params = await searchParams;
   const q = params.q;
   const prefecture = params.prefecture;
-  const communities = searchCommunities(q, prefecture);
+  const type = params.type as CommunityType | undefined;
+  const focusArea = params.focusArea;
+  const minMembers = params.minMembers
+    ? parseInt(params.minMembers, 10)
+    : undefined;
+  const estFrom = params.estFrom ? parseInt(params.estFrom, 10) : undefined;
+  const estTo = params.estTo ? parseInt(params.estTo, 10) : undefined;
+
+  const communities = searchCommunities({
+    query: q,
+    prefecture,
+    type,
+    focusArea,
+    minMembers,
+    establishedFrom: estFrom,
+    establishedTo: estTo,
+  });
+  const allFocusAreas = getAllFocusAreas();
 
   const grouped = new Map<string, Community[]>();
   for (const type of COMMUNITY_TYPES) {
@@ -141,14 +168,169 @@ export default async function CommunitiesPage({ searchParams }: Props) {
             </Suspense>
           </div>
         </div>
+
+        {/* Type filter */}
+        <div className="space-y-2">
+          <div className="text-xs font-semibold text-slate-500">団体タイプ</div>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={
+                "/communities?" +
+                new URLSearchParams({
+                  ...(q ? { q } : {}),
+                  ...(prefecture ? { prefecture } : {}),
+                  ...(focusArea ? { focusArea } : {}),
+                }).toString()
+              }
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                !type
+                  ? "bg-slate-800 text-white shadow-sm"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              }`}
+            >
+              すべて
+            </a>
+            {COMMUNITY_TYPES.map((t) => (
+              <a
+                key={t}
+                href={
+                  "/communities?" +
+                  new URLSearchParams({
+                    ...(q ? { q } : {}),
+                    ...(prefecture ? { prefecture } : {}),
+                    ...(focusArea ? { focusArea } : {}),
+                    type: t,
+                  }).toString()
+                }
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  type === t
+                    ? "bg-slate-800 text-white shadow-sm"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                {t}
+              </a>
+            ))}
+          </div>
+        </div>
+
         <Suspense>
           <PrefectureSelect
             prefectures={PREFECTURES}
             current={prefecture}
             basePath="/communities"
-            extraParams={q ? { q } : undefined}
+            extraParams={{
+              ...(q ? { q } : {}),
+              ...(type ? { type } : {}),
+              ...(focusArea ? { focusArea } : {}),
+            }}
           />
         </Suspense>
+
+        {/* Focus area + member + established (single submit form) */}
+        <form
+          action="/communities"
+          className="grid grid-cols-1 sm:grid-cols-4 gap-3"
+        >
+          {q && <input type="hidden" name="q" value={q} />}
+          {prefecture && (
+            <input type="hidden" name="prefecture" value={prefecture} />
+          )}
+          {type && <input type="hidden" name="type" value={type} />}
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-500">
+              注力テーマ
+            </label>
+            <select
+              name="focusArea"
+              defaultValue={focusArea || ""}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="">すべて</option>
+              {allFocusAreas.map((f) => (
+                <option key={f} value={f}>
+                  {f}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-500">
+              最低会員数
+            </label>
+            <input
+              type="number"
+              name="minMembers"
+              min="0"
+              step="100"
+              defaultValue={minMembers ?? ""}
+              placeholder="例: 1000"
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-500">
+              設立年（範囲）
+            </label>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="number"
+                name="estFrom"
+                min="1800"
+                max="2100"
+                defaultValue={estFrom ?? ""}
+                placeholder="から"
+                className="w-1/2 px-2 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-slate-400">〜</span>
+              <input
+                type="number"
+                name="estTo"
+                min="1800"
+                max="2100"
+                defaultValue={estTo ?? ""}
+                placeholder="まで"
+                className="w-1/2 px-2 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+            >
+              絞り込み適用
+            </button>
+          </div>
+        </form>
+
+        {(type ||
+          focusArea ||
+          minMembers != null ||
+          estFrom != null ||
+          estTo != null) && (
+          <div>
+            <a
+              href={
+                "/communities" +
+                (q || prefecture
+                  ? "?" +
+                    new URLSearchParams({
+                      ...(q ? { q } : {}),
+                      ...(prefecture ? { prefecture } : {}),
+                    }).toString()
+                  : "")
+              }
+              className="text-xs font-medium text-rose-600 hover:bg-rose-50 px-3 py-1.5 rounded-lg"
+            >
+              フィルターをクリア
+            </a>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2">

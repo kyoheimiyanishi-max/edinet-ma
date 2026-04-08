@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { generateText } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 
@@ -6,7 +7,8 @@ import { anthropic } from "@ai-sdk/anthropic";
  * 例: "AI" → ["AI", "人工知能", "機械学習", "ディープラーニング", "DX"]
  * 例: "フィンテック" → ["フィンテック", "FinTech", "金融テクノロジー", "決済", "送金"]
  */
-export async function expandQuery(query: string): Promise<string[]> {
+
+async function expandQueryUncached(query: string): Promise<string[]> {
   if (!process.env.ANTHROPIC_API_KEY) return [query];
 
   try {
@@ -39,4 +41,16 @@ AI
   } catch {
     return [query];
   }
+}
+
+const cachedExpandQuery = unstable_cache(
+  async (q: string) => expandQueryUncached(q),
+  ["ai-expand-query-v1"],
+  { revalidate: 86400 * 30, tags: ["ai-expand-query"] },
+);
+
+export async function expandQuery(query: string): Promise<string[]> {
+  const normalized = query.trim();
+  if (!normalized) return [query];
+  return cachedExpandQuery(normalized);
 }

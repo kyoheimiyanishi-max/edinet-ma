@@ -26,6 +26,9 @@ export interface WikidataInfo {
   operatingIncome?: number;
   ceo?: string;
   parentCompany?: string;
+  parentOrg?: string;
+  subsidiaries?: string[];
+  ownedCompanies?: string[];
 }
 
 export interface WebSearchResult {
@@ -489,11 +492,28 @@ export async function fetchWikidata(
       refIds.push(parentId);
       refMap.parentCompany = parentId;
     }
+    const parentOrgId = wdExtractEntityId(claims.P749);
+    if (parentOrgId) {
+      refIds.push(parentOrgId);
+      refMap.parentOrg = parentOrgId;
+    }
+
+    // Multi-value: subsidiaries (P355) and owned companies (P1830)
+    const subsidiaryIds = wdExtractEntityIds(claims.P355);
+    const ownedIds = wdExtractEntityIds(claims.P1830);
+    refIds.push(...subsidiaryIds, ...ownedIds);
 
     let labels: Record<string, string> = {};
     if (refIds.length > 0) {
       labels = await wdResolveLabels(refIds);
     }
+
+    const subsidiaries = subsidiaryIds
+      .map((id) => labels[id])
+      .filter((v): v is string => Boolean(v));
+    const ownedCompanies = ownedIds
+      .map((id) => labels[id])
+      .filter((v): v is string => Boolean(v));
 
     // Financial properties
     const revenue = wdExtractQuantity(claims.P2139);
@@ -520,6 +540,9 @@ export async function fetchWikidata(
       parentCompany: refMap.parentCompany
         ? labels[refMap.parentCompany]
         : undefined,
+      parentOrg: refMap.parentOrg ? labels[refMap.parentOrg] : undefined,
+      subsidiaries: subsidiaries.length > 0 ? subsidiaries : undefined,
+      ownedCompanies: ownedCompanies.length > 0 ? ownedCompanies : undefined,
     };
   } catch {
     return null;
@@ -560,6 +583,21 @@ function wdExtractString(claims: any[] | undefined): string | undefined {
 function wdExtractEntityId(claims: any[] | undefined): string | undefined {
   if (!claims?.length) return undefined;
   return claims[0]?.mainsnak?.datavalue?.value?.id as string | undefined;
+}
+
+function wdExtractEntityIds(claims: any[] | undefined): string[] {
+  if (!claims?.length) return [];
+  const ids: string[] = [];
+  for (const c of claims) {
+    // Skip statements marked as deprecated / end-dated (has P582 end date qualifier)
+    const rank = c?.rank as string | undefined;
+    if (rank === "deprecated") continue;
+    const endDate = c?.qualifiers?.P582;
+    if (Array.isArray(endDate) && endDate.length > 0) continue;
+    const id = c?.mainsnak?.datavalue?.value?.id as string | undefined;
+    if (id) ids.push(id);
+  }
+  return ids;
 }
 
 async function wdResolveLabels(ids: string[]): Promise<Record<string, string>> {

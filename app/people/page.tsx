@@ -1,10 +1,21 @@
 import { Suspense } from "react";
-import { MA_PEOPLE, searchPeople, CATEGORIES } from "@/lib/people";
+import {
+  searchPeople,
+  CATEGORIES,
+  getAllOrganizations,
+  getAllNotableDeals,
+} from "@/lib/people";
 import type { Person } from "@/lib/people";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 
 interface Props {
-  searchParams: Promise<{ q?: string; category?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    category?: string;
+    organization?: string;
+    deal?: string;
+    hasLinks?: string;
+  }>;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -15,39 +26,47 @@ const CATEGORY_COLORS: Record<string, string> = {
   専門家: "bg-purple-100 text-purple-700",
 };
 
-function CategoryFilter({
-  current,
-  searchQ,
+function buildUrl(
+  current: {
+    q?: string;
+    category?: string;
+    organization?: string;
+    deal?: string;
+    hasLinks?: string;
+  },
+  override: Partial<typeof current>,
+): string {
+  const merged = { ...current, ...override };
+  const params = new URLSearchParams();
+  if (merged.q) params.set("q", merged.q);
+  if (merged.category) params.set("category", merged.category);
+  if (merged.organization) params.set("organization", merged.organization);
+  if (merged.deal) params.set("deal", merged.deal);
+  if (merged.hasLinks) params.set("hasLinks", merged.hasLinks);
+  const qs = params.toString();
+  return qs ? `/people?${qs}` : "/people";
+}
+
+function FilterChip({
+  active,
+  href,
+  children,
 }: {
-  current?: string;
-  searchQ?: string;
+  active: boolean;
+  href: string;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
-      <a
-        href={searchQ ? `/people?q=${encodeURIComponent(searchQ)}` : "/people"}
-        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-          !current
-            ? "bg-slate-800 text-white shadow-sm"
-            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-        }`}
-      >
-        すべて
-      </a>
-      {CATEGORIES.map((cat) => (
-        <a
-          key={cat}
-          href={`/people?category=${encodeURIComponent(cat)}${searchQ ? `&q=${encodeURIComponent(searchQ)}` : ""}`}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-            current === cat
-              ? "bg-slate-800 text-white shadow-sm"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
-        >
-          {cat}
-        </a>
-      ))}
-    </div>
+    <a
+      href={href}
+      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+        active
+          ? "bg-slate-800 text-white shadow-sm"
+          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+      }`}
+    >
+      {children}
+    </a>
   );
 }
 
@@ -132,7 +151,21 @@ export default async function PeoplePage({ searchParams }: Props) {
   const params = await searchParams;
   const q = params.q;
   const category = params.category;
-  const people = searchPeople(q, category);
+  const organization = params.organization;
+  const deal = params.deal;
+  const hasLinks = params.hasLinks === "1" ? "1" : undefined;
+
+  const people = searchPeople({
+    query: q,
+    category,
+    organization,
+    deal,
+    hasLinks: hasLinks === "1",
+  });
+
+  const allOrgs = getAllOrganizations();
+  const allDeals = getAllNotableDeals();
+  const current = { q, category, organization, deal, hasLinks };
 
   return (
     <div className="space-y-6">
@@ -156,7 +189,103 @@ export default async function PeoplePage({ searchParams }: Props) {
             defaultValue={q || ""}
           />
         </Suspense>
-        <CategoryFilter current={category} searchQ={q} />
+
+        {/* Category */}
+        <div className="space-y-2">
+          <div className="text-xs font-semibold text-slate-500">カテゴリ</div>
+          <div className="flex flex-wrap gap-2">
+            <FilterChip
+              active={!category}
+              href={buildUrl(current, { category: undefined })}
+            >
+              すべて
+            </FilterChip>
+            {CATEGORIES.map((cat) => (
+              <FilterChip
+                key={cat}
+                active={category === cat}
+                href={buildUrl(current, { category: cat })}
+              >
+                {cat}
+              </FilterChip>
+            ))}
+          </div>
+        </div>
+
+        {/* Organization + Notable deal: shared form so both apply on submit */}
+        <form
+          action="/people"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+        >
+          {q && <input type="hidden" name="q" value={q} />}
+          {category && <input type="hidden" name="category" value={category} />}
+          {hasLinks && <input type="hidden" name="hasLinks" value={hasLinks} />}
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-500">
+              所属組織
+            </label>
+            <select
+              name="organization"
+              defaultValue={organization || ""}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="">すべての組織</option>
+              {allOrgs.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-500">
+              関連案件
+            </label>
+            <select
+              name="deal"
+              defaultValue={deal || ""}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="">すべての案件</option>
+              {allDeals.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="w-full px-4 py-2 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 transition-colors shadow-sm"
+            >
+              絞り込み適用
+            </button>
+          </div>
+        </form>
+
+        {/* Has links toggle */}
+        <div className="flex items-center gap-2">
+          <FilterChip
+            active={hasLinks === "1"}
+            href={buildUrl(current, {
+              hasLinks: hasLinks === "1" ? undefined : "1",
+            })}
+          >
+            🔗 外部リンクあり
+          </FilterChip>
+          {(category || organization || deal || hasLinks) && (
+            <a
+              href={buildUrl({}, { q })}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-rose-600 hover:bg-rose-50 transition-all"
+            >
+              フィルターをクリア
+            </a>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-2">

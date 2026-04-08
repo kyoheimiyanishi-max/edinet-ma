@@ -11,8 +11,12 @@ import {
   getEdinetUrl,
 } from "@/lib/edinetdb";
 import type { FinancialHistory } from "@/lib/edinetdb";
-import { fetchMarketSegment } from "@/lib/market";
+import { fetchMarketSegment, fetchMarketCap } from "@/lib/market";
 import { searchNews, formatPubDate } from "@/lib/news";
+import ExpandableLinkList, {
+  type LineItem,
+} from "@/components/ExpandableLinkList";
+import { summarizeItems } from "@/lib/summary";
 import {
   enrichCompany,
   fetchWikidata,
@@ -22,13 +26,19 @@ import {
   type WikidataInfo,
   type WebSearchResult,
 } from "@/lib/enrich";
-import CompanyEmployeeSection from "@/components/CompanyEmployeeSection";
+import {
+  aggregateGroupCompanies,
+  relationChipStyle,
+  relationBadgeLetter,
+  type GroupCompany,
+} from "@/lib/group-companies";
 import MaStrategyPanel from "@/components/MaStrategyPanel";
 import { FinancialCharts } from "@/components/FinancialCharts";
 import type { FinancialChartData } from "@/components/FinancialCharts";
 import Link from "next/link";
 import { Suspense } from "react";
 import CompanyAnalysis from "@/components/CompanyAnalysis";
+import AddToSellerButton from "@/components/AddToSellerButton";
 
 interface Props {
   params: Promise<{ code: string }>;
@@ -51,6 +61,36 @@ function MetricCard({
       <p className="font-semibold text-slate-800">{value}</p>
       {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
     </div>
+  );
+}
+
+function GroupCompanyChip({ company }: { company: GroupCompany }) {
+  const style = relationChipStyle(company.relation);
+  const letter = relationBadgeLetter(company.relation);
+  const title = [
+    `${company.name} を検索`,
+    company.ownershipPct != null ? `出資比率: ${company.ownershipPct}%` : "",
+    company.description || "",
+    `出典: ${company.sources.join(", ")}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+  return (
+    <Link
+      href={`/search?q=${encodeURIComponent(company.name)}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${style}`}
+      title={title}
+    >
+      <span className="text-[9px] px-1 py-0.5 rounded bg-white/60 font-bold tracking-wider">
+        {letter}
+      </span>
+      <span>{company.name}</span>
+      {company.ownershipPct != null && (
+        <span className="text-[10px] opacity-70 tabular-nums">
+          {company.ownershipPct}%
+        </span>
+      )}
+    </Link>
   );
 }
 
@@ -79,6 +119,105 @@ function SectionCard({
         {action}
       </div>
       <div className="p-6">{children}</div>
+    </section>
+  );
+}
+
+function SummarySectionCard({
+  title,
+  badge,
+  items,
+  emptyText,
+  aiSummary,
+}: {
+  title: string;
+  badge?: string;
+  items: LineItem[];
+  emptyText: string;
+  aiSummary?: string;
+}) {
+  return (
+    <section className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 min-w-0">
+        <div className="flex items-center gap-2 shrink-0">
+          <h3 className="font-semibold text-slate-700">{title}</h3>
+          {badge && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 whitespace-nowrap">
+              {badge}
+            </span>
+          )}
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          {items.length === 0 ? (
+            <span className="text-sm text-slate-400">{emptyText}</span>
+          ) : aiSummary ? (
+            <div className="flex items-center gap-2 min-w-0">
+              <span
+                className="text-[10px] px-1.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold shrink-0"
+                title="Claude AI による要約"
+              >
+                ✨ AI
+              </span>
+              <span
+                className="text-sm text-slate-700 truncate"
+                title={aiSummary}
+              >
+                {aiSummary}
+              </span>
+              <span className="text-[10px] text-slate-400 shrink-0">
+                {items.length} 件
+              </span>
+            </div>
+          ) : (
+            <a
+              href={items[0].url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 max-w-full text-sm text-slate-600 hover:text-blue-600 transition-colors"
+              title={items[0].title}
+            >
+              <span className="truncate">{items[0].title}</span>
+              {items.length > 1 && (
+                <span className="text-[10px] text-slate-400 shrink-0">
+                  他 {items.length - 1} 件
+                </span>
+              )}
+            </a>
+          )}
+        </div>
+      </div>
+      <div className="p-6">
+        <ExpandableLinkList items={items} emptyText={emptyText} />
+      </div>
+    </section>
+  );
+}
+
+function SummarySectionSkeleton({
+  title,
+  badge,
+}: {
+  title: string;
+  badge?: string;
+}) {
+  return (
+    <section className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100">
+        <div className="flex items-center gap-2 shrink-0">
+          <h3 className="font-semibold text-slate-700">{title}</h3>
+          {badge && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
+              {badge}
+            </span>
+          )}
+        </div>
+        <div className="flex-1">
+          <div className="shimmer h-4 rounded w-48" />
+        </div>
+      </div>
+      <div className="p-6">
+        <div className="shimmer h-24 rounded-xl" />
+      </div>
     </section>
   );
 }
@@ -172,242 +311,112 @@ function WebResultCard({ result }: { result: WebSearchResult }) {
   );
 }
 
-// ---- Async sections (Suspense) ----
+// ---- Data fetchers: return LineItem[] ----
+
+function newsToItem(n: {
+  title: string;
+  link: string;
+  source?: string;
+  pubDate?: string;
+}): LineItem {
+  return {
+    title: n.title,
+    url: n.link,
+    source: n.source,
+    date: n.pubDate ? formatPubDate(n.pubDate) : undefined,
+  };
+}
+
+function webResultToItem(r: WebSearchResult): LineItem {
+  return {
+    title: r.title,
+    url: r.url,
+    source: r.source,
+    description: r.snippet,
+  };
+}
+
+function dedupItems(items: LineItem[]): LineItem[] {
+  const seenUrls = new Set<string>();
+  const seenTitles = new Set<string>();
+  const out: LineItem[] = [];
+  for (const item of items) {
+    if (!item.title || !item.url) continue;
+    const urlKey = item.url.split("?")[0];
+    if (seenUrls.has(urlKey)) continue;
+    const titleKey = item.title.slice(0, 40).toLowerCase();
+    if (seenTitles.has(titleKey)) continue;
+    seenUrls.add(urlKey);
+    seenTitles.add(titleKey);
+    out.push(item);
+  }
+  return out;
+}
+
+async function fetchNewsAndWebItems(
+  newsQueries: string[],
+  webQueries: string[],
+): Promise<LineItem[]> {
+  const newsSettled = await Promise.allSettled(
+    newsQueries.map((q) => searchNews(q)),
+  );
+  const newsItems = newsSettled
+    .flatMap((r) => (r.status === "fulfilled" ? r.value : []))
+    .map(newsToItem);
+
+  let webItems: LineItem[] = [];
+  if (webQueries.length > 0) {
+    const { fetchMultiWebSearch } = await import("@/lib/enrich");
+    const webResults = await fetchMultiWebSearch(webQueries).catch(() => []);
+    webItems = webResults.map(webResultToItem);
+  }
+
+  return dedupItems([...newsItems, ...webItems]);
+}
+
+// ---- Section server components: return <SummarySectionCard> ----
 
 async function CompanyNewsSection({ companyName }: { companyName: string }) {
   const shortName = companyName.replace(/株式会社|（株）|有限会社/g, "").trim();
-  const [r1, r2, r3] = await Promise.allSettled([
-    searchNews(shortName),
-    searchNews(`${shortName} リリース`),
-    searchNews(`${shortName} サービス OR 事業`),
-  ]);
-  const seen = new Set<string>();
-  const news = [
-    ...(r1.status === "fulfilled" ? r1.value : []),
-    ...(r2.status === "fulfilled" ? r2.value : []),
-    ...(r3.status === "fulfilled" ? r3.value : []),
-  ].filter((n) => {
-    const k = n.title.slice(0, 40).toLowerCase();
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
-
-  if (news.length > 0) {
-    return (
-      <div className="space-y-2">
-        {news.slice(0, 8).map((item, i) => (
-          <a
-            key={i}
-            href={item.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block p-3 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all"
-          >
-            <p className="text-sm text-slate-800 font-medium line-clamp-2">
-              {item.title}
-            </p>
-            <div className="flex items-center gap-2 mt-1.5">
-              {item.source && (
-                <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500">
-                  {item.source}
-                </span>
-              )}
-              {item.pubDate && (
-                <span className="text-[10px] text-slate-400">
-                  {formatPubDate(item.pubDate)}
-                </span>
-              )}
-            </div>
-          </a>
-        ))}
-      </div>
-    );
-  }
-
-  const { fetchCompanyWebSearch } = await import("@/lib/enrich");
-  const webResults = await fetchCompanyWebSearch(companyName).catch(() => []);
-  if (webResults.length > 0) {
-    return (
-      <div className="space-y-2">
-        {webResults.slice(0, 5).map((r, i) => (
-          <WebResultCard key={i} result={r} />
-        ))}
-      </div>
-    );
-  }
+  const items = await fetchNewsAndWebItems(
+    [shortName, `${shortName} リリース`, `${shortName} サービス OR 事業`],
+    [`${shortName} 企業情報`, `${shortName} ニュース`],
+  );
+  const aiSummary = await summarizeItems(items, `${shortName} の関連ニュース`);
   return (
-    <p className="text-sm text-slate-400 text-center py-4">関連ニュースなし</p>
+    <SummarySectionCard
+      title="関連ニュース"
+      badge="自動検索"
+      items={items}
+      emptyText="関連ニュースなし"
+      aiSummary={aiSummary}
+    />
   );
 }
 
 async function MaNewsSection({ companyName }: { companyName: string }) {
   const shortName = companyName.replace(/株式会社|（株）/g, "").trim();
-  const news = await searchNews(`${shortName} M&A 買収`);
-  if (news.length === 0)
-    return (
-      <p className="text-sm text-slate-400 text-center py-4">
-        関連ニュースなし
-      </p>
-    );
+  const items = await fetchNewsAndWebItems(
+    [
+      `${shortName} M&A 買収`,
+      `${shortName} 統合 合併`,
+      `${shortName} TOB 公開買付`,
+    ],
+    [`${shortName} M&A`, `${shortName} 買収 合併`],
+  );
+  const aiSummary = await summarizeItems(
+    items,
+    `${shortName} のM&A関連ニュース`,
+  );
   return (
-    <div className="space-y-2">
-      {news.slice(0, 5).map((item, i) => (
-        <a
-          key={i}
-          href={item.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block p-3 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all"
-        >
-          <p className="text-sm text-slate-800 font-medium line-clamp-2">
-            {item.title}
-          </p>
-          <div className="flex items-center gap-2 mt-1.5">
-            {item.source && (
-              <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500">
-                {item.source}
-              </span>
-            )}
-            {item.pubDate && (
-              <span className="text-[10px] text-slate-400">
-                {formatPubDate(item.pubDate)}
-              </span>
-            )}
-          </div>
-        </a>
-      ))}
-    </div>
+    <SummarySectionCard
+      title="M&A 関連ニュース"
+      badge="自動検索"
+      items={items}
+      emptyText="M&A 関連ニュースなし"
+      aiSummary={aiSummary}
+    />
   );
-}
-
-async function WebFallbackSection({
-  companyName,
-  queries,
-}: {
-  companyName: string;
-  queries: string[];
-}) {
-  const shortName = companyName.replace(/株式会社|（株）|有限会社/g, "").trim();
-
-  // Strategy 1: Google News RSS (most reliable)
-  const newsQueries = queries.map((q) => `${shortName} ${q.split(" OR ")[0]}`);
-  const newsSettled = await Promise.allSettled(
-    newsQueries.map((q) => searchNews(q)),
-  );
-  const newsItems = newsSettled.flatMap((r) =>
-    r.status === "fulfilled" ? r.value : [],
-  );
-  const seenNews = new Set<string>();
-  const uniqueNews = newsItems.filter((n) => {
-    const k = n.title.slice(0, 40).toLowerCase();
-    if (seenNews.has(k)) return false;
-    seenNews.add(k);
-    return true;
-  });
-
-  if (uniqueNews.length > 0) {
-    return (
-      <div className="space-y-2">
-        {uniqueNews.slice(0, 5).map((item, i) => (
-          <a
-            key={i}
-            href={item.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block p-3 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all"
-          >
-            <p className="text-sm text-slate-800 font-medium line-clamp-2">
-              {item.title}
-            </p>
-            <div className="flex items-center gap-2 mt-1.5">
-              {item.source && (
-                <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500">
-                  {item.source}
-                </span>
-              )}
-              {item.pubDate && (
-                <span className="text-[10px] text-slate-400">
-                  {formatPubDate(item.pubDate)}
-                </span>
-              )}
-            </div>
-          </a>
-        ))}
-      </div>
-    );
-  }
-
-  // Strategy 2: DuckDuckGo (broader queries without quotes)
-  const { fetchMultiWebSearch } = await import("@/lib/enrich");
-  const results = await fetchMultiWebSearch(
-    queries.map((q) => `${shortName} ${q}`),
-  ).catch(() => []);
-  if (results.length > 0) {
-    return (
-      <div className="space-y-2">
-        {results.slice(0, 5).map((r, i) => (
-          <WebResultCard key={i} result={r} />
-        ))}
-      </div>
-    );
-  }
-
-  return <p className="text-sm text-slate-400 text-center py-4">データなし</p>;
-}
-
-// ---- Reputation/reviews section ----
-
-async function ReputationSection({ companyName }: { companyName: string }) {
-  const shortName = companyName.replace(/株式会社|（株）|有限会社/g, "").trim();
-  const newsResults = await searchNews(
-    `${shortName} 評判 口コミ 年収 働き方`,
-  ).catch(() => []);
-  if (newsResults.length > 0) {
-    return (
-      <div className="space-y-2">
-        {newsResults.slice(0, 5).map((item, i) => (
-          <a
-            key={i}
-            href={item.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block p-3 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all"
-          >
-            <p className="text-sm text-slate-800 font-medium line-clamp-2">
-              {item.title}
-            </p>
-            <div className="flex items-center gap-2 mt-1.5">
-              {item.source && (
-                <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500">
-                  {item.source}
-                </span>
-              )}
-              {item.pubDate && (
-                <span className="text-[10px] text-slate-400">
-                  {formatPubDate(item.pubDate)}
-                </span>
-              )}
-            </div>
-          </a>
-        ))}
-      </div>
-    );
-  }
-  const { fetchMultiWebSearch } = await import("@/lib/enrich");
-  const results = await fetchMultiWebSearch([
-    `${shortName} 評判 口コミ 年収`,
-    `${shortName} OpenWork Glassdoor 転職`,
-  ]).catch(() => []);
-  if (results.length > 0)
-    return (
-      <div className="space-y-2">
-        {results.slice(0, 5).map((r, i) => (
-          <WebResultCard key={i} result={r} />
-        ))}
-      </div>
-    );
-  return <p className="text-sm text-slate-400 text-center py-4">データなし</p>;
 }
 
 async function CompetitorSection({
@@ -418,56 +427,182 @@ async function CompetitorSection({
   industry?: string;
 }) {
   const shortName = companyName.replace(/株式会社|（株）|有限会社/g, "").trim();
-  const newsResults = await searchNews(`${shortName} 競合 ライバル 比較`).catch(
-    () => [],
+  const items = await fetchNewsAndWebItems(
+    [
+      `${shortName} 競合 ライバル 比較`,
+      `${shortName} 業界 シェア`,
+      `${shortName} 市場 動向`,
+    ],
+    [`${shortName} 競合`, `${shortName} 業界`],
   );
-  if (newsResults.length > 0) {
+
+  // AI summary runs on web results only (before prepending the internal link)
+  const aiSummary = await summarizeItems(
+    items,
+    `${shortName}（${industry ?? "業界不明"}）の競合・業界動向`,
+  );
+
+  if (industry) {
+    items.unshift({
+      title: `同業種「${industry}」の企業一覧を見る →`,
+      url: `/search?source=edinet&industry=${encodeURIComponent(industry)}`,
+      source: "内部リンク",
+    });
+  }
+
+  return (
+    <SummarySectionCard
+      title="競合企業・業界"
+      badge="自動検索"
+      items={items}
+      emptyText="競合情報なし"
+      aiSummary={aiSummary}
+    />
+  );
+}
+
+async function ReputationSection({ companyName }: { companyName: string }) {
+  const shortName = companyName.replace(/株式会社|（株）|有限会社/g, "").trim();
+  const items = await fetchNewsAndWebItems(
+    [
+      `${shortName} 評判 口コミ 年収`,
+      `${shortName} 働き方 ワークライフバランス`,
+      `${shortName} OpenWork 転職`,
+    ],
+    [`${shortName} 評判 口コミ`, `${shortName} OpenWork`],
+  );
+  const aiSummary = await summarizeItems(
+    items,
+    `${shortName} の評判・口コミ・働き方`,
+  );
+  return (
+    <SummarySectionCard
+      title="評判・口コミ"
+      badge="自動検索"
+      items={items}
+      emptyText="評判・口コミの情報なし"
+      aiSummary={aiSummary}
+    />
+  );
+}
+
+async function WebFallbackSection({
+  sectionTitle,
+  sectionBadge,
+  companyName,
+  queries,
+  emptyText,
+}: {
+  sectionTitle: string;
+  sectionBadge: string;
+  companyName: string;
+  queries: string[];
+  emptyText: string;
+}) {
+  const shortName = companyName.replace(/株式会社|（株）|有限会社/g, "").trim();
+  const newsQueries = queries.map((q) => `${shortName} ${q.split(" OR ")[0]}`);
+  const webQueries = queries.map((q) => `${shortName} ${q}`);
+  const items = await fetchNewsAndWebItems(newsQueries, webQueries);
+  const aiSummary = await summarizeItems(
+    items,
+    `${shortName} の${sectionTitle}`,
+  );
+  return (
+    <SummarySectionCard
+      title={sectionTitle}
+      badge={sectionBadge}
+      items={items}
+      emptyText={emptyText}
+      aiSummary={aiSummary}
+    />
+  );
+}
+
+// ---- Group companies section ----
+
+async function GroupCompaniesSection({
+  companyName,
+  edinetCode,
+  wikidata,
+  description,
+}: {
+  companyName: string;
+  edinetCode?: string;
+  wikidata?: WikidataInfo | null;
+  description?: string;
+}) {
+  const groups = await aggregateGroupCompanies({
+    companyName,
+    edinetCode,
+    wikidata,
+    description,
+  }).catch(() => [] as GroupCompany[]);
+
+  if (groups.length === 0) {
     return (
-      <div className="space-y-2">
-        {industry && (
-          <a
-            href={`/search?source=edinet&industry=${encodeURIComponent(industry)}`}
-            className="block p-3 rounded-xl border border-blue-100 bg-blue-50/50 hover:bg-blue-50 transition-all text-sm text-blue-700 font-medium"
-          >
-            同業種「{industry}」の企業一覧を見る →
-          </a>
-        )}
-        {newsResults.slice(0, 5).map((item, i) => (
-          <a
-            key={i}
-            href={item.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block p-3 rounded-xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all"
-          >
-            <p className="text-sm text-slate-800 font-medium line-clamp-2">
-              {item.title}
-            </p>
-            <div className="flex items-center gap-2 mt-1.5">
-              {item.source && (
-                <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500">
-                  {item.source}
-                </span>
-              )}
-            </div>
-          </a>
-        ))}
-      </div>
+      <p className="text-sm text-slate-400 text-center py-4">
+        グループ会社・関連企業の情報が見つかりませんでした
+      </p>
     );
   }
+
+  const parents = groups.filter((g) => g.relation === "parent");
+  const subsidiaries = groups.filter((g) => g.relation === "subsidiary");
+  const affiliates = groups.filter((g) => g.relation === "affiliate");
+
+  // Count by source for footer summary
+  const sourceCounts = new Map<string, number>();
+  for (const g of groups) {
+    for (const s of g.sources) {
+      sourceCounts.set(s, (sourceCounts.get(s) ?? 0) + 1);
+    }
+  }
+
   return (
-    <div className="space-y-2">
-      {industry && (
-        <a
-          href={`/search?source=edinet&industry=${encodeURIComponent(industry)}`}
-          className="block p-3 rounded-xl border border-blue-100 bg-blue-50/50 hover:bg-blue-50 transition-all text-sm text-blue-700 font-medium"
-        >
-          同業種「{industry}」の企業一覧を見る →
-        </a>
+    <div className="space-y-5">
+      {parents.length > 0 && (
+        <GroupSection title="親会社" companies={parents} />
       )}
-      <p className="text-sm text-slate-400 text-center py-2">
-        競合ニュースなし
+      {subsidiaries.length > 0 && (
+        <GroupSection title="子会社" companies={subsidiaries} />
+      )}
+      {affiliates.length > 0 && (
+        <GroupSection title="関連会社・グループ会社" companies={affiliates} />
+      )}
+
+      <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-slate-400">
+        <span className="font-semibold text-slate-500">データソース:</span>
+        {Array.from(sourceCounts.entries()).map(([src, count]) => (
+          <span key={src} className="inline-flex items-center gap-1">
+            <span className="w-1 h-1 rounded-full bg-slate-300" />
+            {src} ({count})
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function GroupSection({
+  title,
+  companies,
+}: {
+  title: string;
+  companies: GroupCompany[];
+}) {
+  return (
+    <div>
+      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+        {title}{" "}
+        <span className="text-slate-400 font-normal normal-case">
+          ({companies.length})
+        </span>
       </p>
+      <div className="flex flex-wrap gap-2">
+        {companies.map((c) => (
+          <GroupCompanyChip key={`${c.relation}-${c.name}`} company={c} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -554,69 +689,69 @@ async function EnrichedSections({
       )}
 
       {/* 特許情報 */}
-      <SectionCard title="特許情報" badge="自動取得">
-        <Suspense
-          fallback={
-            <p className="text-sm text-slate-400 text-center py-4">検索中...</p>
-          }
-        >
-          <WebFallbackSection
-            companyName={name}
-            queries={["特許 OR 出願 OR patent", "知的財産 OR 技術 OR 発明"]}
-          />
-        </Suspense>
-      </SectionCard>
+      <Suspense
+        fallback={<SummarySectionSkeleton title="特許情報" badge="自動取得" />}
+      >
+        <WebFallbackSection
+          sectionTitle="特許情報"
+          sectionBadge="自動取得"
+          companyName={name}
+          queries={["特許 OR 出願 OR patent", "知的財産 OR 技術 OR 発明"]}
+          emptyText="特許関連情報なし"
+        />
+      </Suspense>
 
       {/* 補助金 */}
-      <SectionCard title="補助金・助成金" badge="自動取得">
-        <Suspense
-          fallback={
-            <p className="text-sm text-slate-400 text-center py-4">検索中...</p>
-          }
-        >
-          <WebFallbackSection
-            companyName={name}
-            queries={[
-              "補助金 OR 助成金 OR 採択",
-              "支援 OR NEDO OR JST OR 経産省",
-            ]}
-          />
-        </Suspense>
-      </SectionCard>
+      <Suspense
+        fallback={
+          <SummarySectionSkeleton title="補助金・助成金" badge="自動取得" />
+        }
+      >
+        <WebFallbackSection
+          sectionTitle="補助金・助成金"
+          sectionBadge="自動取得"
+          companyName={name}
+          queries={[
+            "補助金 OR 助成金 OR 採択",
+            "支援 OR NEDO OR JST OR 経産省",
+          ]}
+          emptyText="補助金・助成金情報なし"
+        />
+      </Suspense>
 
       {/* 届出・認定 */}
-      <SectionCard title="届出・認定情報" badge="自動取得">
-        <Suspense
-          fallback={
-            <p className="text-sm text-slate-400 text-center py-4">検索中...</p>
-          }
-        >
-          <WebFallbackSection
-            companyName={name}
-            queries={[
-              "認定 OR 届出 OR ISO OR Pマーク",
-              "受賞 OR 表彰 OR アワード OR 選出",
-            ]}
-          />
-        </Suspense>
-      </SectionCard>
+      <Suspense
+        fallback={
+          <SummarySectionSkeleton title="届出・認定情報" badge="自動取得" />
+        }
+      >
+        <WebFallbackSection
+          sectionTitle="届出・認定情報"
+          sectionBadge="自動取得"
+          companyName={name}
+          queries={[
+            "認定 OR 届出 OR ISO OR Pマーク",
+            "受賞 OR 表彰 OR アワード OR 選出",
+          ]}
+          emptyText="届出・認定情報なし"
+        />
+      </Suspense>
 
       {/* 職場情報 */}
-      <SectionCard title="職場情報" badge="自動取得">
-        <Suspense
-          fallback={
-            <p className="text-sm text-slate-400 text-center py-4">検索中...</p>
-          }
-        >
-          <WebFallbackSection
-            companyName={name}
-            queries={[
-              "年収 OR 給与 OR 待遇 OR 福利厚生",
-              "働き方 OR ワークライフバランス OR 残業",
-            ]}
-          />
-        </Suspense>
-      </SectionCard>
+      <Suspense
+        fallback={<SummarySectionSkeleton title="職場情報" badge="自動取得" />}
+      >
+        <WebFallbackSection
+          sectionTitle="職場情報"
+          sectionBadge="自動取得"
+          companyName={name}
+          queries={[
+            "年収 OR 給与 OR 待遇 OR 福利厚生",
+            "働き方 OR ワークライフバランス OR 残業",
+          ]}
+          emptyText="職場情報なし"
+        />
+      </Suspense>
 
       {/* 採用・カルチャー */}
       {wantedlyResults.length > 0 && (
@@ -740,14 +875,18 @@ export default async function CompanyPage({ params }: Props) {
       getCompanyShareholders(code),
       getCompanyFinancials(code),
     ]);
-    const marketSegment = await fetchMarketSegment(company.sec_code);
-
-    // Phase 2: Wikidata enrichment (parallel, resilient)
-    const wd = await fetchWikidata(company.name).catch(() => null);
+    const [marketSegment, scrapedMarketCap, wd] = await Promise.all([
+      fetchMarketSegment(company.sec_code),
+      company.market_cap == null
+        ? fetchMarketCap(company.sec_code)
+        : Promise.resolve(null),
+      fetchWikidata(company.name).catch(() => null),
+    ]);
 
     const f = company.latest_financials;
     const e = company.latest_earnings;
     const secCode = company.sec_code?.replace(/0$/, "");
+    const marketCap = company.market_cap ?? scrapedMarketCap;
 
     const chartData: FinancialChartData[] =
       financials.length > 0
@@ -869,11 +1008,16 @@ export default async function CompanyPage({ params }: Props) {
               >
                 {company.credit_rating} ({company.credit_score}pt)
               </span>
-              {company.market_cap != null && (
+              {marketCap != null && (
                 <span className="text-xs text-slate-500">
-                  時価総額: {formatYen(company.market_cap)}
+                  時価総額: {formatYen(marketCap)}
                 </span>
               )}
+              <AddToSellerButton
+                companyName={company.name}
+                companyCode={company.edinet_code}
+                industry={company.industry}
+              />
             </div>
           </div>
           {wd?.description && (
@@ -886,77 +1030,119 @@ export default async function CompanyPage({ params }: Props) {
           )}
         </div>
 
-        {/* ===== Quick Links ===== */}
-        {company.sec_code && (
-          <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-4">
-            <div className="flex flex-wrap gap-3">
-              <ExternalLink
-                href={`https://finance.yahoo.co.jp/quote/${company.sec_code}.T`}
-              >
-                Yahoo! ファイナンス（株価）
-              </ExternalLink>
-              <ExternalLink href={`https://kabutan.jp/stock/?code=${secCode}`}>
-                株探（チャート・四季報）
-              </ExternalLink>
-              <ExternalLink
-                href={`https://www.nikkei.com/nkd/company/?scode=${secCode}`}
-              >
-                日経（企業情報）
-              </ExternalLink>
-              <ExternalLink href={`https://irbank.net/${secCode}`}>
-                IR BANK（IR・財務）
-              </ExternalLink>
-              <ExternalLink
-                href={`https://disclosure2.edinet-fsa.go.jp/WZEK0040.aspx?company=${company.edinet_code}`}
-              >
-                EDINET（開示書類）
-              </ExternalLink>
-              {f?.edinet_filing_url && (
-                <ExternalLink href={f.edinet_filing_url}>
-                  有価証券報告書
-                </ExternalLink>
-              )}
-              {wd?.officialWebsite && (
-                <ExternalLink href={wd.officialWebsite}>
-                  公式サイト
-                </ExternalLink>
-              )}
-              <ExternalLink
-                href={`https://www.j-platpat.inpit.go.jp/c1800/PU/JP/jpn/applicant?applicant=${encodeURIComponent(company.name)}`}
-              >
-                J-PlatPat（特許）
-              </ExternalLink>
+        {/* ===== サマリー ===== */}
+        <SectionCard title="サマリー" badge="主要指標">
+          <div className="space-y-4">
+            <div>
+              <p className="text-xs text-slate-400 mb-1.5 font-medium">
+                会社概要
+              </p>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                {wd?.description
+                  ? wd.description
+                  : `${company.name}（${company.industry}）`}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              <MetricCard
+                label="上場区分"
+                value={
+                  marketSegment ||
+                  company.listing_category ||
+                  (company.sec_code ? "上場" : "非上場")
+                }
+              />
+              <MetricCard
+                label="時価総額"
+                value={marketCap != null ? formatYen(marketCap) : "-"}
+                sub={
+                  company.market_cap == null && marketCap != null
+                    ? "kabutan"
+                    : undefined
+                }
+              />
+              <MetricCard
+                label="売上高"
+                value={f?.revenue != null ? formatYen(f.revenue) : "-"}
+                sub={f ? `${f.fiscal_year}年度` : undefined}
+              />
+              <MetricCard
+                label="現預金"
+                value={f?.cash != null ? formatYen(f.cash) : "-"}
+                sub={f ? `${f.fiscal_year}年度` : undefined}
+              />
+              <MetricCard
+                label="純利益"
+                value={f?.net_income != null ? formatYen(f.net_income) : "-"}
+                sub={f ? `${f.fiscal_year}年度` : undefined}
+              />
             </div>
           </div>
-        )}
+        </SectionCard>
 
-        {/* ===== 担当社員 ===== */}
-        <SectionCard title="担当社員" badge="社員管理">
-          <CompanyEmployeeSection
-            companyCode={company.edinet_code}
-            companyName={company.name}
-          />
+        {/* ===== グループ会社・関連企業 ===== */}
+        <SectionCard
+          title="グループ会社・関連企業"
+          badge="Wikidata + Wikipedia + AI抽出"
+        >
+          <Suspense
+            fallback={
+              <div className="space-y-3">
+                <div className="shimmer h-5 w-24 rounded" />
+                <div className="flex flex-wrap gap-2">
+                  <div className="shimmer h-8 w-32 rounded-full" />
+                  <div className="shimmer h-8 w-40 rounded-full" />
+                  <div className="shimmer h-8 w-28 rounded-full" />
+                </div>
+              </div>
+            }
+          >
+            <GroupCompaniesSection
+              companyName={company.name}
+              edinetCode={company.edinet_code}
+              wikidata={wd}
+              description={wd?.description}
+            />
+          </Suspense>
         </SectionCard>
 
         {/* ===== 関連ニュース ===== */}
-        <SectionCard title="関連ニュース" badge="自動検索">
-          <Suspense fallback={<div className="shimmer h-32 rounded-xl" />}>
-            <CompanyNewsSection companyName={company.name} />
-          </Suspense>
-        </SectionCard>
+        <Suspense
+          fallback={
+            <SummarySectionSkeleton title="関連ニュース" badge="自動検索" />
+          }
+        >
+          <CompanyNewsSection companyName={company.name} />
+        </Suspense>
 
         {/* ===== M&A 関連ニュース ===== */}
-        <SectionCard title="M&A 関連ニュース" badge="自動検索">
-          <Suspense fallback={<div className="shimmer h-32 rounded-xl" />}>
-            <MaNewsSection companyName={company.name} />
-          </Suspense>
-        </SectionCard>
+        <Suspense
+          fallback={
+            <SummarySectionSkeleton title="M&A 関連ニュース" badge="自動検索" />
+          }
+        >
+          <MaNewsSection companyName={company.name} />
+        </Suspense>
 
         {/* AI Analysis: Overview, Business Model, Officers, M&A, Strategy */}
-        <CompanyAnalysis
-          edinetCode={company.edinet_code}
-          companyName={company.name}
-        />
+        <Suspense
+          fallback={
+            <div className="space-y-6">
+              <SummarySectionSkeleton title="会社概要" badge="Claude AI" />
+              <SummarySectionSkeleton
+                title="事業モデル・銘柄特徴"
+                badge="Claude AI"
+              />
+              <SummarySectionSkeleton title="主要役員" badge="Claude AI" />
+              <SummarySectionSkeleton title="M&A 買収一覧" badge="Claude AI" />
+            </div>
+          }
+        >
+          <CompanyAnalysis
+            edinetCode={company.edinet_code}
+            companyName={company.name}
+          />
+        </Suspense>
 
         {/* ===== AI M&A 戦略推察 ===== */}
         <SectionCard title="AI M&A 戦略推察" badge="Claude AI">
@@ -967,7 +1153,7 @@ export default async function CompanyPage({ params }: Props) {
               listingCategory: company.listing_category,
               creditRating: company.credit_rating,
               creditScore: company.credit_score,
-              marketCap: company.market_cap ?? undefined,
+              marketCap: marketCap ?? undefined,
               revenue: f?.revenue ?? undefined,
               operatingIncome: f?.operating_income ?? undefined,
               netIncome: f?.net_income ?? undefined,
@@ -1440,21 +1626,25 @@ export default async function CompanyPage({ params }: Props) {
         </SectionCard>
 
         {/* ===== 競合企業 ===== */}
-        <SectionCard title="競合企業・業界" badge="自動検索">
-          <Suspense fallback={<div className="shimmer h-32 rounded-xl" />}>
-            <CompetitorSection
-              companyName={company.name}
-              industry={company.industry}
-            />
-          </Suspense>
-        </SectionCard>
+        <Suspense
+          fallback={
+            <SummarySectionSkeleton title="競合企業・業界" badge="自動検索" />
+          }
+        >
+          <CompetitorSection
+            companyName={company.name}
+            industry={company.industry}
+          />
+        </Suspense>
 
         {/* ===== 評判・口コミ ===== */}
-        <SectionCard title="評判・口コミ" badge="自動検索">
-          <Suspense fallback={<div className="shimmer h-32 rounded-xl" />}>
-            <ReputationSection companyName={company.name} />
-          </Suspense>
-        </SectionCard>
+        <Suspense
+          fallback={
+            <SummarySectionSkeleton title="評判・口コミ" badge="自動検索" />
+          }
+        >
+          <ReputationSection companyName={company.name} />
+        </Suspense>
 
         {/* ===== Enriched sections (Suspense) ===== */}
         <Suspense
@@ -1471,6 +1661,52 @@ export default async function CompanyPage({ params }: Props) {
             companyUrl={wd?.officialWebsite}
           />
         </Suspense>
+
+        {/* ===== 外部リンク（ページ末尾） ===== */}
+        <SectionCard title="外部リンク" badge="参考情報">
+          <div className="flex flex-wrap gap-3">
+            {company.sec_code && (
+              <>
+                <ExternalLink
+                  href={`https://finance.yahoo.co.jp/quote/${company.sec_code}.T`}
+                >
+                  Yahoo! ファイナンス（株価）
+                </ExternalLink>
+                <ExternalLink
+                  href={`https://kabutan.jp/stock/?code=${secCode}`}
+                >
+                  株探（チャート・四季報）
+                </ExternalLink>
+                <ExternalLink
+                  href={`https://www.nikkei.com/nkd/company/?scode=${secCode}`}
+                >
+                  日経（企業情報）
+                </ExternalLink>
+                <ExternalLink href={`https://irbank.net/${secCode}`}>
+                  IR BANK（IR・財務）
+                </ExternalLink>
+              </>
+            )}
+            <ExternalLink
+              href={`https://disclosure2.edinet-fsa.go.jp/WZEK0040.aspx?company=${company.edinet_code}`}
+            >
+              EDINET（開示書類）
+            </ExternalLink>
+            {f?.edinet_filing_url && (
+              <ExternalLink href={f.edinet_filing_url}>
+                有価証券報告書
+              </ExternalLink>
+            )}
+            {wd?.officialWebsite && (
+              <ExternalLink href={wd.officialWebsite}>公式サイト</ExternalLink>
+            )}
+            <ExternalLink
+              href={`https://www.j-platpat.inpit.go.jp/c1800/PU/JP/jpn/applicant?applicant=${encodeURIComponent(company.name)}`}
+            >
+              J-PlatPat（特許）
+            </ExternalLink>
+          </div>
+        </SectionCard>
       </div>
     );
   } catch {

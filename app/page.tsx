@@ -20,7 +20,7 @@ const CATEGORIES = [
         color: "from-purple-500 to-purple-600",
       },
       {
-        href: "/weekly",
+        href: "/shareholders",
         title: "株主名検索",
         description:
           "投資ファンド・事業会社の保有銘柄を横断検索（大量保有報告書）",

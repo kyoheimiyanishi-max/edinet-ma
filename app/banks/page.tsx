@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import {
   searchBanks,
   getAllTypes,
+  getAllMaServices,
   type Bank,
   type BankType,
 } from "@/lib/banks";
@@ -10,7 +11,13 @@ import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
 
 interface Props {
-  searchParams: Promise<{ q?: string; type?: string; prefecture?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    type?: string;
+    prefecture?: string;
+    service?: string;
+    hasMaTeam?: string;
+  }>;
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -28,10 +35,14 @@ function TypeFilter({
   current,
   searchQ,
   prefecture,
+  service,
+  hasMaTeam,
 }: {
   current?: string;
   searchQ?: string;
   prefecture?: string;
+  service?: string;
+  hasMaTeam?: string;
 }) {
   const types = getAllTypes();
   const buildHref = (type?: string) => {
@@ -39,6 +50,8 @@ function TypeFilter({
     if (searchQ) params.set("q", searchQ);
     if (type) params.set("type", type);
     if (prefecture) params.set("prefecture", prefecture);
+    if (service) params.set("service", service);
+    if (hasMaTeam) params.set("hasMaTeam", hasMaTeam);
     return `/banks?${params}`;
   };
 
@@ -149,7 +162,16 @@ export default async function BanksPage({ searchParams }: Props) {
   const q = params.q;
   const type = params.type as BankType | undefined;
   const prefecture = params.prefecture;
-  const banks = searchBanks(q, type, prefecture);
+  const service = params.service;
+  const hasMaTeam = params.hasMaTeam === "1" ? "1" : undefined;
+  const banks = searchBanks({
+    query: q,
+    type,
+    prefecture,
+    service,
+    hasMaTeam: hasMaTeam === "1",
+  });
+  const allServices = getAllMaServices();
 
   return (
     <div className="space-y-6">
@@ -172,15 +194,93 @@ export default async function BanksPage({ searchParams }: Props) {
             defaultValue={q ?? ""}
           />
         </Suspense>
-        <TypeFilter current={type} searchQ={q} prefecture={prefecture} />
+        <TypeFilter
+          current={type}
+          searchQ={q}
+          prefecture={prefecture}
+          service={service}
+          hasMaTeam={hasMaTeam}
+        />
         <Suspense>
           <PrefectureSelect
             prefectures={PREFECTURES}
             current={prefecture}
             basePath="/banks"
-            extraParams={{ ...(q ? { q } : {}), ...(type ? { type } : {}) }}
+            extraParams={{
+              ...(q ? { q } : {}),
+              ...(type ? { type } : {}),
+              ...(service ? { service } : {}),
+              ...(hasMaTeam ? { hasMaTeam } : {}),
+            }}
           />
         </Suspense>
+
+        {/* M&A service + has team */}
+        <form
+          action="/banks"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end"
+        >
+          {q && <input type="hidden" name="q" value={q} />}
+          {type && <input type="hidden" name="type" value={type} />}
+          {prefecture && (
+            <input type="hidden" name="prefecture" value={prefecture} />
+          )}
+
+          <div className="space-y-1.5 sm:col-span-2">
+            <label className="text-xs font-semibold text-slate-500">
+              M&Aサービス
+            </label>
+            <select
+              name="service"
+              defaultValue={service || ""}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="">すべて</option>
+              {allServices.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-end gap-2">
+            <label className="inline-flex items-center gap-2 text-xs text-slate-600 px-3 py-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:bg-slate-50 flex-1">
+              <input
+                type="checkbox"
+                name="hasMaTeam"
+                value="1"
+                defaultChecked={hasMaTeam === "1"}
+                className="rounded"
+              />
+              <span className="font-medium">専門部隊あり</span>
+            </label>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap"
+            >
+              適用
+            </button>
+          </div>
+        </form>
+
+        {(service || hasMaTeam) && (
+          <a
+            href={`/banks${
+              q || type || prefecture
+                ? "?" +
+                  new URLSearchParams({
+                    ...(q ? { q } : {}),
+                    ...(type ? { type } : {}),
+                    ...(prefecture ? { prefecture } : {}),
+                  }).toString()
+                : ""
+            }`}
+            className="inline-block text-xs font-medium text-rose-600 hover:bg-rose-50 px-3 py-1.5 rounded-lg"
+          >
+            詳細フィルターをクリア
+          </a>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
@@ -190,6 +290,10 @@ export default async function BanksPage({ searchParams }: Props) {
           件{type && <span className="text-slate-400 ml-1">({type})</span>}
           {prefecture && (
             <span className="text-slate-400 ml-1">/ {prefecture}</span>
+          )}
+          {service && <span className="text-slate-400 ml-1">/ {service}</span>}
+          {hasMaTeam && (
+            <span className="text-slate-400 ml-1">/ 専門部隊あり</span>
           )}
         </span>
       </div>

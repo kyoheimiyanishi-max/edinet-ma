@@ -16,6 +16,7 @@ interface Project {
   priority: string;
   relatedCompanies: RelatedCompany[];
   assignedEmployeeIds: string[];
+  sellerId?: string;
   startDate: string;
   targetDate: string;
   createdAt: string;
@@ -27,6 +28,13 @@ interface Employee {
   name: string;
   department: string;
   position: string;
+}
+
+interface SellerSummary {
+  id: string;
+  companyName: string;
+  industry?: string;
+  stage: string;
 }
 
 const PROJECT_STATUSES = [
@@ -64,6 +72,7 @@ const EMPTY_FORM = {
   description: "",
   status: "企画中",
   priority: "中",
+  sellerId: "",
   startDate: "",
   targetDate: "",
 };
@@ -77,6 +86,7 @@ const EMPTY_COMPANY = {
 export default function ProjectManager() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [sellers, setSellers] = useState<SellerSummary[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -99,10 +109,18 @@ export default function ProjectManager() {
     setEmployees(await res.json());
   }, []);
 
+  const fetchSellers = useCallback(async () => {
+    const res = await fetch("/api/sellers");
+    setSellers(await res.json());
+  }, []);
+
   useEffect(() => {
     fetchProjects();
     fetchEmployees();
-  }, [fetchProjects, fetchEmployees]);
+    fetchSellers();
+  }, [fetchProjects, fetchEmployees, fetchSellers]);
+
+  const sellerById = new Map(sellers.map((s) => [s.id, s] as const));
 
   const filtered = search
     ? projects.filter(
@@ -119,6 +137,7 @@ export default function ProjectManager() {
 
     const body = {
       ...form,
+      sellerId: form.sellerId || undefined,
       relatedCompanies: formCompanies,
       assignedEmployeeIds: formEmployeeIds,
     };
@@ -157,6 +176,7 @@ export default function ProjectManager() {
       description: p.description,
       status: p.status,
       priority: p.priority,
+      sellerId: p.sellerId ?? "",
       startDate: p.startDate,
       targetDate: p.targetDate,
     });
@@ -344,6 +364,31 @@ export default function ProjectManager() {
               </div>
             </div>
 
+            {/* Linked Seller */}
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">
+                紐付け売主
+              </label>
+              <select
+                value={form.sellerId}
+                onChange={(e) => setForm({ ...form, sellerId: e.target.value })}
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">（紐付けなし）</option>
+                {sellers.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.companyName}
+                    {s.industry ? ` / ${s.industry}` : ""} — {s.stage}
+                  </option>
+                ))}
+              </select>
+              {sellers.length === 0 && (
+                <p className="text-[10px] text-slate-400 mt-1">
+                  売主管理タブで売主を登録すると紐付けできます
+                </p>
+              )}
+            </div>
+
             {/* Related Companies */}
             <div>
               <label className="block text-xs font-medium text-slate-500 mb-2">
@@ -497,6 +542,9 @@ export default function ProjectManager() {
             const assignedEmps = employees.filter((e) =>
               p.assignedEmployeeIds.includes(e.id),
             );
+            const linkedSeller = p.sellerId
+              ? sellerById.get(p.sellerId)
+              : undefined;
             return (
               <div
                 key={p.id}
@@ -528,7 +576,12 @@ export default function ProjectManager() {
                           {p.description}
                         </p>
                       )}
-                      <div className="flex items-center gap-3 mt-2">
+                      <div className="flex items-center gap-3 mt-2 flex-wrap">
+                        {linkedSeller && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold">
+                            売主: {linkedSeller.companyName}
+                          </span>
+                        )}
                         {p.startDate && (
                           <span className="text-[10px] text-slate-400">
                             開始: {p.startDate}
@@ -585,6 +638,26 @@ export default function ProjectManager() {
 
                 {expandedId === p.id && (
                   <div className="border-t border-slate-100 bg-slate-50/50 p-5 space-y-4">
+                    {linkedSeller && (
+                      <div>
+                        <h4 className="text-xs font-semibold text-slate-600 mb-2">
+                          紐付け売主
+                        </h4>
+                        <div className="flex items-center gap-2 bg-white rounded-lg border border-indigo-200 px-3 py-2">
+                          <span className="text-sm font-semibold text-indigo-700">
+                            {linkedSeller.companyName}
+                          </span>
+                          {linkedSeller.industry && (
+                            <span className="text-[10px] text-slate-500">
+                              {linkedSeller.industry}
+                            </span>
+                          )}
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 ml-auto">
+                            {linkedSeller.stage}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                     {p.relatedCompanies.length > 0 && (
                       <div>
                         <h4 className="text-xs font-semibold text-slate-600 mb-2">

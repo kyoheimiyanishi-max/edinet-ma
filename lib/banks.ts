@@ -974,23 +974,47 @@ export const BANKS: Bank[] = [
 
 // ---- Search ----
 
+export interface BankFilters {
+  query?: string;
+  type?: BankType;
+  prefecture?: string;
+  service?: string;
+  hasMaTeam?: boolean;
+}
+
 export function searchBanks(
-  query?: string,
+  queryOrFilters?: string | BankFilters,
   type?: BankType,
   prefecture?: string,
 ): Bank[] {
+  const filters: BankFilters =
+    typeof queryOrFilters === "object"
+      ? queryOrFilters
+      : { query: queryOrFilters, type, prefecture };
+
   let results: Bank[] = BANKS;
 
-  if (type) {
-    results = results.filter((b) => b.type === type);
+  if (filters.type) {
+    results = results.filter((b) => b.type === filters.type);
   }
 
-  if (prefecture) {
-    results = results.filter((b) => b.prefecture === prefecture);
+  if (filters.prefecture) {
+    results = results.filter((b) => b.prefecture === filters.prefecture);
   }
 
-  if (query && query.trim()) {
-    const q = query.trim().toLowerCase();
+  if (filters.service) {
+    const sv = filters.service.toLowerCase();
+    results = results.filter((b) =>
+      b.maServices.some((s) => s.toLowerCase().includes(sv)),
+    );
+  }
+
+  if (filters.hasMaTeam) {
+    results = results.filter((b) => Boolean(b.maTeam));
+  }
+
+  if (filters.query && filters.query.trim()) {
+    const q = filters.query.trim().toLowerCase();
     results = results.filter(
       (b) =>
         b.name.toLowerCase().includes(q) ||
@@ -1002,6 +1026,14 @@ export function searchBanks(
   }
 
   return results;
+}
+
+export function getAllMaServices(): string[] {
+  const set = new Set<string>();
+  for (const b of BANKS) {
+    for (const s of b.maServices) set.add(s);
+  }
+  return Array.from(set).sort();
 }
 
 // ---- Helpers ----

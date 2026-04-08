@@ -96,11 +96,18 @@ interface Props {
   defaultSource?: SourceType;
   defaultIndustry?: string;
   defaultYear?: string;
+  defaultYearTo?: string;
+  defaultCapitalFrom?: string;
   defaultCapitalTo?: string;
+  defaultEmployeesFrom?: string;
   defaultEmployeesTo?: string;
   defaultPrefecture?: string;
   defaultSubsidy?: boolean;
   defaultPatent?: boolean;
+  defaultCommendation?: boolean;
+  defaultFinance?: boolean;
+  defaultExist?: boolean;
+  defaultBusiness?: string;
   currentYear: number;
 }
 
@@ -109,11 +116,18 @@ export default function UnifiedSearchForm({
   defaultSource,
   defaultIndustry,
   defaultYear,
+  defaultYearTo,
+  defaultCapitalFrom,
   defaultCapitalTo,
+  defaultEmployeesFrom,
   defaultEmployeesTo,
   defaultPrefecture,
   defaultSubsidy,
   defaultPatent,
+  defaultCommendation,
+  defaultFinance,
+  defaultExist,
+  defaultBusiness,
   currentYear,
 }: Props) {
   const router = useRouter();
@@ -127,8 +141,17 @@ export default function UnifiedSearchForm({
     sp.get("industry") ?? defaultIndustry ?? "",
   );
   const [year, setYear] = useState(sp.get("year") ?? defaultYear ?? "");
+  const [yearTo, setYearTo] = useState(
+    sp.get("year_to") ?? defaultYearTo ?? "",
+  );
+  const [capitalFrom, setCapitalFrom] = useState(
+    sp.get("capital_from") ?? defaultCapitalFrom ?? "",
+  );
   const [capitalTo, setCapitalTo] = useState(
     sp.get("capital_to") ?? defaultCapitalTo ?? "",
+  );
+  const [employeesFrom, setEmployeesFrom] = useState(
+    sp.get("employees_from") ?? defaultEmployeesFrom ?? "",
   );
   const [employeesTo, setEmployeesTo] = useState(
     sp.get("employees_to") ?? defaultEmployeesTo ?? "",
@@ -136,12 +159,22 @@ export default function UnifiedSearchForm({
   const [prefecture, setPrefecture] = useState(
     sp.get("prefecture") ?? defaultPrefecture ?? "",
   );
+  const [business, setBusiness] = useState(
+    sp.get("business") ?? defaultBusiness ?? "",
+  );
   const [subsidy, setSubsidy] = useState(
     sp.get("subsidy") === "1" || !!defaultSubsidy,
   );
   const [patent, setPatent] = useState(
     sp.get("patent") === "1" || !!defaultPatent,
   );
+  const [commendation, setCommendation] = useState(
+    sp.get("commendation") === "1" || !!defaultCommendation,
+  );
+  const [finance, setFinance] = useState(
+    sp.get("finance") === "1" || !!defaultFinance,
+  );
+  const [exist, setExist] = useState(sp.get("exist") === "1" || !!defaultExist);
 
   const buildUrl = () => {
     const qs = new URLSearchParams();
@@ -149,11 +182,18 @@ export default function UnifiedSearchForm({
     if (q.trim()) qs.set("q", q.trim());
     if (industry) qs.set("industry", industry);
     if (year) qs.set("year", year);
+    if (yearTo) qs.set("year_to", yearTo);
+    if (capitalFrom) qs.set("capital_from", capitalFrom);
     if (capitalTo) qs.set("capital_to", capitalTo);
+    if (employeesFrom) qs.set("employees_from", employeesFrom);
     if (employeesTo) qs.set("employees_to", employeesTo);
     if (prefecture) qs.set("prefecture", prefecture);
+    if (business.trim()) qs.set("business", business.trim());
     if (subsidy) qs.set("subsidy", "1");
     if (patent) qs.set("patent", "1");
+    if (commendation) qs.set("commendation", "1");
+    if (finance) qs.set("finance", "1");
+    if (exist) qs.set("exist", "1");
     qs.set("page", "1");
     return `/search?${qs}`;
   };
@@ -168,11 +208,18 @@ export default function UnifiedSearchForm({
     setSource("all");
     setIndustry("");
     setYear("");
+    setYearTo("");
+    setCapitalFrom("");
     setCapitalTo("");
+    setEmployeesFrom("");
     setEmployeesTo("");
     setPrefecture("");
+    setBusiness("");
     setSubsidy(false);
     setPatent(false);
+    setCommendation(false);
+    setFinance(false);
+    setExist(false);
     router.push("/search?source=all&page=1");
   };
 
@@ -283,56 +330,129 @@ export default function UnifiedSearchForm({
 
       {/* Advanced filters (gBiz) */}
       {(source === "all" || source === "gbiz") && (
-        <div className="flex flex-wrap gap-3 items-end pt-1 border-t border-slate-100">
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1.5">
-              設立年（以降）
-            </label>
-            <select
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              className={inputClass}
-            >
-              <option value="">指定なし</option>
-              {Array.from({ length: 16 }, (_, i) => currentYear - i).map(
-                (y) => (
-                  <option key={y} value={y}>
-                    {y}年以降
-                    {y >= currentYear - 3
-                      ? " (創業期)"
-                      : y >= currentYear - 7
-                        ? " (成長期)"
-                        : ""}
-                  </option>
-                ),
-              )}
-            </select>
+        <div className="space-y-3 pt-3 border-t border-slate-100">
+          {/* 設立年 範囲 */}
+          <div className="flex flex-wrap gap-3 items-end">
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                設立年 以降
+              </label>
+              <select
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className={inputClass}
+              >
+                <option value="">指定なし</option>
+                {Array.from({ length: 30 }, (_, i) => currentYear - i).map(
+                  (y) => (
+                    <option key={y} value={y}>
+                      {y}年以降
+                      {y >= currentYear - 3
+                        ? " (創業期)"
+                        : y >= currentYear - 7
+                          ? " (成長期)"
+                          : ""}
+                    </option>
+                  ),
+                )}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                設立年 以前
+              </label>
+              <select
+                value={yearTo}
+                onChange={(e) => setYearTo(e.target.value)}
+                className={inputClass}
+              >
+                <option value="">指定なし</option>
+                {Array.from({ length: 30 }, (_, i) => currentYear - i).map(
+                  (y) => (
+                    <option key={y} value={y}>
+                      {y}年以前
+                    </option>
+                  ),
+                )}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                資本金 下限（円）
+              </label>
+              <input
+                type="number"
+                value={capitalFrom}
+                onChange={(e) => setCapitalFrom(e.target.value)}
+                placeholder="例: 1000000"
+                className={`w-40 ${inputClass}`}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                資本金 上限（円）
+              </label>
+              <input
+                type="number"
+                value={capitalTo}
+                onChange={(e) => setCapitalTo(e.target.value)}
+                placeholder="例: 10000000"
+                className={`w-40 ${inputClass}`}
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1.5">
-              資本金上限（円）
-            </label>
-            <input
-              type="number"
-              value={capitalTo}
-              onChange={(e) => setCapitalTo(e.target.value)}
-              placeholder="例: 10000000"
-              className={`w-44 ${inputClass}`}
-            />
+
+          {/* 従業員数 範囲 + 事業項目 */}
+          <div className="flex flex-wrap gap-3 items-end">
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                従業員数 下限
+              </label>
+              <input
+                type="number"
+                value={employeesFrom}
+                onChange={(e) => setEmployeesFrom(e.target.value)}
+                placeholder="例: 10"
+                className={`w-32 ${inputClass}`}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                従業員数 上限
+              </label>
+              <input
+                type="number"
+                value={employeesTo}
+                onChange={(e) => setEmployeesTo(e.target.value)}
+                placeholder="例: 50"
+                className={`w-32 ${inputClass}`}
+              />
+            </div>
+            <div className="flex-1 min-w-48">
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                事業項目
+              </label>
+              <input
+                type="text"
+                value={business}
+                onChange={(e) => setBusiness(e.target.value)}
+                placeholder="例: ソフトウェア、コンサルティング"
+                className={`w-full ${inputClass}`}
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1.5">
-              従業員数上限
+
+          {/* ブールフラグ */}
+          <div className="flex flex-wrap gap-x-5 gap-y-2 items-center">
+            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={exist}
+                onChange={(e) => setExist(e.target.checked)}
+                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
+              />
+              存続中のみ（閉鎖除外）
             </label>
-            <input
-              type="number"
-              value={employeesTo}
-              onChange={(e) => setEmployeesTo(e.target.value)}
-              placeholder="例: 50"
-              className={`w-36 ${inputClass}`}
-            />
-          </div>
-          <div className="flex gap-4 items-center pb-1">
             <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -350,6 +470,24 @@ export default function UnifiedSearchForm({
                 className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
               />
               特許保有
+            </label>
+            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={commendation}
+                onChange={(e) => setCommendation(e.target.checked)}
+                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
+              />
+              表彰あり
+            </label>
+            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={finance}
+                onChange={(e) => setFinance(e.target.checked)}
+                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
+              />
+              財務情報あり
             </label>
           </div>
         </div>

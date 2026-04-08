@@ -861,23 +861,50 @@ export const ADVISORS: TaxAdvisor[] = [
 
 // ---- Search ----
 
+export interface AdvisorFilters {
+  query?: string;
+  type?: AdvisorType;
+  prefecture?: string;
+  specialty?: string;
+  size?: string;
+}
+
 export function searchAdvisors(
-  query?: string,
+  queryOrFilters?: string | AdvisorFilters,
   type?: AdvisorType,
   prefecture?: string,
 ): TaxAdvisor[] {
+  const filters: AdvisorFilters =
+    typeof queryOrFilters === "object"
+      ? queryOrFilters
+      : { query: queryOrFilters, type, prefecture };
+
   let results: TaxAdvisor[] = ADVISORS;
 
-  if (type) {
-    results = results.filter((a) => a.type === type);
+  if (filters.type) {
+    results = results.filter((a) => a.type === filters.type);
   }
 
-  if (prefecture) {
-    results = results.filter((a) => a.prefecture === prefecture);
+  if (filters.prefecture) {
+    results = results.filter((a) => a.prefecture === filters.prefecture);
   }
 
-  if (query && query.trim()) {
-    const q = query.trim().toLowerCase();
+  if (filters.specialty) {
+    const sp = filters.specialty.toLowerCase();
+    results = results.filter((a) =>
+      a.specialties.some((s) => s.toLowerCase().includes(sp)),
+    );
+  }
+
+  if (filters.size) {
+    const sz = filters.size.toLowerCase();
+    results = results.filter(
+      (a) => a.size && a.size.toLowerCase().includes(sz),
+    );
+  }
+
+  if (filters.query && filters.query.trim()) {
+    const q = filters.query.trim().toLowerCase();
     results = results.filter(
       (a) =>
         a.name.toLowerCase().includes(q) ||
@@ -890,6 +917,14 @@ export function searchAdvisors(
   }
 
   return results;
+}
+
+export function getAllSizes(): string[] {
+  const set = new Set<string>();
+  for (const a of ADVISORS) {
+    if (a.size) set.add(a.size);
+  }
+  return Array.from(set).sort();
 }
 
 // ---- Helpers ----

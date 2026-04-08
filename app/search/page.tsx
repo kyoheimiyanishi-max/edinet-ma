@@ -14,6 +14,7 @@ import {
 import { expandQuery } from "@/lib/ai-search";
 import UnifiedSearchForm from "@/components/UnifiedSearchForm";
 import type { SourceType } from "@/components/UnifiedSearchForm";
+import AddToSellerButton from "@/components/AddToSellerButton";
 import Link from "next/link";
 
 interface Props {
@@ -22,11 +23,18 @@ interface Props {
     source?: string;
     industry?: string;
     year?: string;
+    year_to?: string;
+    capital_from?: string;
     capital_to?: string;
+    employees_from?: string;
     employees_to?: string;
     prefecture?: string;
+    business?: string;
     subsidy?: string;
     patent?: string;
+    commendation?: string;
+    finance?: string;
+    exist?: string;
     page?: string;
   }>;
 }
@@ -103,13 +111,12 @@ function EdinetGrid({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {companies.map((c) => (
-        <Link
+        <div
           key={c.edinet_code}
-          href={`/company/${c.edinet_code}`}
           className="card-hover group bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm"
         >
           <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
+            <Link href={`/company/${c.edinet_code}`} className="min-w-0 flex-1">
               <p className="font-semibold text-slate-800 truncate group-hover:text-blue-600 transition-colors">
                 {c.name}
               </p>
@@ -121,7 +128,7 @@ function EdinetGrid({
                   {c.industry}
                 </span>
               </p>
-            </div>
+            </Link>
             <div className="flex flex-col items-end gap-1.5 shrink-0">
               <span
                 className={`text-xs px-2.5 py-1 rounded-full font-bold shadow-sm ${creditColor(c.credit_rating)}`}
@@ -133,7 +140,14 @@ function EdinetGrid({
               </span>
             </div>
           </div>
-        </Link>
+          <div className="mt-3 flex justify-end">
+            <AddToSellerButton
+              companyName={c.name}
+              companyCode={c.edinet_code}
+              industry={c.industry}
+            />
+          </div>
+        </div>
       ))}
     </div>
   );
@@ -144,25 +158,52 @@ function EdinetGrid({
 async function GBizResults({
   q,
   year,
+  yearTo,
+  capitalFrom,
   capitalTo,
+  employeesFrom,
   employeesTo,
   prefecture,
+  business,
   subsidy,
   patent,
+  commendation,
+  finance,
+  exist,
   page,
 }: {
   q?: string;
   year?: number;
+  yearTo?: number;
+  capitalFrom?: number;
   capitalTo?: number;
+  employeesFrom?: number;
   employeesTo?: number;
   prefecture?: string;
+  business?: string;
   subsidy?: boolean;
   patent?: boolean;
+  commendation?: boolean;
+  finance?: boolean;
+  exist?: boolean;
   page: number;
 }) {
   // gBizINFO requires at least one filter parameter
   const hasFilter =
-    q || year || capitalTo || employeesTo || prefecture || subsidy || patent;
+    q ||
+    year ||
+    yearTo ||
+    capitalFrom ||
+    capitalTo ||
+    employeesFrom ||
+    employeesTo ||
+    prefecture ||
+    business ||
+    subsidy ||
+    patent ||
+    commendation ||
+    finance ||
+    exist;
   if (!hasFilter) return null;
 
   // AI拡張: 複数キーワードで並列検索
@@ -174,12 +215,19 @@ async function GBizResults({
       terms.map((t) =>
         searchGBiz({
           name: t || undefined,
-          founded_year: year,
+          founded_year_from: year,
+          founded_year_to: yearTo,
+          capital_stock_from: capitalFrom,
           capital_stock_to: capitalTo,
+          employee_number_from: employeesFrom,
           employee_number_to: employeesTo,
           prefecture,
+          business_item: business,
           subsidy,
           patent,
+          commendation,
+          finance,
+          exist_flg: exist,
           page,
           limit: 50,
         }),
@@ -260,13 +308,15 @@ async function GBizResults({
         {companies.map((c) => {
           const age = yearsOld(c.date_of_establishment);
           return (
-            <Link
+            <div
               key={c.corporate_number}
-              href={`/startups/${c.corporate_number}`}
               className="card-hover group bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm"
             >
               <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
+                <Link
+                  href={`/startups/${c.corporate_number}`}
+                  className="min-w-0 flex-1"
+                >
                   <p className="font-semibold text-slate-800 truncate group-hover:text-purple-600 transition-colors">
                     {c.name}
                   </p>
@@ -279,7 +329,7 @@ async function GBizResults({
                       {c.business_summary}
                     </p>
                   )}
-                </div>
+                </Link>
                 <div className="text-right text-xs shrink-0 space-y-1.5">
                   {age !== null && (
                     <span
@@ -316,7 +366,13 @@ async function GBizResults({
                   </span>
                 )}
               </div>
-            </Link>
+              <div className="mt-3 flex justify-end">
+                <AddToSellerButton
+                  companyName={c.name}
+                  companyCode={c.corporate_number}
+                />
+              </div>
+            </div>
           );
         })}
       </div>
@@ -460,15 +516,26 @@ export default async function SearchPage({ searchParams }: Props) {
   const industry = params.industry;
   const page = Math.max(1, parseInt(params.page || "1", 10));
   const year = params.year ? parseInt(params.year, 10) : undefined;
+  const yearTo = params.year_to ? parseInt(params.year_to, 10) : undefined;
+  const capitalFrom = params.capital_from
+    ? parseInt(params.capital_from, 10)
+    : undefined;
   const capitalTo = params.capital_to
     ? parseInt(params.capital_to, 10)
+    : undefined;
+  const employeesFrom = params.employees_from
+    ? parseInt(params.employees_from, 10)
     : undefined;
   const employeesTo = params.employees_to
     ? parseInt(params.employees_to, 10)
     : undefined;
   const prefecture = params.prefecture;
+  const business = params.business;
   const subsidy = params.subsidy === "1" ? true : undefined;
   const patent = params.patent === "1" ? true : undefined;
+  const commendation = params.commendation === "1" ? true : undefined;
+  const finance = params.finance === "1" ? true : undefined;
+  const exist = params.exist === "1" ? true : undefined;
 
   return (
     <div className="space-y-6">
@@ -486,11 +553,18 @@ export default async function SearchPage({ searchParams }: Props) {
             defaultSource={source}
             defaultIndustry={industry}
             defaultYear={params.year}
+            defaultYearTo={params.year_to}
+            defaultCapitalFrom={params.capital_from}
             defaultCapitalTo={params.capital_to}
+            defaultEmployeesFrom={params.employees_from}
             defaultEmployeesTo={params.employees_to}
             defaultPrefecture={prefecture}
+            defaultBusiness={business}
             defaultSubsidy={subsidy}
             defaultPatent={patent}
+            defaultCommendation={commendation}
+            defaultFinance={finance}
+            defaultExist={exist}
             currentYear={CURRENT_YEAR}
           />
         </Suspense>
@@ -509,11 +583,18 @@ export default async function SearchPage({ searchParams }: Props) {
           <GBizResults
             q={q}
             year={year}
+            yearTo={yearTo}
+            capitalFrom={capitalFrom}
             capitalTo={capitalTo}
+            employeesFrom={employeesFrom}
             employeesTo={employeesTo}
             prefecture={prefecture}
+            business={business}
             subsidy={subsidy}
             patent={patent}
+            commendation={commendation}
+            finance={finance}
+            exist={exist}
             page={page}
           />
         </Suspense>
