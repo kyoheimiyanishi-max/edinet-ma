@@ -6,22 +6,27 @@ import { findById as getSeller } from "@/lib/d6e/repos/sellers";
 
 export const maxDuration = 120;
 
+// NOTE: Anthropic Structured Outputs (output_config.format.schema) does not
+// support `minItems` / `maxItems` > 1 on array types, so we drop .min/.max
+// from the Zod schema. The 3〜10 range is instead enforced via the prompt.
+// Similarly, z.number().min()/.max() would produce `minimum/maximum` which
+// Anthropic Structured Outputs also rejects, so fitScore is kept as plain
+// number with the range stated in the describe string.
 const BuyerSchema = z.object({
-  buyers: z
-    .array(
-      z.object({
-        companyName: z.string().describe("買い手候補企業名"),
-        industry: z.string().describe("業種・事業領域"),
-        rationale: z
-          .string()
-          .describe(
-            "この売主にとってこの買い手が適している理由（シナジー・財務余力・戦略適合性など）",
-          ),
-        fitScore: z.number().min(1).max(10).describe("適合度スコア(1-10)"),
-      }),
-    )
-    .min(3)
-    .max(10),
+  buyers: z.array(
+    z.object({
+      companyName: z.string().describe("買い手候補企業名"),
+      industry: z.string().describe("業種・事業領域"),
+      rationale: z
+        .string()
+        .describe(
+          "この売主にとってこの買い手が適している理由（シナジー・財務余力・戦略適合性など）",
+        ),
+      fitScore: z
+        .number()
+        .describe("適合度スコア (1 以上 10 以下の整数、10 が最適)"),
+    }),
+  ),
 });
 
 interface Ctx {
