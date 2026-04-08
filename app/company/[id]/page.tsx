@@ -798,25 +798,6 @@ async function EnrichedSections({
 
   return (
     <>
-      {/* 企業概要 */}
-      {(enriched.wikipedia || enriched.websiteMeta?.description) && (
-        <SectionCard
-          title="企業概要"
-          badge={enriched.wikipedia ? "Wikipedia" : "公式サイト"}
-        >
-          <p className="text-sm text-slate-700 leading-relaxed">
-            {enriched.wikipedia?.description ||
-              enriched.websiteMeta?.description}
-          </p>
-          <div className="mt-3">
-            <SourceLink
-              url={(enriched.wikipedia || enriched.websiteMeta)!.url}
-              name={(enriched.wikipedia || enriched.websiteMeta)!.name}
-            />
-          </div>
-        </SectionCard>
-      )}
-
       {/* 事業内容 */}
       {enriched.websiteMeta?.bodyText && (
         <SectionCard title="事業内容" badge="公式サイトから取得">
