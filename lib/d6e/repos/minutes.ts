@@ -122,11 +122,19 @@ export async function findByProject(
 export async function findByParticipant(
   name: string,
 ): Promise<MeetingMinute[]> {
-  const all = await findAll();
-  const q = name.toLowerCase();
-  return all.filter((m) =>
-    m.participants.some((p) => p.toLowerCase().includes(q)),
+  // Use PostgreSQL's `array_to_string` + ILIKE to filter at the DB
+  // layer instead of fetching every row and filtering in JS. This
+  // stays performant as the minutes table grows.
+  const pattern = escapeSqlValue(
+    `%${name.replace(/%/g, "\\%").replace(/_/g, "\\_")}%`,
   );
+  const result = await executeSql<MinuteRow>(
+    `SELECT ${SELECT_COLUMNS}
+     FROM ${fromClause()}
+     WHERE array_to_string(m.attendees, ',') ILIKE ${pattern}
+     ORDER BY m.meeting_date DESC`,
+  );
+  return (result.rows ?? []).map(rowToMinute);
 }
 
 // ---- Writes ----

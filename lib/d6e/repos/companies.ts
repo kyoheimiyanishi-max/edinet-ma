@@ -2,6 +2,7 @@ import "server-only";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
+import { toListingStatus } from "./_enums";
 
 /**
  * d6e-backed repository for the `companies` table.
@@ -28,6 +29,16 @@ export type ListingStatus =
   | "tokyo_growth"
   | "other";
 
+/**
+ * d6e-persisted company record (the CRM/tracking layer).
+ *
+ * There are three distinct `Company`-ish types in this codebase; keep
+ * them straight when importing:
+ *   - `Company` (this file) — rows from the d6e `companies` table
+ *   - `UnifiedCompany` (`lib/unified-company.ts`) — merged view across
+ *      the live EDINET + gBizINFO APIs used by the search page
+ *   - `Company` (`lib/edinetdb.ts`) — raw EDINET DB API response
+ */
 export interface Company {
   id: string;
   name: string;
@@ -106,9 +117,10 @@ function rowToCompany(row: CompanyRow): Company {
     ...(row.sec_code ? { secCode: row.sec_code } : {}),
     ...(row.industry ? { industry: row.industry } : {}),
     ...(row.industry_detail ? { industryDetail: row.industry_detail } : {}),
-    ...(row.listing_status
-      ? { listingStatus: row.listing_status as ListingStatus }
-      : {}),
+    ...((): { listingStatus?: ListingStatus } => {
+      const ls = toListingStatus(row.listing_status);
+      return ls ? { listingStatus: ls } : {};
+    })(),
     ...(row.address ? { address: row.address } : {}),
     ...(row.postal_code ? { postalCode: row.postal_code } : {}),
     ...(row.phone ? { phone: row.phone } : {}),
@@ -212,13 +224,18 @@ export interface CompanyFilters {
 export async function search(filters: CompanyFilters = {}): Promise<Company[]> {
   const conditions: string[] = [];
   if (filters.query && filters.query.trim()) {
-    const q = filters.query.trim();
-    const escaped = q
-      .replace(/'/g, "''")
+    // Escape both single quotes (SQL literal) and LIKE wildcards
+    // (%, _) then pass through `escapeSqlValue` so the final literal
+    // goes through the same escape path as every other value in the
+    // repo layer. Keeps the injection-avoidance logic in one place.
+    const escapedForLike = filters.query
+      .trim()
+      .replace(/\\/g, "\\\\")
       .replace(/%/g, "\\%")
       .replace(/_/g, "\\_");
+    const pattern = escapeSqlValue(`%${escapedForLike}%`);
     conditions.push(
-      `(name ILIKE '%${escaped}%' OR name_kana ILIKE '%${escaped}%' OR name_en ILIKE '%${escaped}%' OR industry_detail ILIKE '%${escaped}%')`,
+      `(name ILIKE ${pattern} OR name_kana ILIKE ${pattern} OR name_en ILIKE ${pattern} OR industry_detail ILIKE ${pattern})`,
     );
   }
   if (filters.listingStatus) {

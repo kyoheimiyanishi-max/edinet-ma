@@ -10,6 +10,7 @@ import type {
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
+import { toAssignmentRole, toAssignmentStatus } from "./_enums";
 
 /**
  * d6e-backed repository for the `employees` table plus its two
@@ -66,8 +67,8 @@ function rowToAssignment(row: AssignmentRow): CompanyAssignment {
   return {
     companyCode: row.company_code ?? "",
     companyName: row.company_name,
-    role: (row.role ?? "主担当") as CompanyAssignment["role"],
-    status: (row.status ?? "アクティブ") as CompanyAssignment["status"],
+    role: toAssignmentRole(row.role),
+    status: toAssignmentStatus(row.status),
     note: row.note ?? "",
     assignedAt: row.assigned_at,
   };
@@ -91,6 +92,9 @@ function rowToEmployee(
   assignments: CompanyAssignment[],
   kpis: KPI[],
 ): Employee {
+  // Keep `email`/`department`/`position`/`phone` required (not `?`) to
+  // match the legacy Employee type used by the UI; use empty-string
+  // defaults when NULL rather than omitting the key.
   return {
     id: row.id,
     name: row.name,
@@ -188,17 +192,42 @@ export async function search(query?: string): Promise<Employee[]> {
 export async function getAssignmentsByCompany(
   companyCode: string,
 ): Promise<Array<{ employee: Employee; assignment: CompanyAssignment }>> {
-  const result = await executeSql<AssignmentRow>(
+  const assignmentsResult = await executeSql<AssignmentRow>(
     `SELECT ${ASSIGNMENT_COLUMNS} FROM ${tableRef("employee_assignments")} WHERE company_code = ${escapeSqlValue(companyCode)}`,
   );
-  const rows = result.rows ?? [];
-  if (rows.length === 0) return [];
-  const out: Array<{ employee: Employee; assignment: CompanyAssignment }> = [];
-  for (const row of rows) {
-    const employee = await findById(row.employee_id);
-    if (employee) out.push({ employee, assignment: rowToAssignment(row) });
+  const assignmentRows = assignmentsResult.rows ?? [];
+  if (assignmentRows.length === 0) return [];
+
+  // Batch-load the referenced employees + their full nested data
+  // (assignments + kpis) in 3 queries total rather than 3 × N.
+  const uniqueIds = Array.from(
+    new Set(assignmentRows.map((r) => r.employee_id)),
+  );
+  const inList = uniqueIds.map((id) => escapeSqlValue(id)).join(", ");
+  const [employeesResult, assignmentMap, kpiMap] = await Promise.all([
+    executeSql<EmployeeRow>(
+      `SELECT ${EMPLOYEE_COLUMNS} FROM ${tableRef("employees")} WHERE id IN (${inList})`,
+    ),
+    loadAssignmentsByEmployee(uniqueIds),
+    loadKpisByEmployee(uniqueIds),
+  ]);
+
+  const employeesById = new Map<string, Employee>();
+  for (const row of employeesResult.rows ?? []) {
+    employeesById.set(
+      row.id,
+      rowToEmployee(
+        row,
+        assignmentMap.get(row.id) ?? [],
+        kpiMap.get(row.id) ?? [],
+      ),
+    );
   }
-  return out;
+
+  return assignmentRows.flatMap((row) => {
+    const employee = employeesById.get(row.employee_id);
+    return employee ? [{ employee, assignment: rowToAssignment(row) }] : [];
+  });
 }
 
 // ---- Writes (core employee) ----

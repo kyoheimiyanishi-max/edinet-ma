@@ -103,6 +103,12 @@ export async function findByNaturalKey(
 }
 
 // ---- Writes ----
+//
+// This repo intentionally exposes only `create` and `remove` — not
+// `update`. M&A deal rows are news-sourced snapshots that we prefer
+// to replace (delete + recreate) rather than mutate in place so the
+// audit trail stays clean. If a per-field update becomes necessary in
+// the future, follow the pattern in `banks.ts` or `tax-advisors.ts`.
 
 export async function create(input: MaDealInput): Promise<Deal> {
   const id = crypto.randomUUID();

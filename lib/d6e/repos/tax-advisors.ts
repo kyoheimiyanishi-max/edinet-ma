@@ -9,6 +9,7 @@ import { ADVISOR_TYPES } from "@/lib/tax-advisors";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
+import { toAdvisorType } from "./_enums";
 
 /**
  * d6e-backed repository for the `tax_advisors` table.
@@ -37,7 +38,7 @@ function rowToAdvisor(row: TaxAdvisorRow): TaxAdvisor {
   return {
     id: row.id,
     name: row.name,
-    type: row.advisor_type as AdvisorType,
+    type: toAdvisorType(row.advisor_type),
     description: row.description ?? "",
     specialties: Array.isArray(row.specialties) ? row.specialties : [],
     ...(row.prefecture ? { prefecture: row.prefecture } : {}),

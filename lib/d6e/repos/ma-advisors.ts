@@ -9,6 +9,7 @@ import { MA_ADVISOR_TYPES } from "@/lib/ma-advisors";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
+import { toMaAdvisorType } from "./_enums";
 
 /**
  * d6e-backed repository for the `ma_advisors` table (curated M&A
@@ -34,7 +35,7 @@ function rowToAdvisor(row: MaAdvisorRow): MaAdvisor {
   return {
     id: row.id,
     name: row.name,
-    type: row.advisor_type as MaAdvisorType,
+    type: toMaAdvisorType(row.advisor_type),
     description: row.description ?? "",
     services: Array.isArray(row.services) ? row.services : [],
     ...(row.prefecture ? { prefecture: row.prefecture } : {}),
@@ -190,6 +191,38 @@ export async function create(input: MaAdvisorInput): Promise<MaAdvisor> {
     );
   }
   return created;
+}
+
+export async function update(
+  id: string,
+  patch: Partial<MaAdvisorInput>,
+): Promise<MaAdvisor | null> {
+  const assignments: string[] = [];
+  if (patch.name !== undefined)
+    assignments.push(`name = ${escapeSqlValue(patch.name)}`);
+  if (patch.type !== undefined)
+    assignments.push(`advisor_type = ${escapeSqlValue(patch.type)}`);
+  if (patch.description !== undefined)
+    assignments.push(`description = ${escapeSqlValue(patch.description)}`);
+  if (patch.services !== undefined)
+    assignments.push(`services = ${escapeSqlValue(patch.services, "jsonb")}`);
+  if (patch.prefecture !== undefined)
+    assignments.push(`prefecture = ${escapeSqlValue(patch.prefecture)}`);
+  if (patch.url !== undefined)
+    assignments.push(`website_url = ${escapeSqlValue(patch.url)}`);
+  if (patch.listed !== undefined)
+    assignments.push(`listed = ${patch.listed ? "TRUE" : "FALSE"}`);
+  if (patch.targetSize !== undefined)
+    assignments.push(`target_size = ${escapeSqlValue(patch.targetSize)}`);
+
+  if (assignments.length === 0) return findById(id);
+  assignments.push("updated_at = now()");
+
+  const result = await executeSql(
+    `UPDATE ${tableRef("ma_advisors")} SET ${assignments.join(", ")} WHERE id = ${escapeSqlValue(id)}`,
+  );
+  if ((result.affected_rows ?? 0) < 1) return null;
+  return findById(id);
 }
 
 export async function remove(id: string): Promise<boolean> {

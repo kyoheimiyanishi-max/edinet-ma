@@ -47,52 +47,75 @@ async function insertSeller(seller: Seller): Promise<void> {
      )`,
   );
 
-  for (const m of seller.minutes ?? []) {
+  // Batch-insert nested sub-rows in at most 3 multi-row statements
+  // (one per sub-table) instead of per-row awaits.
+  const minutes = seller.minutes ?? [];
+  if (minutes.length > 0) {
+    const values = minutes
+      .map(
+        (m) =>
+          `(
+            ${escapeSqlValue(m.id)},
+            ${escapeSqlValue(seller.id)},
+            ${escapeSqlValue(m.title)},
+            ${escapeSqlValue(m.date)},
+            ${escapeSqlValue(m.participants, "ARRAY", "_text")},
+            ${escapeSqlValue(m.content)},
+            ${escapeSqlValue(m.createdAt)}
+          )`,
+      )
+      .join(", ");
     await executeSql(
       `INSERT INTO ${tableRef("meeting_minutes")}
          (id, seller_id, title, meeting_date, attendees, content, created_at)
-       VALUES (
-         ${escapeSqlValue(m.id)},
-         ${escapeSqlValue(seller.id)},
-         ${escapeSqlValue(m.title)},
-         ${escapeSqlValue(m.date)},
-         ${escapeSqlValue(m.participants, "ARRAY", "_text")},
-         ${escapeSqlValue(m.content)},
-         ${escapeSqlValue(m.createdAt)}
-       )`,
+       VALUES ${values}`,
     );
   }
 
-  for (const d of seller.documents ?? []) {
+  const documents = seller.documents ?? [];
+  if (documents.length > 0) {
+    const values = documents
+      .map(
+        (d) =>
+          `(
+            ${escapeSqlValue(d.id)},
+            ${escapeSqlValue(seller.id)},
+            ${escapeSqlValue(d.title)},
+            ${escapeSqlValue(d.content)},
+            ${escapeSqlValue(d.uploadedAt)}
+          )`,
+      )
+      .join(", ");
     await executeSql(
       `INSERT INTO ${tableRef("seller_documents")}
          (id, seller_id, title, content, uploaded_at)
-       VALUES (
-         ${escapeSqlValue(d.id)},
-         ${escapeSqlValue(seller.id)},
-         ${escapeSqlValue(d.title)},
-         ${escapeSqlValue(d.content)},
-         ${escapeSqlValue(d.uploadedAt)}
-       )`,
+       VALUES ${values}`,
     );
   }
 
-  for (const b of seller.buyers ?? []) {
+  const buyers = seller.buyers ?? [];
+  if (buyers.length > 0) {
+    const values = buyers
+      .map(
+        (b) =>
+          `(
+            ${escapeSqlValue(b.id)},
+            ${escapeSqlValue(seller.id)},
+            ${escapeSqlValue(b.companyCode)},
+            ${escapeSqlValue(b.companyName)},
+            ${escapeSqlValue(b.industry)},
+            ${escapeSqlValue(b.source)},
+            ${escapeSqlValue(b.reasoning)},
+            ${escapeSqlValue(b.status)},
+            ${escapeSqlValue(b.addedAt)},
+            ${escapeSqlValue(b.updatedAt)}
+          )`,
+      )
+      .join(", ");
     await executeSql(
       `INSERT INTO ${tableRef("seller_buyer_candidates")}
          (id, seller_id, company_code, company_name, industry, source, reasoning, status, added_at, updated_at)
-       VALUES (
-         ${escapeSqlValue(b.id)},
-         ${escapeSqlValue(seller.id)},
-         ${escapeSqlValue(b.companyCode)},
-         ${escapeSqlValue(b.companyName)},
-         ${escapeSqlValue(b.industry)},
-         ${escapeSqlValue(b.source)},
-         ${escapeSqlValue(b.reasoning)},
-         ${escapeSqlValue(b.status)},
-         ${escapeSqlValue(b.addedAt)},
-         ${escapeSqlValue(b.updatedAt)}
-       )`,
+       VALUES ${values}`,
     );
   }
 }

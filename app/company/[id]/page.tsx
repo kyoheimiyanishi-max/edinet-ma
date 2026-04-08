@@ -23,9 +23,7 @@ import { summarizeItems } from "@/lib/summary";
 import {
   enrichCompany,
   fetchWikidata,
-  fetchExternalPatents,
   type EnrichResult,
-  type EnrichSource,
   type WikidataInfo,
   type WebSearchResult,
 } from "@/lib/enrich";

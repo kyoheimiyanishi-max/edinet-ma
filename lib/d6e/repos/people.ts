@@ -10,6 +10,7 @@ import { CATEGORIES } from "@/lib/people";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
+import { toPersonCategory } from "./_enums";
 
 /**
  * d6e-backed repository for the `ma_people` table.
@@ -52,7 +53,7 @@ function rowToPerson(row: MaPersonRow): Person {
     role: row.title ?? "",
     organization: row.company ?? "",
     description: row.profile ?? "",
-    category: (row.category ?? "アドバイザー") as PersonCategory,
+    category: toPersonCategory(row.category),
     notableDeals: Array.isArray(row.notable_deals) ? row.notable_deals : [],
     links: Array.isArray(row.links) ? row.links : [],
   };

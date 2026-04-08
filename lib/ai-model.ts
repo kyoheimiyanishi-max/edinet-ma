@@ -26,12 +26,15 @@ const DIRECT_IDS: Record<ModelSlug, string> = {
   haiku: "claude-haiku-4-5-20251001",
 };
 
-function useGateway(): boolean {
+// NOTE: not a React hook — prefix intentionally avoids `use*` to keep
+// eslint-plugin-react-hooks happy when this module is imported from
+// Server Components.
+function isGatewayEnabled(): boolean {
   return !!(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN);
 }
 
 export function getModel(slug: ModelSlug): LanguageModel {
-  if (useGateway()) {
+  if (isGatewayEnabled()) {
     return gateway(GATEWAY_IDS[slug]);
   }
   return anthropic(DIRECT_IDS[slug]);

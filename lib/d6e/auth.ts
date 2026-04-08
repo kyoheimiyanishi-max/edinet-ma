@@ -132,10 +132,25 @@ async function bootstrapFromEnv(): Promise<TokenState | null> {
   }
 
   if (envAccess) {
-    // Legacy path: only the access token is available. Use it until it
-    // expires, then fail loudly so the developer knows to add a refresh
-    // token.
-    const exp = decodeExp(envAccess) ?? nowSeconds() + 300;
+    // Legacy path: only the access token is available. Use it until
+    // it expires, then fail loudly so the developer knows to add a
+    // refresh token. If the exp claim cannot be decoded the token is
+    // malformed — refuse to bootstrap rather than silently granting a
+    // 5-minute lifetime.
+    const exp = decodeExp(envAccess);
+    if (exp === null) {
+      console.error(
+        "[d6e-auth] D6E_DEV_ACCESS_TOKEN is set but its `exp` claim " +
+          "could not be decoded. Refusing to bootstrap — please paste a " +
+          "fresh JWT or set D6E_DEV_REFRESH_TOKEN instead.",
+      );
+      return null;
+    }
+    console.warn(
+      "[d6e-auth] Running in legacy access-token mode. This token will " +
+        "expire and cannot be refreshed automatically; set " +
+        "D6E_DEV_REFRESH_TOKEN for persistent dev sessions.",
+    );
     return {
       accessToken: envAccess,
       refreshToken: "",
@@ -161,16 +176,16 @@ async function refreshIfNeeded(): Promise<TokenState> {
 
   inflightRefresh = (async () => {
     try {
-      // Reload from file in case another process refreshed.
+      // Reload from file in case another process refreshed. Single
+      // file read: the result is used both to short-circuit (if still
+      // valid) and as the source of the refresh token (if expired).
       if (!cached) {
         const fromFile = await readCacheFile();
-        if (fromFile && fromFile.expiresAt > now + PRE_REFRESH_WINDOW_SECONDS) {
-          cached = fromFile;
-          return fromFile;
-        }
         if (fromFile) {
-          // File cache exists but is expired — use its refresh token.
           cached = fromFile;
+          if (fromFile.expiresAt > now + PRE_REFRESH_WINDOW_SECONDS) {
+            return fromFile;
+          }
         }
       }
 

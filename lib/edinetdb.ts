@@ -37,6 +37,14 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
 // ---- Types ----
 
+/**
+ * EDINET DB API response row.
+ *
+ * Naming collision warning: this is one of three `Company` types in
+ * this codebase — see the docstring on `lib/d6e/repos/companies.ts`
+ * for the full list. Import with an alias (e.g. `EdinetCompany`) when
+ * mixing with the others.
+ */
 export interface Company {
   edinet_code: string;
   sec_code: string;

@@ -5,6 +5,7 @@ import { BANK_TYPES } from "@/lib/banks";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
+import { toBankType } from "./_enums";
 
 /**
  * d6e-backed repository for the `banks` table.
@@ -33,7 +34,7 @@ function rowToBank(row: BankRow): Bank {
   return {
     id: row.id,
     name: row.name,
-    type: row.bank_type as BankType,
+    type: toBankType(row.bank_type),
     description: row.description ?? "",
     maServices: Array.isArray(row.ma_services) ? row.ma_services : [],
     ...(row.prefecture ? { prefecture: row.prefecture } : {}),

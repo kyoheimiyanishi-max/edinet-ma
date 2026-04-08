@@ -9,6 +9,7 @@ import { FP_TYPES } from "@/lib/financial-planners";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
+import { toFpType } from "./_enums";
 
 /**
  * d6e-backed repository for the `financial_planners` table.
@@ -34,7 +35,7 @@ function rowToPlanner(row: FinancialPlannerRow): FinancialPlanner {
   return {
     id: row.id,
     name: row.name,
-    type: row.fp_type as FpType,
+    type: toFpType(row.fp_type),
     description: row.description ?? "",
     services: Array.isArray(row.services) ? row.services : [],
     ...(Array.isArray(row.certifications) && row.certifications.length > 0
@@ -208,6 +209,42 @@ export async function create(
     );
   }
   return created;
+}
+
+export async function update(
+  id: string,
+  patch: Partial<FinancialPlannerInput>,
+): Promise<FinancialPlanner | null> {
+  const assignments: string[] = [];
+  if (patch.name !== undefined)
+    assignments.push(`name = ${escapeSqlValue(patch.name)}`);
+  if (patch.type !== undefined)
+    assignments.push(`fp_type = ${escapeSqlValue(patch.type)}`);
+  if (patch.description !== undefined)
+    assignments.push(`description = ${escapeSqlValue(patch.description)}`);
+  if (patch.services !== undefined)
+    assignments.push(`services = ${escapeSqlValue(patch.services, "jsonb")}`);
+  if (patch.certifications !== undefined)
+    assignments.push(
+      `certifications = ${escapeSqlValue(patch.certifications, "jsonb")}`,
+    );
+  if (patch.targetClients !== undefined)
+    assignments.push(`target_clients = ${escapeSqlValue(patch.targetClients)}`);
+  if (patch.prefecture !== undefined)
+    assignments.push(`prefecture = ${escapeSqlValue(patch.prefecture)}`);
+  if (patch.url !== undefined)
+    assignments.push(`website_url = ${escapeSqlValue(patch.url)}`);
+  if (patch.listed !== undefined)
+    assignments.push(`listed = ${patch.listed ? "TRUE" : "FALSE"}`);
+
+  if (assignments.length === 0) return findById(id);
+  assignments.push("updated_at = now()");
+
+  const result = await executeSql(
+    `UPDATE ${tableRef("financial_planners")} SET ${assignments.join(", ")} WHERE id = ${escapeSqlValue(id)}`,
+  );
+  if ((result.affected_rows ?? 0) < 1) return null;
+  return findById(id);
 }
 
 export async function remove(id: string): Promise<boolean> {

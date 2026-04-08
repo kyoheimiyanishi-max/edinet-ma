@@ -9,6 +9,7 @@ import { COMMUNITY_TYPES } from "@/lib/communities";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
+import { toCommunityType } from "./_enums";
 
 /**
  * d6e-backed repository for the `ceo_communities` table.
@@ -47,7 +48,7 @@ function rowToCommunity(row: CeoCommunityRow): Community {
     description: row.description ?? "",
     ...(row.website_url ? { url: row.website_url } : {}),
     ...(row.prefecture ? { prefecture: row.prefecture } : {}),
-    type: (row.organization_type ?? "経営者団体") as CommunityType,
+    type: toCommunityType(row.organization_type),
     ...(row.member_count !== null ? { memberCount: row.member_count } : {}),
     focusAreas: Array.isArray(row.focus_areas) ? row.focus_areas : [],
     ...(row.founded_year !== null ? { established: row.founded_year } : {}),

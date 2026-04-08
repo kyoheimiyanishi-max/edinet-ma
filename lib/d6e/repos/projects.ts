@@ -10,6 +10,7 @@ import type {
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
+import { toProjectPriority, toProjectStatus } from "./_enums";
 
 /**
  * d6e-backed repository for the `projects` table.
@@ -46,8 +47,8 @@ function rowToProject(row: ProjectRow, assignedEmployeeIds: string[]): Project {
     id: row.id,
     name: row.name,
     description: row.description ?? "",
-    status: row.status as ProjectStatus,
-    priority: (row.priority ?? "中") as ProjectPriority,
+    status: toProjectStatus(row.status) as ProjectStatus,
+    priority: toProjectPriority(row.priority) as ProjectPriority,
     relatedCompanies: Array.isArray(row.related_companies)
       ? row.related_companies
       : [],

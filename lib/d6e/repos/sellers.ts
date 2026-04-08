@@ -2,16 +2,15 @@ import "server-only";
 
 import type {
   BuyerCandidate,
-  BuyerStatus,
   Seller,
   SellerDocument,
   SellerInput,
   SellerMinute,
-  SellerStage,
 } from "@/lib/sellers";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
+import { toBuyerSource, toBuyerStatus, toSellerStage } from "./_enums";
 
 /**
  * d6e-backed repository for the seller aggregate.
@@ -108,9 +107,9 @@ function rowToBuyer(row: BuyerRow): BuyerCandidate {
     companyCode: row.company_code ?? "",
     companyName: row.company_name,
     ...(row.industry ? { industry: row.industry } : {}),
-    source: row.source === "ai" ? "ai" : "manual",
+    source: toBuyerSource(row.source),
     reasoning: row.reasoning ?? "",
-    status: row.status as BuyerStatus,
+    status: toBuyerStatus(row.status),
     addedAt: row.added_at,
     updatedAt: row.updated_at,
   };
@@ -131,7 +130,7 @@ function rowToSeller(
     description: row.description ?? "",
     profile: row.profile ?? "",
     desiredTerms: row.desired_terms ?? "",
-    stage: (row.stage ?? "初回面談") as SellerStage,
+    stage: toSellerStage(row.stage),
     minutes,
     documents,
     buyers,
@@ -382,14 +381,17 @@ export async function addBuyer(
   input: Omit<BuyerCandidate, "id" | "addedAt" | "updatedAt">,
 ): Promise<Seller | null> {
   // Preserve legacy dedup: skip if an existing candidate matches by
-  // companyCode (when present) or by companyName.
+  // companyCode (when present) or by companyName. Build the OR
+  // branches as an array so the SQL stays well-formed regardless of
+  // whether companyCode is provided.
+  const orBranches = [`company_name = ${escapeSqlValue(input.companyName)}`];
+  if (input.companyCode) {
+    orBranches.unshift(`company_code = ${escapeSqlValue(input.companyCode)}`);
+  }
   const existing = await executeSql<{ id: string }>(
     `SELECT id FROM ${tableRef("seller_buyer_candidates")}
      WHERE seller_id = ${escapeSqlValue(sellerId)}
-       AND (
-         ${input.companyCode ? `company_code = ${escapeSqlValue(input.companyCode)} OR` : ""}
-         company_name = ${escapeSqlValue(input.companyName)}
-       )
+       AND (${orBranches.join(" OR ")})
      LIMIT 1`,
   );
   if (existing.rows && existing.rows.length > 0) {

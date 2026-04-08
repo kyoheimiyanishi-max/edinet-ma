@@ -155,9 +155,16 @@ export default function EmployeeManager() {
     setLoading(false);
   }, []);
 
+  // TODO(serverComponent): fetch initial employees in a parent Server
+  // Component and pass them as a prop so this effect can be removed.
+  // The current pattern triggers a re-render on mount; for an admin
+  // manager component that's acceptable but the idiomatic Next.js 16
+  // solution is to hoist the initial fetch out of the client bundle.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchEmployees();
   }, [fetchEmployees]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // ---- Filtered list ----
 

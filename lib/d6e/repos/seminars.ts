@@ -251,6 +251,12 @@ export async function getAllOrganizers(): Promise<string[]> {
 }
 
 // ---- Writes ----
+//
+// Only `create` and `remove` are exposed. Seminars are ingested from
+// connpass and other external sources; when an event changes we
+// re-ingest via the seeder (delete-and-replace), keeping the row in
+// sync with the upstream source of truth. Manual field-level updates
+// would risk clobbering on the next seed run.
 
 export async function create(input: SeminarInput): Promise<SeminarEvent> {
   const id = crypto.randomUUID();

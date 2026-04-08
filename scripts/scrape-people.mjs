@@ -342,7 +342,7 @@ async function scrapeGBiz(deduper, remaining) {
       if (deduper.add(person)) added++;
       if (added % 50 === 0) console.log(`  detail progress: +${added}`);
       await sleep(120);
-    } catch (e) {
+    } catch {
       // 個別エラーは無視
     }
   }
@@ -421,7 +421,7 @@ async function scrapeEdinet(deduper, remaining) {
           if (deduper.add(person)) added++;
         }
         await sleep(150);
-      } catch (e) {
+      } catch {
         // 役員データなしは多いので無視
       }
     }

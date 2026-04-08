@@ -198,7 +198,7 @@ export async function fetchWebsiteMeta(
 
 function extractBodyParagraphs(html: string): string {
   // Remove script/style/nav/header/footer tags and their content
-  let cleaned = html
+  const cleaned = html
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<style[\s\S]*?<\/style>/gi, "")
     .replace(/<nav[\s\S]*?<\/nav>/gi, "")

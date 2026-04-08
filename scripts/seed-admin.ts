@@ -36,62 +36,87 @@ async function seedEmployees(): Promise<void> {
   >;
   console.log(`\n📥  employees: ${employees.length} entries`);
 
+  // Partition into "to insert" and "to skip" so the core rows, the
+  // assignments and the KPIs each go in at most one multi-row INSERT
+  // instead of a per-row loop.
+  const fresh: typeof employees = [];
   for (const emp of employees) {
     if (await tableHasId("employees", emp.id)) {
       console.log(`  ⏭  skip ${emp.name} (${emp.id})`);
-      continue;
+    } else {
+      fresh.push(emp);
     }
+  }
+  if (fresh.length === 0) return;
 
-    // Core employee row — preserve original UUID.
+  // 1. Core employee rows (multi-row VALUES).
+  const empValues = fresh
+    .map(
+      (emp) =>
+        `(
+          ${escapeSqlValue(emp.id)},
+          ${escapeSqlValue(emp.name)},
+          ${escapeSqlValue(emp.email)},
+          ${escapeSqlValue(emp.department)},
+          ${escapeSqlValue(emp.position)},
+          ${escapeSqlValue(emp.phone)}
+        )`,
+    )
+    .join(", ");
+  await executeSql(
+    `INSERT INTO ${tableRef("employees")} (id, name, email, department, title, phone) VALUES ${empValues}`,
+  );
+
+  // 2. Assignments (all employees' rows flattened into one INSERT).
+  const assignmentRows = fresh.flatMap((emp) =>
+    (emp.assignments ?? []).map(
+      (a) =>
+        `(
+          ${escapeSqlValue(crypto.randomUUID())},
+          ${escapeSqlValue(emp.id)},
+          ${escapeSqlValue(a.companyCode)},
+          ${escapeSqlValue(a.companyName)},
+          ${escapeSqlValue(a.role)},
+          ${escapeSqlValue(a.status)},
+          ${escapeSqlValue(a.note)},
+          ${escapeSqlValue(a.assignedAt)}
+        )`,
+    ),
+  );
+  if (assignmentRows.length > 0) {
     await executeSql(
-      `INSERT INTO ${tableRef("employees")} (id, name, email, department, title, phone)
-       VALUES (
-         ${escapeSqlValue(emp.id)},
-         ${escapeSqlValue(emp.name)},
-         ${escapeSqlValue(emp.email)},
-         ${escapeSqlValue(emp.department)},
-         ${escapeSqlValue(emp.position)},
-         ${escapeSqlValue(emp.phone)}
-       )`,
+      `INSERT INTO ${tableRef("employee_assignments")}
+         (id, employee_id, company_code, company_name, role, status, note, assigned_at)
+       VALUES ${assignmentRows.join(", ")}`,
     );
+  }
 
-    // Assignments
-    for (const a of emp.assignments ?? []) {
-      await executeSql(
-        `INSERT INTO ${tableRef("employee_assignments")}
-           (id, employee_id, company_code, company_name, role, status, note, assigned_at)
-         VALUES (
-           ${escapeSqlValue(crypto.randomUUID())},
-           ${escapeSqlValue(emp.id)},
-           ${escapeSqlValue(a.companyCode)},
-           ${escapeSqlValue(a.companyName)},
-           ${escapeSqlValue(a.role)},
-           ${escapeSqlValue(a.status)},
-           ${escapeSqlValue(a.note)},
-           ${escapeSqlValue(a.assignedAt)}
-         )`,
-      );
-    }
+  // 3. KPIs (same flatten strategy).
+  const kpiRows = fresh.flatMap((emp) =>
+    (emp.kpis ?? []).map(
+      (k) =>
+        `(
+          ${escapeSqlValue(k.id)},
+          ${escapeSqlValue(emp.id)},
+          ${escapeSqlValue(k.period)},
+          ${escapeSqlValue(k.metric)},
+          ${escapeSqlValue(k.target)},
+          ${escapeSqlValue(k.actual)},
+          ${escapeSqlValue(k.unit)},
+          ${escapeSqlValue(k.note)},
+          ${escapeSqlValue(k.updatedAt)}
+        )`,
+    ),
+  );
+  if (kpiRows.length > 0) {
+    await executeSql(
+      `INSERT INTO ${tableRef("employee_kpis")}
+         (id, employee_id, period, metric, target, actual, unit, note, updated_at)
+       VALUES ${kpiRows.join(", ")}`,
+    );
+  }
 
-    // KPIs (may be missing from legacy records)
-    for (const k of emp.kpis ?? []) {
-      await executeSql(
-        `INSERT INTO ${tableRef("employee_kpis")}
-           (id, employee_id, period, metric, target, actual, unit, note, updated_at)
-         VALUES (
-           ${escapeSqlValue(k.id)},
-           ${escapeSqlValue(emp.id)},
-           ${escapeSqlValue(k.period)},
-           ${escapeSqlValue(k.metric)},
-           ${escapeSqlValue(k.target)},
-           ${escapeSqlValue(k.actual)},
-           ${escapeSqlValue(k.unit)},
-           ${escapeSqlValue(k.note)},
-           ${escapeSqlValue(k.updatedAt)}
-         )`,
-      );
-    }
-
+  for (const emp of fresh) {
     console.log(
       `  ✅  ${emp.name}  (${emp.assignments?.length ?? 0} assignments, ${emp.kpis?.length ?? 0} kpis)`,
     );
@@ -127,16 +152,19 @@ async function seedProjects(): Promise<void> {
        )`,
     );
 
-    // assignedEmployeeIds → project_assignees rows
-    for (const eid of p.assignedEmployeeIds) {
+    // assignedEmployeeIds → project_assignees rows (batch)
+    if (p.assignedEmployeeIds.length > 0) {
+      const assigneeValues = p.assignedEmployeeIds
+        .map((eid) => `(${escapeSqlValue(p.id)}, ${escapeSqlValue(eid)})`)
+        .join(", ");
       try {
         await executeSql(
-          `INSERT INTO ${tableRef("project_assignees")} (project_id, employee_id) VALUES (${escapeSqlValue(p.id)}, ${escapeSqlValue(eid)})`,
+          `INSERT INTO ${tableRef("project_assignees")} (project_id, employee_id) VALUES ${assigneeValues}`,
         );
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         console.error(
-          `    ⚠  assignee FK skipped: ${eid}  ${msg.slice(0, 80)}`,
+          `    ⚠  assignee batch skipped for ${p.name}: ${msg.slice(0, 120)}`,
         );
       }
     }

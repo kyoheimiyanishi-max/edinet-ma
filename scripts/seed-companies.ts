@@ -17,7 +17,7 @@ import {
   type CompanyInput,
   type ListingStatus,
 } from "../lib/d6e/repos/companies";
-import { escapeSqlValue, tableRef } from "../lib/d6e/sql";
+import { tableRef } from "../lib/d6e/sql";
 
 interface CodelistEntry {
   edinetCode: string;

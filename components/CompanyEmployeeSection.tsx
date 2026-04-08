@@ -74,9 +74,13 @@ export default function CompanyEmployeeSection({
     setAssigned(results);
   }, [companyCode]);
 
+  // TODO(serverComponent): hoist initial fetch to a parent Server
+  // Component. Effect is safe (only runs when companyCode changes).
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const unassigned = allEmployees.filter(
     (e) => !assigned.some((a) => a.employee.id === e.id),

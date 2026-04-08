@@ -10,12 +10,7 @@
  */
 
 import { BANKS } from "../lib/banks";
-import {
-  create,
-  findAll,
-  findByName,
-  type BankInput,
-} from "../lib/d6e/repos/banks";
+import { create, findAll, type BankInput } from "../lib/d6e/repos/banks";
 
 async function main(): Promise<void> {
   console.log(`📥  Loading curated BANKS array (${BANKS.length} entries)`);

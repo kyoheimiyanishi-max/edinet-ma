@@ -91,7 +91,8 @@ export async function POST(req: Request) {
           try {
             const companies = await searchEdinetCompanies(query);
             return { results: companies.slice(0, 10), total: companies.length };
-          } catch {
+          } catch (err) {
+            console.error("[chat.searchEdinetCompanies]", err);
             return { error: "EDINET APIキーが未設定またはAPI接続エラー" };
           }
         },
@@ -106,7 +107,8 @@ export async function POST(req: Request) {
         execute: async ({ edinetCode }) => {
           try {
             return await getEdinetCompany(edinetCode);
-          } catch {
+          } catch (err) {
+            console.error("[chat.getEdinetCompany]", err);
             return { error: "企業データの取得に失敗" };
           }
         },
@@ -121,7 +123,8 @@ export async function POST(req: Request) {
           try {
             const data = await getCompanyShareholders(edinetCode);
             return { shareholders: data.slice(0, 20), total: data.length };
-          } catch {
+          } catch (err) {
+            console.error("[chat.getCompanyShareholders]", err);
             return { error: "株主データの取得に失敗" };
           }
         },
@@ -139,7 +142,8 @@ export async function POST(req: Request) {
           try {
             const data = await searchShareholders(holderName);
             return { reports: data.slice(0, 15), total: data.length };
-          } catch {
+          } catch (err) {
+            console.error("[chat.searchShareholders]", err);
             return { error: "株主検索に失敗" };
           }
         },
@@ -160,7 +164,8 @@ export async function POST(req: Request) {
               limit: 10,
             });
             return { companies: data["hojin-infos"]?.slice(0, 10) || [] };
-          } catch {
+          } catch (err) {
+            console.error("[chat.searchGBizCompanies]", err);
             return { error: "gBizINFO APIキーが未設定またはAPI接続エラー" };
           }
         },
@@ -179,7 +184,8 @@ export async function POST(req: Request) {
           try {
             const items = await searchNews(query);
             return { news: items.slice(0, 15), total: items.length };
-          } catch {
+          } catch (err) {
+            console.error("[chat.searchNews]", err);
             return { error: "ニュース取得に失敗" };
           }
         },
@@ -217,7 +223,8 @@ export async function POST(req: Request) {
           try {
             const papers = await searchPapers(query);
             return { papers: papers.slice(0, 10), total: papers.length };
-          } catch {
+          } catch (err) {
+            console.error("[chat.searchResearchPapers]", err);
             return { error: "論文検索に失敗" };
           }
         },
@@ -232,7 +239,8 @@ export async function POST(req: Request) {
           try {
             const videos = await searchVideos(query);
             return { videos: videos.slice(0, 10), total: videos.length };
-          } catch {
+          } catch (err) {
+            console.error("[chat.searchYouTubeVideos]", err);
             return { error: "YouTube APIキーが未設定またはAPI接続エラー" };
           }
         },
@@ -250,7 +258,8 @@ export async function POST(req: Request) {
           try {
             const events = await searchSeminars({ query: keyword });
             return { events: events.slice(0, 10), total: events.length };
-          } catch {
+          } catch (err) {
+            console.error("[chat.searchSeminars]", err);
             return { error: "セミナー検索に失敗" };
           }
         },

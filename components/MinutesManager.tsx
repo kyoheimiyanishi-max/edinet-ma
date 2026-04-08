@@ -77,10 +77,15 @@ export default function MinutesManager() {
     setProjects(await res.json());
   }, []);
 
+  // TODO(serverComponent): move initial fetch to a parent Server
+  // Component and pass data via props. The current effect is safe
+  // (only runs once on mount) but triggers the Next.js 16 lint rule.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     fetchMinutes();
     fetchProjects();
   }, [fetchMinutes, fetchProjects]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const filtered = search
     ? minutes.filter(
