@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { generateText } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { getModel } from "@/lib/ai-model";
 import type { LineItem } from "@/components/ExpandableLinkList";
 
 const MAX_ITEMS = 12;
@@ -14,7 +14,7 @@ const cachedSummary = unstable_cache(
     if (!titlesJoined.trim()) return "";
     try {
       const result = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: getModel("sonnet"),
         system:
           "あなたは日本語のビジネス情報要約の専門家です。与えられた情報リストを1文（最大60文字）で簡潔にまとめてください。余計な前置き・引用符・「まとめ:」等のラベル・句点は付けず、ビジネスパーソンが一目で把握できる平文の1行のみを返してください。",
         prompt: `セクション: ${sectionLabel}

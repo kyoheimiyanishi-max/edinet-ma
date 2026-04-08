@@ -25,6 +25,8 @@ const NAV_ITEMS = [
   { href: "/seminars", label: "セミナー" },
   { href: "/tax-advisors", label: "税理士・会計士" },
   { href: "/banks", label: "銀行・金融機関" },
+  { href: "/ma-advisors", label: "M&A会社" },
+  { href: "/financial-planners", label: "Financial Planner" },
   { href: "/settings", label: "設定" },
 ];
 

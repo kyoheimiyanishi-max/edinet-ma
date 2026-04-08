@@ -1,26 +1,16 @@
 import { Suspense } from "react";
-import {
-  searchCompanies as searchEdinet,
-  listCompanies,
-  creditColor,
-} from "@/lib/edinetdb";
-import {
-  searchCompanies as searchGBiz,
-  kindLabel,
-  formatCapital,
-  formatEstablished,
-  yearsOld,
-} from "@/lib/gbiz";
-import { expandQuery } from "@/lib/ai-search";
-import UnifiedSearchForm from "@/components/UnifiedSearchForm";
-import type { SourceType } from "@/components/UnifiedSearchForm";
-import AddToSellerButton from "@/components/AddToSellerButton";
 import Link from "next/link";
+import { searchUnified, type ListedFilter } from "@/lib/unified-company";
+import type { UnifiedCompany } from "@/lib/unified-company";
+import { creditColor } from "@/lib/edinetdb";
+import { formatCapital } from "@/lib/gbiz";
+import UnifiedSearchForm from "@/components/UnifiedSearchForm";
+import AddToSellerButton from "@/components/AddToSellerButton";
 
 interface Props {
   searchParams: Promise<{
     q?: string;
-    source?: string;
+    listed?: string;
     industry?: string;
     year?: string;
     year_to?: string;
@@ -42,121 +32,23 @@ interface Props {
 const PAGE_SIZE = 30;
 const CURRENT_YEAR = new Date().getFullYear();
 
-// ---- EDINET Results ----
+function parseListed(value: string | undefined): ListedFilter {
+  if (value === "listed" || value === "unlisted") return value;
+  return "all";
+}
 
-async function EdinetResults({
+function parseIntOrUndefined(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+// ---- Result list ----
+
+async function UnifiedResults({
   q,
+  listed,
   industry,
-  page,
-}: {
-  q?: string;
-  industry?: string;
-  page: number;
-}) {
-  const apiKey = process.env.EDINET_API_KEY;
-  if (!apiKey) return null;
-
-  if (q) {
-    // AI拡張: 元のクエリ + AI生成の関連キーワードで並列検索
-    const terms = await expandQuery(q);
-    const settled = await Promise.allSettled(terms.map((t) => searchEdinet(t)));
-    const seen = new Set<string>();
-    const companies = settled
-      .flatMap((r) => (r.status === "fulfilled" ? r.value : []))
-      .filter((c) => {
-        if (seen.has(c.edinet_code)) return false;
-        seen.add(c.edinet_code);
-        return true;
-      });
-
-    if (companies.length === 0) return null;
-    return (
-      <div className="space-y-4">
-        <SectionLabel
-          label="上場企業 (EDINET)"
-          count={companies.length}
-          color="blue"
-          sub={terms.length > 1 ? `AI拡張: ${terms.join(", ")}` : undefined}
-        />
-        <EdinetGrid companies={companies} />
-      </div>
-    );
-  }
-
-  const result = await listCompanies({ industry, limit: PAGE_SIZE, page });
-  const total = result.meta?.pagination?.total || 0;
-  const totalPages = result.meta?.pagination?.total_pages || 1;
-
-  if (result.data.length === 0) return null;
-
-  return (
-    <div className="space-y-4">
-      <SectionLabel
-        label="上場企業 (EDINET)"
-        count={total}
-        color="blue"
-        sub={`${page}/${totalPages} ページ`}
-      />
-      <EdinetGrid companies={result.data} />
-      <Pagination page={page} totalPages={totalPages} industry={industry} />
-    </div>
-  );
-}
-
-function EdinetGrid({
-  companies,
-}: {
-  companies: Awaited<ReturnType<typeof searchEdinet>>;
-}) {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {companies.map((c) => (
-        <div
-          key={c.edinet_code}
-          className="card-hover group bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm"
-        >
-          <div className="flex items-start justify-between gap-2">
-            <Link href={`/company/${c.edinet_code}`} className="min-w-0 flex-1">
-              <p className="font-semibold text-slate-800 truncate group-hover:text-blue-600 transition-colors">
-                {c.name}
-              </p>
-              <p className="text-xs text-slate-400 mt-1 font-mono">
-                {c.edinet_code} {c.sec_code ? `/ ${c.sec_code}` : ""}
-              </p>
-              <p className="text-xs text-slate-500 mt-1.5">
-                <span className="inline-block px-2 py-0.5 bg-slate-100 rounded-full">
-                  {c.industry}
-                </span>
-              </p>
-            </Link>
-            <div className="flex flex-col items-end gap-1.5 shrink-0">
-              <span
-                className={`text-xs px-2.5 py-1 rounded-full font-bold shadow-sm ${creditColor(c.credit_rating)}`}
-              >
-                {c.credit_rating}
-              </span>
-              <span className="text-xs text-slate-400 font-mono">
-                {c.credit_score}pt
-              </span>
-            </div>
-          </div>
-          <div className="mt-3 flex justify-end">
-            <AddToSellerButton
-              companyName={c.name}
-              companyCode={c.edinet_code}
-              industry={c.industry}
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ---- gBizINFO Results ----
-
-async function GBizResults({
-  q,
   year,
   yearTo,
   capitalFrom,
@@ -173,6 +65,8 @@ async function GBizResults({
   page,
 }: {
   q?: string;
+  listed: ListedFilter;
+  industry?: string;
   year?: number;
   yearTo?: number;
   capitalFrom?: number;
@@ -188,309 +82,164 @@ async function GBizResults({
   exist?: boolean;
   page: number;
 }) {
-  // gBizINFO requires at least one filter parameter
-  const hasFilter =
-    q ||
-    year ||
-    yearTo ||
-    capitalFrom ||
-    capitalTo ||
-    employeesFrom ||
-    employeesTo ||
-    prefecture ||
-    business ||
-    subsidy ||
-    patent ||
-    commendation ||
-    finance ||
-    exist;
-  if (!hasFilter) return null;
+  const result = await searchUnified({
+    q,
+    listed,
+    industry,
+    page,
+    perSourceLimit: PAGE_SIZE,
+    gbiz: {
+      founded_year_from: year,
+      founded_year_to: yearTo,
+      capital_stock_from: capitalFrom,
+      capital_stock_to: capitalTo,
+      employee_number_from: employeesFrom,
+      employee_number_to: employeesTo,
+      prefecture,
+      business_item: business,
+      subsidy,
+      patent,
+      commendation,
+      finance,
+      exist_flg: exist,
+    },
+  });
 
-  // AI拡張: 複数キーワードで並列検索
-  const terms = q ? await expandQuery(q) : [undefined];
-
-  let allCompanies: Awaited<ReturnType<typeof searchGBiz>>["hojin-infos"] = [];
-  try {
-    const settled = await Promise.allSettled(
-      terms.map((t) =>
-        searchGBiz({
-          name: t || undefined,
-          founded_year_from: year,
-          founded_year_to: yearTo,
-          capital_stock_from: capitalFrom,
-          capital_stock_to: capitalTo,
-          employee_number_from: employeesFrom,
-          employee_number_to: employeesTo,
-          prefecture,
-          business_item: business,
-          subsidy,
-          patent,
-          commendation,
-          finance,
-          exist_flg: exist,
-          page,
-          limit: 50,
-        }),
-      ),
+  if (result.companies.length === 0) {
+    return (
+      <div className="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-200/60 shadow-sm">
+        条件に該当する企業が見つかりませんでした
+      </div>
     );
-    const seen = new Set<string>();
-    for (const r of settled) {
-      if (r.status !== "fulfilled") continue;
-      for (const c of r.value["hojin-infos"] || []) {
-        if (seen.has(c.corporate_number)) continue;
-        seen.add(c.corporate_number);
-        allCompanies.push(c);
-      }
-    }
-  } catch {
-    return null;
   }
-
-  const data = { "hojin-infos": allCompanies };
-
-  const companies = data["hojin-infos"] || [];
-  if (companies.length === 0) return null;
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <SectionLabel
-          label="法人 (gBizINFO)"
-          count={companies.length}
-          color="purple"
-          sub={[
-            companies.length === 50
-              ? `${page} ページ目（次のページあり）`
-              : `${page} ページ目`,
-            terms.length > 1
-              ? `AI拡張: ${terms.filter(Boolean).join(", ")}`
-              : "",
-          ]
-            .filter(Boolean)
-            .join(" | ")}
-        />
-        <div className="flex gap-2 text-sm">
-          {page > 1 && (
-            <GBizPageLink
-              page={page - 1}
-              params={{
-                q,
-                year,
-                capitalTo,
-                employeesTo,
-                prefecture,
-                subsidy,
-                patent,
-              }}
+      <div className="flex items-center gap-3 text-sm text-slate-500 flex-wrap">
+        <span>
+          ヒット:{" "}
+          <span className="font-semibold text-slate-700">
+            {result.meta.mergedTotal.toLocaleString()}
+          </span>{" "}
+          件
+        </span>
+        <span className="text-slate-300">|</span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          上場 {result.meta.listedCount.toLocaleString()}
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+          非上場 {result.meta.unlistedCount.toLocaleString()}
+        </span>
+        <span className="text-slate-300">|</span>
+        <span className="text-slate-400">
+          EDINET {result.meta.edinetTotal} / gBizINFO {result.meta.gbizTotal}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {result.companies.map((c) => (
+          <UnifiedCard key={c.id} company={c} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function UnifiedCard({ company: c }: { company: UnifiedCompany }) {
+  const accentColor = c.isListed ? "blue" : "purple";
+  const detailHref = `/company/${c.id}`;
+
+  return (
+    <div className="card-hover group bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm">
+      <div className="flex items-start justify-between gap-2">
+        <Link href={detailHref} className="min-w-0 flex-1">
+          <p
+            className={`font-semibold text-slate-800 truncate transition-colors ${
+              c.isListed
+                ? "group-hover:text-blue-600"
+                : "group-hover:text-purple-600"
+            }`}
+          >
+            {c.name}
+          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <span
+              className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                c.isListed
+                  ? "bg-blue-50 text-blue-700"
+                  : "bg-purple-50 text-purple-700"
+              }`}
             >
-              ← 前へ
-            </GBizPageLink>
+              {c.isListed ? "上場" : "非上場"}
+            </span>
+            {c.source === "both" && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">
+                EDINET+gBiz
+              </span>
+            )}
+            <span className="text-xs text-slate-400 font-mono truncate">
+              {c.edinetCode ?? c.corporateNumber}
+            </span>
+          </div>
+          {c.industry && (
+            <p className="text-xs text-slate-500 mt-1.5">
+              <span className="inline-block px-2 py-0.5 bg-slate-100 rounded-full">
+                {c.industry}
+              </span>
+            </p>
           )}
-          {companies.length === 50 && (
-            <GBizPageLink
-              page={page + 1}
-              params={{
-                q,
-                year,
-                capitalTo,
-                employeesTo,
-                prefecture,
-                subsidy,
-                patent,
-              }}
-            >
-              次へ →
-            </GBizPageLink>
+        </Link>
+        <div className="flex flex-col items-end gap-1.5 shrink-0">
+          {c.creditRating && (
+            <>
+              <span
+                className={`text-xs px-2.5 py-1 rounded-full font-bold shadow-sm ${creditColor(c.creditRating)}`}
+              >
+                {c.creditRating}
+              </span>
+              {c.creditScore != null && (
+                <span className="text-xs text-slate-400 font-mono">
+                  {c.creditScore}pt
+                </span>
+              )}
+            </>
           )}
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {companies.map((c) => {
-          const age = yearsOld(c.date_of_establishment);
-          return (
-            <div
-              key={c.corporate_number}
-              className="card-hover group bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <Link
-                  href={`/startups/${c.corporate_number}`}
-                  className="min-w-0 flex-1"
-                >
-                  <p className="font-semibold text-slate-800 truncate group-hover:text-purple-600 transition-colors">
-                    {c.name}
-                  </p>
-                  {c.kana && <p className="text-xs text-slate-400">{c.kana}</p>}
-                  <p className="text-xs text-slate-500 mt-1 truncate">
-                    {c.location}
-                  </p>
-                  {c.business_summary && (
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                      {c.business_summary}
-                    </p>
-                  )}
-                </Link>
-                <div className="text-right text-xs shrink-0 space-y-1.5">
-                  {age !== null && (
-                    <span
-                      className={`inline-block px-2.5 py-1 rounded-full font-bold shadow-sm ${
-                        age <= 3
-                          ? "bg-purple-100 text-purple-700"
-                          : age <= 7
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-slate-100 text-slate-600"
-                      }`}
-                    >
-                      {age <= 3 ? "創業期" : age <= 7 ? "成長期" : ""}
-                      {age}年
-                    </span>
-                  )}
-                  <p className="text-slate-400">{kindLabel(c.kind)}</p>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-slate-500">
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-1 h-1 rounded-full bg-slate-300" />
-                  設立: {formatEstablished(c.date_of_establishment)}
-                </span>
-                {c.capital_stock != null && (
-                  <span className="inline-flex items-center gap-1">
-                    <span className="w-1 h-1 rounded-full bg-slate-300" />
-                    資本金: {formatCapital(c.capital_stock)}
-                  </span>
-                )}
-                {c.employee_number != null && (
-                  <span className="inline-flex items-center gap-1">
-                    <span className="w-1 h-1 rounded-full bg-slate-300" />
-                    従業員: {c.employee_number}人
-                  </span>
-                )}
-              </div>
-              <div className="mt-3 flex justify-end">
-                <AddToSellerButton
-                  companyName={c.name}
-                  companyCode={c.corporate_number}
-                />
-              </div>
-            </div>
-          );
-        })}
+
+      {(c.capitalStock != null || c.employeeNumber != null || c.location) && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 text-xs text-slate-500">
+          {c.capitalStock != null && (
+            <span className="inline-flex items-center gap-1">
+              <span className={`w-1 h-1 rounded-full bg-${accentColor}-300`} />
+              資本金 {formatCapital(c.capitalStock)}
+            </span>
+          )}
+          {c.employeeNumber != null && (
+            <span className="inline-flex items-center gap-1">
+              <span className={`w-1 h-1 rounded-full bg-${accentColor}-300`} />
+              {c.employeeNumber}人
+            </span>
+          )}
+          {c.location && (
+            <span className="inline-flex items-center gap-1 truncate">
+              <span className={`w-1 h-1 rounded-full bg-${accentColor}-300`} />
+              {c.location}
+            </span>
+          )}
+        </div>
+      )}
+
+      <div className="mt-3 flex justify-end">
+        <AddToSellerButton
+          companyName={c.name}
+          companyCode={c.edinetCode ?? c.corporateNumber}
+          industry={c.industry}
+        />
       </div>
     </div>
-  );
-}
-
-// ---- Shared UI ----
-
-function SectionLabel({
-  label,
-  count,
-  color,
-  sub,
-}: {
-  label: string;
-  count: number;
-  color: "blue" | "purple";
-  sub?: string;
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <span
-        className={`w-1.5 h-1.5 rounded-full ${color === "blue" ? "bg-blue-500" : "bg-purple-500"}`}
-      />
-      <span className="text-sm text-slate-500">
-        {label}:{" "}
-        <span className="font-semibold text-slate-700">
-          {typeof count === "number" ? count.toLocaleString() : count}
-        </span>{" "}
-        件{sub && <span className="text-slate-300 mx-1">|</span>}
-        {sub && <span>{sub}</span>}
-      </span>
-    </div>
-  );
-}
-
-function Pagination({
-  page,
-  totalPages,
-  industry,
-}: {
-  page: number;
-  totalPages: number;
-  industry?: string;
-}) {
-  const buildHref = (p: number) => {
-    const qs = new URLSearchParams();
-    qs.set("source", "edinet");
-    if (industry) qs.set("industry", industry);
-    qs.set("page", String(p));
-    return `/search?${qs}`;
-  };
-  const pages = [];
-  for (let i = Math.max(1, page - 2); i <= Math.min(totalPages, page + 2); i++)
-    pages.push(i);
-
-  return (
-    <div className="flex items-center justify-center gap-1.5 pt-2">
-      {page > 1 && (
-        <Link
-          href={buildHref(page - 1)}
-          className="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
-        >
-          ← 前
-        </Link>
-      )}
-      {pages.map((p) => (
-        <Link
-          key={p}
-          href={buildHref(p)}
-          className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-medium transition-all ${
-            p === page
-              ? "bg-blue-600 text-white shadow-md shadow-blue-500/25"
-              : "text-slate-600 hover:bg-slate-100"
-          }`}
-        >
-          {p}
-        </Link>
-      ))}
-      {page < totalPages && (
-        <Link
-          href={buildHref(page + 1)}
-          className="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
-        >
-          次 →
-        </Link>
-      )}
-    </div>
-  );
-}
-
-function GBizPageLink({
-  page,
-  params,
-  children,
-}: {
-  page: number;
-  params: Record<string, unknown>;
-  children: React.ReactNode;
-}) {
-  const qs = new URLSearchParams();
-  qs.set("source", "gbiz");
-  qs.set("page", String(page));
-  if (params.q) qs.set("q", String(params.q));
-  if (params.year) qs.set("year", String(params.year));
-  if (params.capitalTo) qs.set("capital_to", String(params.capitalTo));
-  if (params.employeesTo) qs.set("employees_to", String(params.employeesTo));
-  if (params.prefecture) qs.set("prefecture", String(params.prefecture));
-  if (params.subsidy) qs.set("subsidy", "1");
-  if (params.patent) qs.set("patent", "1");
-  return (
-    <Link
-      href={`/search?${qs}`}
-      className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors"
-    >
-      {children}
-    </Link>
   );
 }
 
@@ -511,24 +260,17 @@ function ResultSkeleton() {
 
 export default async function SearchPage({ searchParams }: Props) {
   const params = await searchParams;
-  const source = (params.source || "all") as SourceType;
+  const listed = parseListed(params.listed);
   const q = params.q;
   const industry = params.industry;
   const page = Math.max(1, parseInt(params.page || "1", 10));
-  const year = params.year ? parseInt(params.year, 10) : undefined;
-  const yearTo = params.year_to ? parseInt(params.year_to, 10) : undefined;
-  const capitalFrom = params.capital_from
-    ? parseInt(params.capital_from, 10)
-    : undefined;
-  const capitalTo = params.capital_to
-    ? parseInt(params.capital_to, 10)
-    : undefined;
-  const employeesFrom = params.employees_from
-    ? parseInt(params.employees_from, 10)
-    : undefined;
-  const employeesTo = params.employees_to
-    ? parseInt(params.employees_to, 10)
-    : undefined;
+
+  const year = parseIntOrUndefined(params.year);
+  const yearTo = parseIntOrUndefined(params.year_to);
+  const capitalFrom = parseIntOrUndefined(params.capital_from);
+  const capitalTo = parseIntOrUndefined(params.capital_to);
+  const employeesFrom = parseIntOrUndefined(params.employees_from);
+  const employeesTo = parseIntOrUndefined(params.employees_to);
   const prefecture = params.prefecture;
   const business = params.business;
   const subsidy = params.subsidy === "1" ? true : undefined;
@@ -537,20 +279,35 @@ export default async function SearchPage({ searchParams }: Props) {
   const finance = params.finance === "1" ? true : undefined;
   const exist = params.exist === "1" ? true : undefined;
 
+  const hasAnyInput =
+    Boolean(q) ||
+    Boolean(industry) ||
+    year != null ||
+    yearTo != null ||
+    capitalFrom != null ||
+    capitalTo != null ||
+    employeesFrom != null ||
+    employeesTo != null ||
+    Boolean(prefecture) ||
+    Boolean(business) ||
+    Boolean(subsidy) ||
+    Boolean(patent) ||
+    Boolean(commendation) ||
+    Boolean(finance) ||
+    Boolean(exist) ||
+    listed === "listed";
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold text-slate-800">企業検索</h2>
-        <p className="text-sm text-slate-500 mt-1">
-          EDINET上場企業 + gBizINFO 500万社を横断検索
-        </p>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6">
         <Suspense>
           <UnifiedSearchForm
             defaultQ={q}
-            defaultSource={source}
+            defaultListed={listed}
             defaultIndustry={industry}
             defaultYear={params.year}
             defaultYearTo={params.year_to}
@@ -570,18 +327,12 @@ export default async function SearchPage({ searchParams }: Props) {
         </Suspense>
       </div>
 
-      {/* EDINET Results */}
-      {(source === "all" || source === "edinet") && (
+      {hasAnyInput ? (
         <Suspense fallback={<ResultSkeleton />}>
-          <EdinetResults q={q} industry={industry} page={page} />
-        </Suspense>
-      )}
-
-      {/* gBizINFO Results */}
-      {(source === "all" || source === "gbiz") && (
-        <Suspense fallback={<ResultSkeleton />}>
-          <GBizResults
+          <UnifiedResults
             q={q}
+            listed={listed}
+            industry={industry}
             year={year}
             yearTo={yearTo}
             capitalFrom={capitalFrom}
@@ -598,10 +349,7 @@ export default async function SearchPage({ searchParams }: Props) {
             page={page}
           />
         </Suspense>
-      )}
-
-      {/* Empty state when no source selected */}
-      {!q && source === "all" && !industry && (
+      ) : (
         <div className="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-200/60 shadow-sm">
           企業名を入力するか、フィルターで絞り込んでください
         </div>

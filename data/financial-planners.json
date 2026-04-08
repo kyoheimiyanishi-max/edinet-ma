@@ -1,0 +1,5523 @@
+[
+  {
+    "id": "fp-partner",
+    "name": "FPパートナー",
+    "type": "独立系FP",
+    "description": "全国展開する独立系FP大手「マネードクター」を運営。保険・資産運用・住宅ローン・相続まで幅広く無料相談対応。東証プライム上場。",
+    "services": [
+      "ライフプラン",
+      "資産運用",
+      "保険見直し",
+      "相続対策"
+    ],
+    "certifications": [
+      "CFP",
+      "AFP",
+      "FP技能士"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://www.fppartner.co.jp/",
+    "listed": true
+  },
+  {
+    "id": "gaia-fp",
+    "name": "Gaia（ガイア）",
+    "type": "独立系FP",
+    "description": "有料相談型の独立系FP会社。金融商品の販売手数料に依存しないフィーベースの資産コンサルティングを展開。",
+    "services": [
+      "資産運用相談",
+      "ライフプラン設計",
+      "リタイアメントプランニング"
+    ],
+    "certifications": [
+      "CFP",
+      "AFP"
+    ],
+    "targetClients": "個人・富裕層",
+    "prefecture": "東京都",
+    "url": "https://www.gaiainc.jp/",
+    "listed": false
+  },
+  {
+    "id": "wealthnavi",
+    "name": "ウェルスナビ",
+    "type": "ロボアド",
+    "description": "国内最大級のロボアドバイザー「WealthNavi」を運営。全自動の国際分散投資サービスを個人向けに提供。東証グロース上場。",
+    "services": [
+      "ロボアドバイザー",
+      "自動積立",
+      "国際分散投資"
+    ],
+    "targetClients": "個人投資家",
+    "prefecture": "東京都",
+    "url": "https://www.wealthnavi.com/",
+    "listed": true
+  },
+  {
+    "id": "money-design-theo",
+    "name": "お金のデザイン（THEO）",
+    "type": "ロボアド",
+    "description": "ロボアドバイザー「THEO」を運営。IFA・金融機関向けのプラットフォームサービスも展開。",
+    "services": [
+      "ロボアドバイザー",
+      "IFA向けプラットフォーム"
+    ],
+    "targetClients": "個人投資家・法人",
+    "prefecture": "東京都",
+    "url": "https://www.money-design.com/",
+    "listed": false
+  },
+  {
+    "id": "jampg",
+    "name": "日本資産運用基盤グループ",
+    "type": "IFA",
+    "description": "IFA・地域金融機関向けの資産運用プラットフォーム事業を展開。フィーベース資産運用の普及を推進。東証グロース上場。",
+    "services": [
+      "IFA支援",
+      "資産運用プラットフォーム",
+      "金融機関向けソリューション"
+    ],
+    "targetClients": "IFA・金融機関",
+    "prefecture": "東京都",
+    "url": "https://www.japan-am-platform.com/",
+    "listed": true
+  },
+  {
+    "id": "bridge-international",
+    "name": "Bridge International",
+    "type": "IFA",
+    "description": "独立系IFA（Independent Financial Advisor）ネットワーク。証券会社と業務提携し、中立的な立場で顧客資産運用を支援。",
+    "services": [
+      "IFA資産運用",
+      "ポートフォリオ構築",
+      "相続・事業承継相談"
+    ],
+    "certifications": [
+      "証券外務員",
+      "CFP",
+      "AFP"
+    ],
+    "targetClients": "個人富裕層・法人オーナー",
+    "prefecture": "東京都",
+    "url": "https://bridge-international.jp/",
+    "listed": false
+  },
+  {
+    "id": "asset-guide",
+    "name": "アセットガイド",
+    "type": "独立系FP",
+    "description": "富裕層・経営者向けの資産コンサルティングを行う独立系FP会社。相続・事業承継税制を含む総合相談に対応。",
+    "services": [
+      "富裕層資産管理",
+      "相続対策",
+      "事業承継相談"
+    ],
+    "certifications": [
+      "CFP",
+      "1級FP技能士"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://assetguide.jp/",
+    "listed": false
+  },
+  {
+    "id": "mufg-pb",
+    "name": "三菱UFJモルガン・スタンレーPB証券",
+    "type": "銀行系FP",
+    "description": "三菱UFJフィナンシャル・グループとモルガン・スタンレーの合弁による富裕層向けプライベートバンキング。資産運用・事業承継・不動産コンサルを総合提供。",
+    "services": [
+      "プライベートバンキング",
+      "資産運用",
+      "事業承継",
+      "不動産"
+    ],
+    "targetClients": "超富裕層・企業オーナー",
+    "prefecture": "東京都",
+    "url": "https://www.sc.mufg.jp/company/pb/",
+    "listed": false
+  },
+  {
+    "id": "nomura-private-wealth",
+    "name": "野村證券 プライベート・ウェルス・マネジメント",
+    "type": "銀行系FP",
+    "description": "野村證券の富裕層向けPWM部門。資産運用から相続・事業承継・M&Aまで一貫したソリューションを提供。",
+    "services": [
+      "PWM",
+      "資産運用",
+      "相続対策",
+      "事業承継"
+    ],
+    "targetClients": "超富裕層・企業オーナー",
+    "prefecture": "東京都",
+    "url": "https://www.nomura.co.jp/service/pwm/",
+    "listed": false
+  },
+  {
+    "id": "sony-life-planner",
+    "name": "ソニー生命ライフプランナー",
+    "type": "保険系FP",
+    "description": "ソニー生命の専属ライフプランナーによる個別コンサルティング。生命保険を軸にしたライフプラン・資産形成相談を提供。",
+    "services": [
+      "生命保険設計",
+      "ライフプラン",
+      "相続対策"
+    ],
+    "certifications": [
+      "MDRT",
+      "CFP",
+      "AFP"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://www.sonylife.co.jp/",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1080001024510",
+    "name": "浜松ファイナンシャルプランナーズ事務所株式会社",
+    "type": "FP事務所",
+    "description": "FP事務所。 所在地: 静岡県静岡市駿河区池田２７４番２号 〒4228005",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "静岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1080001024510",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1260001016423",
+    "name": "株式会社岡山ファイナンシャルプランナーズ",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 岡山県岡山市北区大供本町４７４番地１ 〒7000911",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "岡山県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1260001016423",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010405002852",
+    "name": "特定非営利活動法人日本ファイナンシャル・プランナーズ協会",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 東京都港区虎ノ門４丁目１番２８号 〒1050001",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "法人・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010405002852",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4350001004432",
+    "name": "株式会社長谷川ファイナンシャルプランナー",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 宮崎県宮崎市大字恒久５２４４番地１ 〒8800916",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "宮崎県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4350001004432",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4490001003718",
+    "name": "株式会社浦田ファイナンシャルプランナーズ",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 高知県高知市百石町３丁目１４番１１号 〒7808015",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "高知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4490001003718",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5360002009775",
+    "name": "有限会社天久ファイナンシャルプランナー",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 沖縄県那覇市字天久１０３９番地 〒9000005",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "沖縄県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5360002009775",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6020005004402",
+    "name": "神奈川県ファイナンシャルプランナーズ協同組合",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 神奈川県横浜市神奈川区鶴屋町２丁目２１番地８ 〒2210835",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6020005004402",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6030001099718",
+    "name": "株式会社アルファ・ファイナンシャルプランナーズ",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 東京都新宿区西新宿７丁目１－１２ 〒1600023",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6030001099718",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5021003003578",
+    "name": "石渡ファイナンシャルプランニング事務所合同会社",
+    "type": "FP事務所",
+    "description": "FP事務所。 所在地: 東京都港区芝５丁目３２番１２号シャーメゾンステージ田町３階 〒1080014",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5021003003578",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5240001014482",
+    "name": "広島ファイナンシャルプランニング株式会社",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 広島県広島市中区小町８番２７号 〒7300041",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "広島県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5240001014482",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001164514",
+    "name": "株式会社ブレーメ・ファイナンシャルプランニング",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 東京都中央区日本橋大伝馬町６番２－８０１号 〒1030011",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001164514",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7011001110623",
+    "name": "日本ファイナンシャルプランニング株式会社",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 東京都渋谷区代々木２丁目１４番５号 〒1510053",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7011001110623",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8180005017287",
+    "name": "一般社団法人ファイナンシャルプランニング協会",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 愛知県名古屋市中区千代田５丁目７番１５号アーバニア千代田１２１１ 〒4600012",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "法人・経営者",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8180005017287",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001016976",
+    "name": "三菱ＵＦＪ不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区東新橋１丁目９番２号 〒1050021",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001016976",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001042238",
+    "name": "富国生命投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区内幸町２丁目２番２号 〒1000011",
+    "services": [
+      "保険見直し",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001042238",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001090724",
+    "name": "安田不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田錦町２丁目１１番地 〒1010054",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001090724",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001096036",
+    "name": "公共投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区銀座１丁目１４番４号 〒1040061",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001096036",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001165427",
+    "name": "ＮＴＴ都市開発投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目５番１号 〒1000004",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001165427",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001188130",
+    "name": "アレス投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区新富２丁目７番４号 〒1040041",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001188130",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001204291",
+    "name": "霞ヶ関投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区霞が関３丁目２番１号 〒1000013",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001204291",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010401071588",
+    "name": "森ビル不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区六本木６丁目７番６号 〒1060032",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010401071588",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010401085159",
+    "name": "光通信投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都豊島区東池袋２丁目６０番２号池袋パークハイツ２Ｆ－１２ 〒1700013",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010401085159",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010701021680",
+    "name": "楽天投信投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区南青山２丁目６番２１号 〒1070062",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010701021680",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1011101034744",
+    "name": "野村不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区芝浦１丁目１番１号 〒1050023",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1011101034744",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1220001008176",
+    "name": "エステック不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 石川県金沢市新神田５丁目５番地 〒9218013",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "石川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1220001008176",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001092059",
+    "name": "匠投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区紀尾井町１番１１号 〒1020094",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001092059",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001175334",
+    "name": "三菱ＨＣキャピタル不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目４番１号 〒1000005",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001175334",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001179491",
+    "name": "ヒューリック不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区銀座６丁目１３番１６号 〒1040061",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001179491",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001186810",
+    "name": "ＳＫＡＮＩＯＧＬＯＳ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目８番３号丸の内トラストタワー本館２０階 〒1000005",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001186810",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010401059104",
+    "name": "株式会社長谷工不動産投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区芝４丁目２番３号 〒1080014",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010401059104",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010401073757",
+    "name": "鹿島不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区永田町２丁目１１番１号 〒1000014",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010401073757",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2011101067941",
+    "name": "日神不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都新宿区新宿１丁目２８番１１号 〒1600022",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2011101067941",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2011101068626",
+    "name": "株式会社グローバル投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都新宿区西新宿２丁目４番１号 〒1600023",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2011101068626",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2011101098953",
+    "name": "株式会社グッドコムアセット投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都新宿区西新宿７丁目２０番１号住友不動産西新宿ビル 〒1600023",
+    "services": [
+      "資産運用",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2011101098953",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001058166",
+    "name": "三井不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋１丁目４番１号 〒1030027",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001058166",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001124760",
+    "name": "ファイブスター投信投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区入船１丁目２番９号八丁堀ＭＦビル８階 〒1040042",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001124760",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001127433",
+    "name": "ザクロ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂９丁目６番２９号 〒1070052",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001127433",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001165152",
+    "name": "あおぞら不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区麹町６丁目１番地１ 〒1020083",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001165152",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001183435",
+    "name": "株式会社ボルテックス投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区富士見２丁目１０番２号 〒1020071",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001183435",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001214784",
+    "name": "株式会社オープンハウス不動産投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田淡路町２丁目３番地６ 〒1010063",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001214784",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010401060333",
+    "name": "株式会社リサ投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区港南２丁目１５番３号 〒1080075",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010401060333",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010401092863",
+    "name": "ケネディクス不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区内幸町２丁目１番６号 〒1000011",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010401092863",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3011001147504",
+    "name": "大成不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都新宿区西新宿２丁目１番１号 〒1600023",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3011001147504",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3011301017159",
+    "name": "株式会社ＪＣブレイン投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都杉並区高円寺北３丁目１番９号青田ビル４０３ 〒1660002",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3011301017159",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010001094771",
+    "name": "ライジングブル投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋箱崎町１番５号ハニー箱崎ビル２Ｆ 〒1030015",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010001094771",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010401119021",
+    "name": "スターアジア投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区愛宕２丁目５番１号愛宕グリーンヒルズＭＯＲＩタワー１８階 〒1050002",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010401119021",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4011001029214",
+    "name": "メディック投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区白金３丁目７番１８号２０２ 〒1080072",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4011001029214",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4011101092376",
+    "name": "Ａ．Ｐ．サステナブル不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内２丁目３番２号 〒1000005",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4011101092376",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4040002043642",
+    "name": "有限会社遠藤雅幸投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 千葉県浦安市日の出１丁目３番４－５０２号海風の街 〒2790013",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "千葉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4040002043642",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4290001026334",
+    "name": "バランス投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 福岡県福岡市中央区平尾１丁目１３番２５号３０２ 〒8100014",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "福岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4290001026334",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001072561",
+    "name": "株式会社ＦＡ第一投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋兜町１番１０号 〒1030026",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001072561",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001112185",
+    "name": "みずほ不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目５番５号 〒1000004",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001112185",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001125583",
+    "name": "ＬＣＲ不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区永田町２丁目１１番１号 〒1000014",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001125583",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001140418",
+    "name": "ファーストブラザーズ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内２丁目４番１号 〒1000005",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001140418",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001217884",
+    "name": "ＪＲ東日本不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目７番１２号 〒1000005",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001217884",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001221218",
+    "name": "農中ＪＡＭＬ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋室町３丁目４番４号 〒1030022",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001221218",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010005004049",
+    "name": "一般社団法人日本投資顧問業協会",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋茅場町１丁目５番８号（東京証券会館） 〒1030025",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "法人・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010005004049",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010401086855",
+    "name": "バークレイズ投信投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区六本木６丁目１０番１号 〒1060032",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010401086855",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5040003008206",
+    "name": "つばめ投資顧問合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 千葉県袖ケ浦市奈良輪３３６ＧＡＵＬＡＢ３０７号室 〒2990263",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "千葉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5040003008206",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5080001025983",
+    "name": "ＳＦＧ不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 静岡県静岡市駿河区南町１１番１号 〒4228067",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "静岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5080001025983",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5120001215679",
+    "name": "関電不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市北区中之島３丁目３番２３号 〒5300005",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5120001215679",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5430001064384",
+    "name": "株式会社みんなの投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 北海道札幌市中央区南九条西５丁目１番１５号 〒0640809",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "北海道",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5430001064384",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010001132934",
+    "name": "株式会社ワイズ不動産投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田駿河台１丁目５番地６－２０３号 〒1010062",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010001132934",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010001139913",
+    "name": "いちご投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内２丁目６番１号 〒1000005",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010001139913",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010001163277",
+    "name": "大和ハウス不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区飯田橋３丁目２番２号 〒1020072",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010001163277",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010001167518",
+    "name": "アパ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂２丁目１２番７号 〒1070052",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010001167518",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010001176790",
+    "name": "大栄不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋人形町２丁目１５番１号フジタ人形町ビル６階 〒1030013",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010001176790",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010001219558",
+    "name": "ＢＳＰ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区九段南１丁目６番５号九段会館テラス 〒1020074",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010001219558",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010401071039",
+    "name": "株式会社ザイマックス不動産投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂１丁目１１番３０号 〒1070052",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010401071039",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6120001104757",
+    "name": "阪急阪神不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市北区角田町１番１２号 〒5300017",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6120001104757",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001049285",
+    "name": "大和住銀投信投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区霞が関３丁目２番１号 〒1000013",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001049285",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7020001015930",
+    "name": "株式会社プラザ投資顧問室",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県横浜市保土ケ谷区坂本町１２８ＦＫＤビル４０１ 〒2400043",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7020001015930",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7040001070940",
+    "name": "プリミエール投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 千葉県我孫子市高野山５８４番地の２１ 〒2701145",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "千葉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7040001070940",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001015377",
+    "name": "ＧＡＭ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目３番１号ＪＡビル 〒1000004",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001015377",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001026606",
+    "name": "東京ガス不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区紀尾井町４番３ 〒1020094",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001026606",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001075000",
+    "name": "三菱地所投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目６番５号 〒1000005",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001075000",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001084934",
+    "name": "ラサール不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目１１番１号 〒1000005",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001084934",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001096277",
+    "name": "三井住友トラスト不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目５番１号 〒1000004",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001096277",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001097564",
+    "name": "アルボーン・パートナーズ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目６番１号大手町ビル２階２３５区 〒1000004",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001097564",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001137147",
+    "name": "中銀投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田小川町３丁目１１番２号インペリアルお茶の水２０３号 〒1010052",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001137147",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010401148297",
+    "name": "カタリスト投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂１丁目１２番３２号 〒1070052",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010401148297",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8011101061294",
+    "name": "リアルリンク国際投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都文京区後楽１丁目４番１４号 〒1120004",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8011101061294",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8011201015456",
+    "name": "株式会社暁投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 埼玉県越谷市南越谷２丁目１４番４１号 〒3430845",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "埼玉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8011201015456",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8040001094303",
+    "name": "投資顧問アジアグローバル・インベストメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 千葉県千葉市若葉区都賀１丁目２０番２９号 〒2640025",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "千葉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8040001094303",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8100001024518",
+    "name": "株式会社Ｓｕｃｃｅｓｓ　Ｃｌｕｂ投資顧問",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂６丁目９番１７号赤坂メープルヒル６階弁護士法人法の里内 〒1070052",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8100001024518",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8120001074412",
+    "name": "池田泉州投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市北区豊崎３丁目１番２２号 〒5310072",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8120001074412",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8470001001034",
+    "name": "香賀投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 香川県高松市亀井町８番地１２ 〒7600050",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "香川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8470001001034",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001065462",
+    "name": "日立投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都台東区東上野２丁目１６番１号 〒1100015",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001065462",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001088125",
+    "name": "バリューサーチ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 埼玉県さいたま市南区鹿手袋６丁目１４番１１－３０８号 〒3360031",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "埼玉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001088125",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001112405",
+    "name": "東京建物不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋３丁目２番５号 〒1030027",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001112405",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001130761",
+    "name": "ＣＳＲデザイン環境投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区九段南３丁目８番１１号 〒1020074",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001130761",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001132378",
+    "name": "ＴＯＲＡＮＯＴＥＣ投信投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門４丁目３番１号城山トラストタワー３６階 〒1050001",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001132378",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001166954",
+    "name": "やまびこ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区新川２丁目３番４号新川田所ビル５階 〒1040033",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001166954",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001172449",
+    "name": "ノースアイランド投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋横山町１０番１１号 〒1030003",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001172449",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001175146",
+    "name": "マーチャントブレインズ投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区西新橋１丁目６番１２号アイオス虎ノ門１２０２号室 〒1050003",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001175146",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401070772",
+    "name": "日鉄興和不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂２丁目２３番１号 〒1070052",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401070772",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401071746",
+    "name": "オリックス不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区浜松町２丁目３番１号 〒1050013",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401071746",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401122648",
+    "name": "ＭＩＲＡＲＴＨ不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町２丁目２番１号 〒1000004",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401122648",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9011003018103",
+    "name": "投資顧問ランキング合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都渋谷区道玄坂１丁目１０番８号渋谷道玄坂東急ビル 〒1500043",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9011003018103",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9120001247140",
+    "name": "ＪＲ西日本不動産投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市北区中之島２丁目２番７号中之島セントラルタワー 〒5300005",
+    "services": [
+      "住宅ローン相談",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9120001247140",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9190001018683",
+    "name": "トップトレーダー投資顧問株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 三重県四日市市ときわ３丁目２番４号 〒5100834",
+    "services": [
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "三重県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9190001018683",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001197767",
+    "name": "日本資産運用基盤株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田錦町３丁目１７番１ 〒1010054",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001197767",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010405020371",
+    "name": "一般社団法人資産運用検定協会",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区芝浦３丁目９番１号芝浦ルネサイトタワー２Ｆ 〒1080023",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "法人・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010405020371",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9190001020689",
+    "name": "資産運用パートナーズ株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 三重県四日市市河原田町２０８－５ 〒5100874",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "三重県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9190001020689",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001182612",
+    "name": "株式会社ＯＡＧウェルスマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区五番町６番地２ 〒1020076",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001182612",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001209539",
+    "name": "ＵＢＳ　ＳｕＭｉ　ＴＲＵＳＴウェルス・マネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目４番１号 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001209539",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1011001163775",
+    "name": "Ｅ・ウェルスマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都渋谷区道玄坂２丁目１５番１号ノア道玄坂１２１３ 〒1500043",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1011001163775",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2230001010485",
+    "name": "ずかわ証券ウェルスマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 富山県高岡市守山町５番地の１ 〒9330928",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "富山県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2230001010485",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001149213",
+    "name": "マイウェルスマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区平河町２丁目１１番１０号 〒1020093",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001149213",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010601054563",
+    "name": "日本橋ウェルスマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋兜町１７番１号 〒1030026",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010601054563",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010401153424",
+    "name": "アクサ・ウェルス・マネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区白金１丁目１７番３号 〒1080072",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010401153424",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5290001071445",
+    "name": "株式会社グローバルウェルスマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 福岡県福岡市博多区店屋町６番６号ＭＯＤＥＲＮＢＵＲＥＡＵ店屋町９０２号 〒8120025",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "福岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5290001071445",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010401149049",
+    "name": "ＬＧＴウェルスマネジメント信託株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門２丁目１０番４号オークラプレステージタワー９階 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010401149049",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7180001090446",
+    "name": "三縁証券ウェルスマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 愛知県名古屋市中村区名駅南１丁目２４番３０号 〒4500003",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7180001090446",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001148763",
+    "name": "株式会社ネイチャーウェルスマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内２丁目２番１号岸本ビルヂング６階 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001148763",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8130002016940",
+    "name": "トクセイ・ウェルスマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 京都府京都市中京区夷川通堺町東入ル亀屋町１６３番地２ 〒6040000",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8130002016940",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8140001039636",
+    "name": "あいおい証券ウェルスマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 兵庫県相生市大石町４番２５号 〒6780005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "兵庫県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8140001039636",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001096862",
+    "name": "ウェルス・マネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂１丁目１２番３２号 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001096862",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001203154",
+    "name": "ＰＯＤウェルスマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区六本木１丁目４番５号アークヒルズサウスタワー１６階 〒1060032",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001203154",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9020001129638",
+    "name": "株式会社サーフウェルスマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県横浜市神奈川区鶴屋町３丁目３０番地１ 〒2210835",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9020001129638",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001068274",
+    "name": "三菱ＵＦＪウェルスアドバイザーズ株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区銀座１丁目７番３号 〒1040061",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001068274",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010401152867",
+    "name": "ウェルス・リアルティ・マネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂１丁目１２番３２号 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010401152867",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1013301040621",
+    "name": "株式会社ウェルスクエア",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都豊島区東池袋１丁目３４番５号 〒1700013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1013301040621",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1050002031839",
+    "name": "有限会社ウェルストーン",
+    "type": "IFA",
+    "description": "IFA。 所在地: 茨城県日立市南高野町１丁目１９番８号 〒3191224",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "茨城県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1050002031839",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1140001081033",
+    "name": "尾崎ウェルスチール株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市西淀川区佃４丁目１４番１号 〒5550001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1140001081033",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1260001031406",
+    "name": "株式会社ウェルストン",
+    "type": "IFA",
+    "description": "IFA。 所在地: 広島県福山市箕島町６４１５番地 〒7210957",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "広島県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1260001031406",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001200868",
+    "name": "みらいウェルス株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区京橋２丁目２番１号京橋エドグラン１９階 〒1040031",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001200868",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010003039751",
+    "name": "合同会社ウェルスファンドツー",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目４番１号東京共同会計事務所内 〒1000005",
+    "services": [
+      "資産運用",
+      "投資助言"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010003039751",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2120001208462",
+    "name": "ペレグリン・ウェルス・サービシズ株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市西区西本町１丁目７番２１－８０３号 〒5500005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2120001208462",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2120001219369",
+    "name": "株式会社ウェルスペック",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市西区北堀江１丁目６－５大輪ビル９Ｆ 〒5500014",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2120001219369",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2180305008776",
+    "name": "一般社団法人グッドウェルス",
+    "type": "IFA",
+    "description": "IFA。 所在地: 愛知県西尾市上矢田町熊子３９番地８ 〒4440313",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2180305008776",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001167611",
+    "name": "ウェルスナビ株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都品川区西五反田８丁目４番１３号五反田ＪＰビルディング９階 〒1410031",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001167611",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001168485",
+    "name": "ウェルスガーディアン株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田須田町１丁目２４番６号ＡＣＮ神田須田町ビル１１Ｆ 〒1010041",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001168485",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001204141",
+    "name": "ジャパンウェルスアドバイザーズ株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋人形町１丁目４番１０号 〒1030013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001204141",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001239443",
+    "name": "ＭｉＲａＩウェルス・パートナーズ株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目５番１号 〒1000004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001239443",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3012801020981",
+    "name": "株式会社ウェルスアセット",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都新宿区西新宿７丁目１９－２２新宿ダイカンプラザシティ２１２ 〒1600023",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3012801020981",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3013301035909",
+    "name": "山一ウェルス・エンゲージメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都豊島区東池袋３丁目１－１サンシャイン６０、１２階 〒1700013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3013301035909",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3020001133538",
+    "name": "株式会社ウェルスプラン",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県横浜市中区扇町１丁目１番地２５ 〒2310027",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3020001133538",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3080101018848",
+    "name": "株式会社アークウェルス",
+    "type": "IFA",
+    "description": "IFA。 所在地: 静岡県沼津市大岡９８４番地の１ 〒4100022",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "静岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3080101018848",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3240001060330",
+    "name": "株式会社ウェルスクリエイト",
+    "type": "IFA",
+    "description": "IFA。 所在地: 広島県広島市南区京橋町１番７号アスティ広島京橋ビルディング 〒7320828",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "広島県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3240001060330",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3310001016894",
+    "name": "株式会社長崎ウェルスチール工業",
+    "type": "IFA",
+    "description": "IFA。 所在地: 長崎県長崎市多以良町１５５１番地１０９ 〒8512213",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "長崎県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3310001016894",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3430001087387",
+    "name": "ウェルスリー株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 北海道札幌市西区発寒三条１丁目２－２５ 〒0630823",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "北海道",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3430001087387",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010401161930",
+    "name": "株式会社ウェルスコンダクターズ",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂３丁目１２番１１号ゴールド赤坂３階 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010401161930",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5011101007119",
+    "name": "株式会社コモンウェルスエンジニアーズ",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都新宿区高田馬場３丁目３５番２号 〒1690075",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5011101007119",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5011102018197",
+    "name": "有限会社コモンウェルスシビルデザイン",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都新宿区高田馬場３丁目３５番２号 〒1690075",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5011102018197",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5040002016151",
+    "name": "有限会社コモンウェルス",
+    "type": "IFA",
+    "description": "IFA。 所在地: 千葉県千葉市若葉区小倉台５丁目１９番２号 〒2640006",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "千葉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5040002016151",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5300003001349",
+    "name": "ウェルス・クリエーション合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 佐賀県佐賀市本庄町大字末次２５５番地４ 〒8400024",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "佐賀県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5300003001349",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010001203743",
+    "name": "ウェルスガーディアンキャピタルパートナーズ株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田須田町１丁目２４番６号ＡＣＮ神田須田町ビル１１Ｆ 〒1010041",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010001203743",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010501048449",
+    "name": "株式会社ＴＹウェルス・パートナーズ",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋蛎殻町１丁目６番３号ＶＯＲＴ茅場町Ⅰ 〒1030014",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010501048449",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6011101062435",
+    "name": "株式会社ウェルステート",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都新宿区市谷仲之町３番３４号 〒1620064",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6011101062435",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6122001034661",
+    "name": "株式会社ウェルステックラボ",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大東市大野１丁目５番９号 〒5740042",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6122001034661",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6140001094476",
+    "name": "株式会社ウェルスエンジニアリング",
+    "type": "IFA",
+    "description": "IFA。 所在地: 兵庫県加古川市平岡町一色４番地の６ 〒6750115",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "兵庫県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6140001094476",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6180001062090",
+    "name": "東海東京ウェルス・コンサルティング株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 愛知県名古屋市中村区名駅４丁目５番２８号 〒4500002",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6180001062090",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6260001031574",
+    "name": "株式会社ウェルスマイル",
+    "type": "IFA",
+    "description": "IFA。 所在地: 岡山県岡山市南区古新田１３９１番地１コワーキングスペースひとやね 〒7010203",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "岡山県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6260001031574",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001122612",
+    "name": "エクスウェルス・インテグレート・ジャパン株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区九段南１丁目５番６号りそな九段ビル５階 〒1020074",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001122612",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001215969",
+    "name": "ウェルスウォーター株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区銀座１丁目３番３号 〒1040061",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001215969",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010003029847",
+    "name": "合同会社ウェルスファンド",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目４番１号東京共同会計事務所内 〒1000005",
+    "services": [
+      "資産運用",
+      "投資助言"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010003029847",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7011001044805",
+    "name": "Ｉ－Ｏウェルス・アドバイザーズ株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都渋谷区広尾１丁目８番６号 〒1500012",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7011001044805",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7011101073456",
+    "name": "株式会社スーツ・ウェルス・マネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区九段南４丁目６番１３号ニュー九段マンション３０１号 〒1020074",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7011101073456",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8021001062672",
+    "name": "コンコルドウェルス株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県小田原市上新田２２番地の２２ 〒2500877",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8021001062672",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8430001087325",
+    "name": "株式会社ウェルスタート",
+    "type": "IFA",
+    "description": "IFA。 所在地: 北海道札幌市中央区北四条西１７丁目１番地ＶＥＲＩＴＡＳ美術館通１０６号 〒0600004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "北海道",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8430001087325",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401170341",
+    "name": "株式会社ウェルスゲート",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区南青山１丁目２番６号ラティス青山スクエア２階 〒1070062",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401170341",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9030001096885",
+    "name": "株式会社ウェルストーン",
+    "type": "IFA",
+    "description": "IFA。 所在地: 埼玉県入間市大字野田１４６１番地２ 〒3580054",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "埼玉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9030001096885",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9280001008361",
+    "name": "株式会社ウェルス",
+    "type": "IFA",
+    "description": "IFA。 所在地: 島根県邑智郡邑南町高水２４６７－１０ 〒6960131",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "島根県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9280001008361",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3040001042332",
+    "name": "株式会社プライベートバンキング＆コンサルティング",
+    "type": "銀行系FP",
+    "description": "銀行系FP。 所在地: 埼玉県さいたま市北区盆栽町９５番２号２０６ 〒3310805",
+    "services": [
+      "プライベートバンキング"
+    ],
+    "targetClients": "富裕層・経営者",
+    "prefecture": "埼玉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3040001042332",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1120001123687",
+    "name": "株式会社トータルライフプランニング",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 大阪府大阪市北区堂島２丁目４番４ブリリアタワー堂島３９０７号 〒5300003",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1120001123687",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1220001019487",
+    "name": "株式会社ライフプラン",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 石川県金沢市新保本４丁目６５番地１６ 〒9218062",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "石川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1220001019487",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010003018284",
+    "name": "ライフプラン合同会社",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 東京都中央区八重洲２丁目１１番２号 〒1040028",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010003018284",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2013301000343",
+    "name": "明治安田ライフプランセンター株式会社",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 東京都豊島区高田３丁目１９番１０号 〒1710033",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2013301000343",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2021001056234",
+    "name": "株式会社湘南ライフプランニング",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 神奈川県藤沢市亀井野３３１０番地 〒2520813",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2021001056234",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2120001030924",
+    "name": "株式会社伸和ライフプラン",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 大阪府大阪市住之江区粉浜西２丁目１８番４－１０２号 〒5590007",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2120001030924",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2120001161694",
+    "name": "コア・ライフプランニング株式会社",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 大阪府大阪市西区靱本町１丁目１１番７号信濃橋三井ビルディング 〒5500004",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2120001161694",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3011001058635",
+    "name": "株式会社マネーライフプランニング",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 東京都中央区銀座３丁目１１番１３号 〒1040061",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3011001058635",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3011001066506",
+    "name": "株式会社フリーライフプランニング",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 神奈川県横浜市西区北幸２丁目１０番地２８ 〒2200004",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3011001066506",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4270001007212",
+    "name": "株式会社メディカルライフプラン",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 鳥取県鳥取市南隈７２８番地 〒6800903",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "鳥取県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4270001007212",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5180001049254",
+    "name": "株式会社ネオライフプランニング",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 愛知県名古屋市中区栄４丁目６番１５号フォーティーンヒルズセンタービル９階 〒4600008",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5180001049254",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010901029007",
+    "name": "アドバンスライフプランニング株式会社",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 東京都世田谷区太子堂１丁目１２番３９号 〒1540004",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010901029007",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7011201015176",
+    "name": "株式会社マイライフプランニング",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 東京都中野区中央１丁目１番１号 〒1640011",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7011201015176",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7120903002198",
+    "name": "合同会社グッド・ウィル・ライフプランニング",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 大阪府箕面市船場西２丁目２番１号ニューエリモビル５階 〒5620036",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7120903002198",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010005026767",
+    "name": "一般社団法人ライフプランサポート協会",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 東京都千代田区九段南１丁目５番地６りそな九段ビル５Ｆ 〒1020074",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "法人・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010005026767",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8180002022455",
+    "name": "有限会社ライフプランナー",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 愛知県名古屋市西区堀端町２番２号 〒4510033",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8180002022455",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010405010535",
+    "name": "一般財団法人地域社会ライフプラン協会",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 東京都千代田区内幸町２丁目１番１号 〒1000011",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "法人・経営者",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010405010535",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9150001020536",
+    "name": "株式会社ライフプランナー",
+    "type": "保険系FP",
+    "description": "保険系FP。 所在地: 奈良県奈良市大宮町６丁目１－１１新大宮第２ビル３階２号室 〒6308115",
+    "services": [
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "奈良県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9150001020536",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001081038",
+    "name": "ＨＣアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田神保町２丁目１１番地 〒1010051",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001081038",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001104938",
+    "name": "ＤＢＪアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目９番２号 〒1000004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001104938",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001113063",
+    "name": "株式会社リオ・アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区永田町２丁目１２番４号 〒1000014",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001113063",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001131684",
+    "name": "大和ハウス・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区永田町２丁目４番８号 〒1000014",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001131684",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001132666",
+    "name": "サムティアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目８番３号 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001132666",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001167893",
+    "name": "東京インフラアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区麹町２丁目３番地麹町プレイス８階 〒1020083",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001167893",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001175203",
+    "name": "地主アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目５番１号 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001175203",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001208755",
+    "name": "三井物産デジタル・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋堀留町１丁目９番８号 〒1030012",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001208755",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010001213524",
+    "name": "礒野アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区永田町２丁目１１番１号山王パークタワー３階 〒1000014",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010001213524",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010401064261",
+    "name": "Ｔ＆Ｄアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区芝５丁目３６番７号 〒1080014",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010401064261",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010401080721",
+    "name": "株式会社虎ノ門アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門１丁目１５番１１号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010401080721",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010401084664",
+    "name": "マイルストンアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区六本木６丁目１５番１号けやき坂テラス４階 〒1060032",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010401084664",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010401158765",
+    "name": "クレド・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門１丁目１７番１号虎ノ門ヒルズビジネスタワー 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010401158765",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010802002092",
+    "name": "株式会社エクセルアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区高輪２丁目１４番１７号 〒1080074",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010802002092",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1010902025555",
+    "name": "株式会社Ｍ＆Ｈアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区南青山３丁目１７番３号 〒1070062",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1010902025555",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1011001050627",
+    "name": "ＧＣＭアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋蛎殻町２丁目１１番３号日本橋水天宮ビル３階 〒1030014",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1011001050627",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1011001054867",
+    "name": "東急アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都渋谷区道玄坂１丁目１０番７号 〒1500043",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1011001054867",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1011301024925",
+    "name": "ＭＫＫアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都武蔵野市吉祥寺本町２丁目１５番３２号 〒1800004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1011301024925",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1020001108566",
+    "name": "スカイオーシャン・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県横浜市西区みなとみらい３丁目１番１号 〒2200012",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1020001108566",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1020001122179",
+    "name": "株式会社ＡＳアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県横浜市西区南軽井沢５番地１ 〒2200002",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1020001122179",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1040003018266",
+    "name": "市川アセットマネジメント合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 千葉県市川市行徳駅前１丁目１７番７－４０１号（コスモビル） 〒2720133",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "千葉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1040003018266",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1120001170580",
+    "name": "大阪アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市中央区北浜３丁目５番１９号 〒5410041",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1120001170580",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1130001050294",
+    "name": "なぎさアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目１－２大手門タワー 〒1000004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1130001050294",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1140001117126",
+    "name": "株式会社ＦＨアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 兵庫県神戸市長田区菅原通２丁目８番１号 〒6530015",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "兵庫県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1140001117126",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1270001008444",
+    "name": "株式会社リアルアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 鳥取県倉吉市伊木２１４番地３ 〒6820024",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "鳥取県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1270001008444",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1290001033705",
+    "name": "株式会社ミヨシアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 福岡県福岡市中央区天神３丁目１０番２０号 〒8100001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "福岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1290001033705",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1290001092610",
+    "name": "ＪＲ九州アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 福岡県福岡市博多区博多駅前２丁目８番１２号 〒8120011",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "福岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1290001092610",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1300001004183",
+    "name": "株式会社スリーエムアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 佐賀県佐賀市高木瀬東２丁目１１番７号 〒8490922",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "佐賀県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1300001004183",
+    "listed": false
+  },
+  {
+    "id": "gbiz:1700150076553",
+    "name": "アルファダイン・アセットマネジメント・ホールディングス・リミテッド",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目１番１号大手町パークビルディング 〒1000004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=1700150076553",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001049257",
+    "name": "大和アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目９番１号 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001049257",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001090483",
+    "name": "キャピタルアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区内神田１丁目１３番７号 〒1010047",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001090483",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001109184",
+    "name": "ＥＷアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋小舟町８番１号 〒1030024",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001109184",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001109333",
+    "name": "株式会社オールアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田神保町１丁目４０番 〒1010051",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001109333",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001136146",
+    "name": "株式会社ファイブランド・アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区八丁堀４丁目１４番７号 〒1040032",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001136146",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001156193",
+    "name": "マッコーリーアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区紀尾井町１番３号東京ガーデンテラス紀尾井町紀尾井タワー 〒1020094",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001156193",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001162142",
+    "name": "株式会社エスコンアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門２丁目１０番４号オークラプレステージタワー２０階 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001162142",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001174815",
+    "name": "三井物産アセットマネジメント・ホールディングス株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区西神田３丁目２番１号 〒1010065",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001174815",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001204282",
+    "name": "霞ヶ関アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区霞が関３丁目２番１号 〒1000013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001204282",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010001238165",
+    "name": "なかのアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋兜町５番１号 〒1030026",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010001238165",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010401042324",
+    "name": "オリックス・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区浜松町２丁目３番１号 〒1050013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010401042324",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010401045054",
+    "name": "ＳＢＩアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区六本木１丁目６番１号 〒1060032",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010401045054",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010401057735",
+    "name": "みなとアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県川崎市川崎区駅前本町１９番地１７第三草創ビル５階 〒2100007",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010401057735",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010401077188",
+    "name": "株式会社フラッグシップアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門４丁目１番２８号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010401077188",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010401079382",
+    "name": "ＰａｙＰａｙアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区紀尾井町１番３号 〒1020094",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010401079382",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010401083558",
+    "name": "株式会社コアアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都豊島区西池袋１丁目４番１０号 〒1710021",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010401083558",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2010501047396",
+    "name": "株式会社ＹＡＫアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都台東区台東３丁目３５番７号 〒1100016",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2010501047396",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2011001056037",
+    "name": "株式会社ＳＧＬアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区晴海５丁目５－２ 〒1040053",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2011001056037",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2011001126905",
+    "name": "ＰＢアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂９丁目７番２号ミッドタウン・イースト４階 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2011001126905",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2030001000473",
+    "name": "ＳＶアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 埼玉県さいたま市大宮区吉敷町１丁目１３５番地Ａｒａｉビル８階 〒3300843",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "埼玉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2030001000473",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2100001029968",
+    "name": "栗林アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 長野県松本市大字島立８４５番地１ 〒3900852",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "長野県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2100001029968",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2120001002972",
+    "name": "株式会社エイチ・ツー・オーアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市西成区花園南１丁目４番４号 〒5570015",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2120001002972",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2120001071794",
+    "name": "株式会社アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市西区千代崎２丁目１１番３－８０３号 〒5500023",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2120001071794",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2120001113885",
+    "name": "株式会社パリミキアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区銀座２丁目８番４号泰明ビル２階 〒1040061",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2120001113885",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2120001191907",
+    "name": "堂島アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市北区堂島１丁目３番１号 〒5300003",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2120001191907",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2180001162332",
+    "name": "兜アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 愛知県名古屋市北区大曽根３丁目１０番７号 〒4620825",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2180001162332",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2190003001982",
+    "name": "合同会社アンカーアセットマネジメント研究会",
+    "type": "IFA",
+    "description": "IFA。 所在地: 三重県津市栄町２丁目４１８番地 〒5140004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "三重県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2190003001982",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2250001015730",
+    "name": "ワイエムアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 山口県下関市竹崎町４丁目２番３６号 〒7500025",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "山口県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2250001015730",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2350001012313",
+    "name": "咲花アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 宮崎県延岡市平原町１丁目９９９番地５ 〒8820866",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "宮崎県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2350001012313",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2360001002437",
+    "name": "株式会社レキオスアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 沖縄県宜野湾市志真志４丁目３０番６号 〒9012213",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "沖縄県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2360001002437",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001034076",
+    "name": "東京海上アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目８番２号 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001034076",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001062358",
+    "name": "ＳＢＩ岡三アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区京橋２丁目２番１号 〒1040031",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001062358",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001068479",
+    "name": "ＢＮＰパリバ・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目９番１号グラントウキョウノースタワー 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001068479",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001095936",
+    "name": "クッシュマン・アンド・ウェイクフィールド・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区永田町２丁目１１番１号 〒1000014",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001095936",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001122277",
+    "name": "ＧＫアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋蛎殻町１丁目３２－９深山ビル４階 〒1030014",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001122277",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001124868",
+    "name": "ＨＳＢＣアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋３丁目１１番１号ＨＳＢＣビルディング 〒1030027",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001124868",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001130008",
+    "name": "アセットマネジメントＯｎｅオルタナティブインベストメンツ株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目８番２号鉃鋼ビルディング 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001130008",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001148413",
+    "name": "株式会社エーアール・アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都文京区湯島１丁目９番１５号 〒1130034",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001148413",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001162967",
+    "name": "トリオアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田駿河台２丁目１番３４号 〒1010062",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001162967",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001169673",
+    "name": "オールニッポン・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋３丁目２番５号 〒1030027",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001169673",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001188789",
+    "name": "ａｕアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区西神田３丁目２番１号 〒1010065",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001188789",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001208241",
+    "name": "ＳＬジャパンアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目９番２号グラントウキョウサウスタワー１１階 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001208241",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001211311",
+    "name": "ＢＳＰアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区九段南１丁目６番５号九段会館テラス 〒1020074",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001211311",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010001218595",
+    "name": "ＶＳＧアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都渋谷区渋谷１丁目１５番２１号ポーラ渋谷ビル４階 〒1500002",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010001218595",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010002044917",
+    "name": "有限会社エスエス・アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内３丁目１番１号東京共同会計事務所内 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010002044917",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010003036839",
+    "name": "白狼アセットマネジメント合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋小網町８番２号 〒1030016",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010003036839",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010401040228",
+    "name": "森トラスト・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門４丁目３番１号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010401040228",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010401060069",
+    "name": "フィンテックアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都品川区上大崎３丁目１番１号目黒セントラルスクエア１５階 〒1410021",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010401060069",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010401128452",
+    "name": "日本風力開発アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区霞が関３丁目２番５号 〒1000013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010401128452",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010402024238",
+    "name": "有限会社エバーリッチアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区北青山３丁目６番７号青山パラシオタワー１１Ｆ 〒1070061",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010402024238",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3010901023211",
+    "name": "ドゥラックアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂５丁目２－３３ 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3010901023211",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3011001039825",
+    "name": "リバブルアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都渋谷区道玄坂１丁目９番５号 〒1500043",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3011001039825",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3011001060640",
+    "name": "いちごアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都渋谷区広尾１丁目６番１０号 〒1500012",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3011001060640",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3011001061630",
+    "name": "株式会社バナーアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都品川区上大崎３丁目１０番１３号 〒1410021",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3011001061630",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3011001108984",
+    "name": "株式会社幻冬舎アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都渋谷区千駄ヶ谷２丁目３０番１号 〒1510051",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3011001108984",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3013301012379",
+    "name": "リッチモンドアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都豊島区目白３丁目２番１０号目白駅前柳屋ビル 〒1710031",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3013301012379",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3040001108372",
+    "name": "Ｋ＆Ｃアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 千葉県松戸市小金きよしケ丘１丁目１番地の２大島レジデンス北小金６０３ 〒2700013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "千葉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3040001108372",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3040002009611",
+    "name": "株式会社ヒカリアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 千葉県千葉市稲毛区山王町２７７番地３ 〒2630002",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "千葉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3040002009611",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3120001182970",
+    "name": "京阪アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市中央区大手前１丁目７番３１号 〒5400008",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3120001182970",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3180301015949",
+    "name": "株式会社シンカアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 愛知県高浜市神明町１丁目１番地２４ 〒4441305",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3180301015949",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3200001032754",
+    "name": "すみれアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 岐阜県高山市問屋町４３番地 〒5060002",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "岐阜県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3200001032754",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3340001019192",
+    "name": "太夷アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 千葉県袖ケ浦市袖ケ浦駅前２丁目６－６ガウベース２０１ 〒2990269",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "千葉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3340001019192",
+    "listed": false
+  },
+  {
+    "id": "gbiz:3430001006090",
+    "name": "ＬＬＤアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 北海道札幌市中央区南四条西６丁目８番地 〒0640804",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "北海道",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=3430001006090",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010001032203",
+    "name": "ジャパンリアルエステイトアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目１番１号 〒1000004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010001032203",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010001046310",
+    "name": "しんきんアセットマネジメント投信株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区京橋３丁目８番１号 〒1040031",
+    "services": [
+      "資産運用",
+      "投資助言"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010001046310",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010001157280",
+    "name": "ヘルスケアアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区神田小川町３丁目３番地 〒1010052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010001157280",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010001170135",
+    "name": "マネックス・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂１丁目１２番３２号 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010001170135",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010001191197",
+    "name": "株式会社サンケイビル・アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区内神田２丁目３番４号 〒1010047",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010001191197",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010401049128",
+    "name": "三井住友ＤＳアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門１丁目１７番１号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010401049128",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010401075867",
+    "name": "天狗アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 長野県北安曇郡白馬村大字北城６９７４－１ 〒3999301",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "長野県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010401075867",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010401107488",
+    "name": "エネクス・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区霞が関３丁目２番５号 〒1000013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010401107488",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010401125085",
+    "name": "ライオン・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区南青山４丁目１６番１１号アールスクエア南青山２０４ 〒1070062",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010401125085",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4010403007752",
+    "name": "麻布アセットマネジメント合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区麻布十番２丁目１１番５号 〒1060045",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4010403007752",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4011001124592",
+    "name": "ＦＡＩＴＨアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門５丁目１２－１３ザイマックス神谷町ビル４Ｆ 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4011001124592",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4011101077435",
+    "name": "カナディアン・ソーラー・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門２丁目４番７号Ｔ－ＬＩＴＥ１３階 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4011101077435",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4011103005195",
+    "name": "ＧＴアセットマネジメント合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 愛知県名古屋市中区栄５丁目８－３２ 〒4600008",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4011103005195",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4020001059914",
+    "name": "リストアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県横浜市中区尾上町４丁目４７番地 〒2310015",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4020001059914",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4020001138338",
+    "name": "Ｔ＆Ｆアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県横浜市港北区大豆戸町１２００番地５ベルメゾンエスペランス４０１ 〒2220032",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4020001138338",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4030001138865",
+    "name": "株式会社エネテクアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区八重洲２丁目１１番２号 〒1040028",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4030001138865",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4120101029682",
+    "name": "株式会社プリメールアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府堺市堺区北花田口町３丁１番１５号 〒5900074",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4120101029682",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4290001034337",
+    "name": "Ｐ＆Ｔアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門３丁目１９番７号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4290001034337",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4290001091774",
+    "name": "勝利アセットマネジメントジャパン株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 福岡県福岡市中央区天神３丁目３番５号天神大産ビル３階 〒8100001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "福岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4290001091774",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4400501000033",
+    "name": "株式会社日本観光アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 岩手県一関市厳美町字下り松６５番地２ 〒0210101",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "岩手県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4400501000033",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001113670",
+    "name": "丸紅アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門２丁目２番３号虎ノ門アルセアタワー 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001113670",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001114875",
+    "name": "東洋不動産アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門１丁目１番２８号東洋不動産虎ノ門ビル２階 〒1050001",
+    "services": [
+      "資産運用",
+      "住宅ローン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001114875",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001126689",
+    "name": "あいざわアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区東新橋１丁目９番１号 〒1050021",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001126689",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001132786",
+    "name": "株式会社星野リゾート・アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区銀座１丁目１０番６号 〒1040061",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001132786",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001158699",
+    "name": "ヴェリタスアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区港南２丁目１６番７－４１０３号 〒1080075",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001158699",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001202184",
+    "name": "第一生命リアルティアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門２丁目２番３号 〒1050001",
+    "services": [
+      "資産運用",
+      "保険見直し"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001202184",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001213792",
+    "name": "住友林業アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町１丁目３番２号 〒1000004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001213792",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001221548",
+    "name": "八十二アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋室町４丁目１番２２号 〒1030022",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001221548",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001224963",
+    "name": "三幸アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区銀座４丁目６番１号 〒1040061",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001224963",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010001237445",
+    "name": "コンパス・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区九段南１丁目６－５九段会館テラス１Ｆビジネスエアポート九段下 〒1020074",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010001237445",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010401040523",
+    "name": "平和不動産アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋兜町５番１号 〒1030026",
+    "services": [
+      "資産運用",
+      "住宅ローン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010401040523",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010401069307",
+    "name": "スター・マイカ・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門４丁目３番１号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010401069307",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010401092762",
+    "name": "西松アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門１丁目１６番１７号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010401092762",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010401123328",
+    "name": "ブルースカイアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区東新橋１丁目５番２号汐留シティセンター８階 〒1050021",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010401123328",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010401127799",
+    "name": "株式会社広島リサ・アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区港南２丁目１５番３号 〒1080075",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010401127799",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010401164462",
+    "name": "ＳＲＥアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂１丁目８番１号 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010401164462",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010601037617",
+    "name": "ＳＢＳアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都新宿区西新宿８丁目１７番１号 〒1600023",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010601037617",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010601048309",
+    "name": "りそなアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都江東区木場１丁目５番６５号 〒1350042",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010601048309",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5010901048099",
+    "name": "楽天ステイアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区港南２丁目１６番５号 〒1080075",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5010901048099",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5290001089826",
+    "name": "ＦＪアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 福岡県福岡市博多区綱場町９番２０号 〒8120024",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "福岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5290001089826",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010001094638",
+    "name": "東海東京アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区新川１丁目１７番２１号 〒1040033",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010001094638",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010001141324",
+    "name": "カレラアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂１丁目１２番３２号アーク森ビル１２階 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010001141324",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010401057310",
+    "name": "ジャパンエクセレントアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区南青山１丁目１５番９号 〒1070062",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010401057310",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010401094171",
+    "name": "ＥＧＷアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区六本木６丁目１０番１号 〒1060032",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010401094171",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010401104558",
+    "name": "株式会社エーピーアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区高輪３丁目２５番２３号京急第２ビル１Ｆ 〒1080074",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010401104558",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010401109482",
+    "name": "ＣＦＩアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂９丁目７番１号 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010401109482",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010401146600",
+    "name": "ＩＵアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区麻布十番２丁目１番８号 〒1060045",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010401146600",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6010401148951",
+    "name": "株式会社ＭＶＰＲアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門１丁目２１番１０号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6010401148951",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6011001113412",
+    "name": "株式会社ストレージ・アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都目黒区上目黒２丁目１５番１４号 〒1530051",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6011001113412",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6011001142956",
+    "name": "ＪＭＲアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都渋谷区道玄坂１丁目２２番９号 〒1500043",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6011001142956",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6011301017908",
+    "name": "東京アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都杉並区堀ノ内１丁目８番２２－２０１号ティエラコート杉並方南町 〒1660013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6011301017908",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6011601022756",
+    "name": "ＪＮＩアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都新宿区新宿６丁目２７番３０号新宿イーストサイドスクエア６階６０１Ｅ 〒1600022",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6011601022756",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6013301023547",
+    "name": "株式会社ＴＨＰアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂５丁目２番２０号 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6013301023547",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6020001094538",
+    "name": "株式会社ＯＶＡＬアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県横浜市中区桜木町１丁目１番８号 〒2310062",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6020001094538",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6060001006605",
+    "name": "絆アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 栃木県宇都宮市石井町２８０５番地８ 〒3210912",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "栃木県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6060001006605",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6120901033188",
+    "name": "株式会社ズームアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府池田市石橋２丁目１５番２７号３Ｆ 〒5630032",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6120901033188",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6200003004749",
+    "name": "合同会社リバイブアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 愛知県名古屋市東区泉１丁目１番３０号 〒4610001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6200003004749",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6260001004357",
+    "name": "中銀アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 岡山県岡山市北区柳町２丁目１１番２３号 〒7000904",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "岡山県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6260001004357",
+    "listed": false
+  },
+  {
+    "id": "gbiz:6360001004891",
+    "name": "株式会社ＲＣＭアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 沖縄県那覇市久茂地１丁目７番１号琉球リース総合ビル１１階 〒9000015",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "沖縄県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=6360001004891",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001031160",
+    "name": "ＳＯＭＰＯアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋２丁目２番１６号 〒1030027",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001031160",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001040723",
+    "name": "中央日土地アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門１丁目１番３号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001040723",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001054021",
+    "name": "野村アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都江東区豊洲２丁目２番１号 〒1350061",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001054021",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001054095",
+    "name": "農林中金全共連アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区九段南１丁目６番５号 〒1020074",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001054095",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001090371",
+    "name": "スターツアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋３丁目１番８号 〒1030027",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001090371",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001145200",
+    "name": "くにうみアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区元麻布２丁目１番１３号 〒1060046",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001145200",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001145282",
+    "name": "株式会社アセットマネジメントあさくら",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内２丁目４番１号丸の内ビルディング１１階 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001145282",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010001188199",
+    "name": "武士道アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋兜町６番５号 〒1030026",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010001188199",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010401071970",
+    "name": "ＡＤＩＦＪＡＰＡＮアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区新川２丁目８番８号ＳＮＴ八丁堀ビル４階 〒1040033",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010401071970",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7011001052601",
+    "name": "ニュースアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都渋谷区東３丁目１１番１０号 〒1500011",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7011001052601",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7030003005680",
+    "name": "ＭＪアセットマネジメント合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 埼玉県さいたま市大宮区上小町７６６番地フローラ大宮３０２ 〒3300855",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "埼玉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7030003005680",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7080001022806",
+    "name": "静岡アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 静岡県静岡市葵区御幸町３番地の２１、１３０１号 〒4200857",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "静岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7080001022806",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7120001235980",
+    "name": "エスリード・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市福島区福島６丁目２５番１９号 〒5530003",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7120001235980",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7120002056963",
+    "name": "有限会社マーキュリーアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市北区堂島浜１丁目４番１６号 〒5300004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7120002056963",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7140001109076",
+    "name": "株式会社ユーパワーアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 兵庫県西宮市今津出在家町９番２０号 〒6638227",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "兵庫県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7140001109076",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001036852",
+    "name": "いちよしアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋茅場町１丁目５番８号 〒1030025",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001036852",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001076700",
+    "name": "エンジェルジャパン・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目８番１号丸の内トラストタワーＮ館 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001076700",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001107348",
+    "name": "コムジェスト・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目８番２号 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001107348",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001114914",
+    "name": "三井住友トラスト・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区芝公園１丁目１番１号 〒1050011",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001114914",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010001232906",
+    "name": "ＩＭＰＡＸアセットマネジメント合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門１丁目２３番１号虎ノ門ヒルズ森タワー１８階 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010001232906",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010401040306",
+    "name": "明治安田アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町２丁目３番２号 〒1000004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010401040306",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010401056087",
+    "name": "シオズミアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区西新橋３丁目１３－７ 〒1050003",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010401056087",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010401072159",
+    "name": "アモーヴァ・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂９丁目７番１号 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010401072159",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010401080748",
+    "name": "株式会社ワールドアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 福岡県福岡市博多区博多駅前２丁目１番１号 〒8120011",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "福岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010401080748",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010401082876",
+    "name": "ＵＧＳアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂６丁目５番３８－８０７号 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010401082876",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010403027219",
+    "name": "Ｂ＆Ｍアセットマネジメント合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区新橋３丁目３番１３号ＴｓａｏＨｉｂｉｙａ９Ｆ 〒1050004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010403027219",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010901021796",
+    "name": "株式会社中田アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都世田谷区玉川１丁目１５番２－３５０２号 〒1580094",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010901021796",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8011001098825",
+    "name": "積水ハウス・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂４丁目１５番１号 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8011001098825",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8013301031572",
+    "name": "株式会社ＪＴＢアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都台東区上野１丁目１０番１２号 〒1100005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8013301031572",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8021003010654",
+    "name": "Ｔ＆Ｓアセットマネジメント合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県平塚市高浜台１－３－２０１ 〒2540805",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8021003010654",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8120001127509",
+    "name": "株式会社福屋アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市北区曾根崎２丁目３番５号１０Ｆ 〒5300057",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8120001127509",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8120001222862",
+    "name": "信和アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市中央区南船場１丁目１８番１１号 〒5420081",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8120001222862",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8290001075476",
+    "name": "株式会社シノケンアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区浜松町２丁目３番１号 〒1050013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8290001075476",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8360001025259",
+    "name": "エステックアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区京橋２丁目７番１９号 〒1040031",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8360001025259",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8430001087102",
+    "name": "北海道アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 北海道札幌市中央区北一条西５丁目２番地 〒0600001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "北海道",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8430001087102",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001021473",
+    "name": "アセットマネジメントＯｎｅ株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目８番２号 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001021473",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001025953",
+    "name": "ニッセイアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内１丁目６番６号 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001025953",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001034450",
+    "name": "三菱ＵＦＪアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区東新橋１丁目９番１号 〒1050021",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001034450",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001087795",
+    "name": "ＡＩＦＡＭアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区海岸１丁目２番２０号 〒1050022",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001087795",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001099915",
+    "name": "ＳＰＣアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区明石町８番１号 〒1040044",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001099915",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001122916",
+    "name": "ＵＯＢアセットマネジメントジャパン株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区永田町２丁目１１番１号山王パークタワー 〒1000014",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001122916",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001130778",
+    "name": "イー・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋久松町１１番８号 〒1030005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001130778",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001146130",
+    "name": "ＧＶＣアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区日本橋箱崎町２１番１号 〒1030015",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001146130",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010001155577",
+    "name": "関電アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区京橋１丁目１１番１号 〒1040031",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010001155577",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010003017379",
+    "name": "オメガアセットマネジメント合同会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都中央区新川１丁目４番１１号 〒1040033",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010003017379",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401040809",
+    "name": "株式会社ジェイ・ウィル・アセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区有楽町１丁目７番１号 〒1000006",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401040809",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401049949",
+    "name": "ＳＢＩグローバルアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区六本木１丁目６番１号 〒1060032",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401049949",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401062547",
+    "name": "Ａ．Ｐ．アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区丸の内２丁目３番２号 〒1000005",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401062547",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401074501",
+    "name": "キンカ・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門４丁目３番１号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401074501",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401097592",
+    "name": "ビーロット・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区新橋１丁目１１番７号 〒1050004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401097592",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401100579",
+    "name": "ＰＯＰアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 神奈川県川崎市高津区末長１丁目４７番１－９０８梶ヶ谷プラザビル 〒2130013",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "神奈川県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401100579",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401118670",
+    "name": "マリモ・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区虎ノ門２丁目３番１７号 〒1050001",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401118670",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401177246",
+    "name": "株式会社ＺＥＡＬアセットマネジメント",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区三田３丁目５番１９号 〒1080073",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401177246",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401179011",
+    "name": "クレアシオン・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都港区赤坂９丁目７番１号 〒1070052",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401179011",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010601038669",
+    "name": "ちばぎんアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都墨田区江東橋２丁目１３番７号 〒1300022",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010601038669",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9011101068215",
+    "name": "ＭＩＲＡＲＴＨアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都千代田区大手町２丁目１番１号 〒1000004",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9011101068215",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9011301011486",
+    "name": "朝日ライフアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 東京都杉並区和泉１丁目２２番１９号 〒1680063",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9011301011486",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9030001124183",
+    "name": "ミトスアセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 埼玉県川口市本町２丁目５番１５－８１３号 〒3320012",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "埼玉県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9030001124183",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9120001183047",
+    "name": "センコー・アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市北区大淀中１丁目１番３０号 〒5310076",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9120001183047",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9120001246092",
+    "name": "大阪ガス都市開発アセットマネジメント株式会社",
+    "type": "IFA",
+    "description": "IFA。 所在地: 大阪府大阪市中央区高麗橋４丁目２番１６号 〒5410043",
+    "services": [
+      "資産運用"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "大阪府",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9120001246092",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2140001084299",
+    "name": "株式会社プランナーズインク",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 兵庫県川西市小戸２丁目７番１６号 〒6660014",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "兵庫県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2140001084299",
+    "listed": false
+  },
+  {
+    "id": "gbiz:2360001017294",
+    "name": "ワイズプランナーズ株式会社",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 沖縄県那覇市泊１丁目１１番地９ 〒9000012",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "沖縄県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=2360001017294",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4180001040404",
+    "name": "株式会社プランナーズランド",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 愛知県名古屋市中区栄５丁目１３番２１号 〒4600008",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "愛知県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4180001040404",
+    "listed": false
+  },
+  {
+    "id": "gbiz:4330005008398",
+    "name": "特定非営利活動法人日本マイホームプランナーズ協会",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 熊本県熊本市東区西原２丁目３５番３３号 〒8618029",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "法人・経営者",
+    "prefecture": "熊本県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=4330005008398",
+    "listed": false
+  },
+  {
+    "id": "gbiz:5430002035905",
+    "name": "有限会社プランナーズ・インク",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 北海道札幌市中央区北二条西２丁目１番５ 〒0600002",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "北海道",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=5430002035905",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7010002017828",
+    "name": "有限会社エイシンプランナーズ",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 東京都渋谷区恵比寿西１丁目３０番１０号 〒1500021",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7010002017828",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7011001047849",
+    "name": "ウィズ・プランナーズ株式会社",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 東京都品川区西五反田７丁目２１番１号 〒1410031",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7011001047849",
+    "listed": false
+  },
+  {
+    "id": "gbiz:7380001006274",
+    "name": "株式会社ピオ・プランナーズ",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 福島県郡山市島１丁目２３番１３号 〒9638034",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "福島県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=7380001006274",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010401091126",
+    "name": "株式会社ＮＯＬＴＹプランナーズ",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 東京都中央区新川１丁目４番１号 〒1040033",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010401091126",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8010401161457",
+    "name": "株式会社プランナーズバリュー",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 東京都豊島区南大塚２丁目３８番１号 〒1700005",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8010401161457",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8140001000721",
+    "name": "株式会社プランナーズ・インターナショナル",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 兵庫県神戸市東灘区向洋町中５丁目１５番地 〒6580032",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "兵庫県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8140001000721",
+    "listed": false
+  },
+  {
+    "id": "gbiz:8290801018122",
+    "name": "株式会社アルファプランナーズ",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 福岡県行橋市西宮市１丁目１３番２５号 〒8240031",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "福岡県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=8290801018122",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9010401100653",
+    "name": "トータルサービスプランナーズネット株式会社",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 東京都渋谷区千駄ヶ谷４丁目８番７号 〒1510051",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "東京都",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9010401100653",
+    "listed": false
+  },
+  {
+    "id": "gbiz:9410003002943",
+    "name": "アーキプランナーズ株式会社",
+    "type": "独立系FP",
+    "description": "独立系FP。 所在地: 秋田県秋田市新屋松美ガ丘北町８番５１号 〒0101618",
+    "services": [
+      "ライフプラン相談"
+    ],
+    "targetClients": "個人・ファミリー層",
+    "prefecture": "秋田県",
+    "url": "https://info.gbiz.go.jp/hojin/ichiran?hojinBangou=9410003002943",
+    "listed": false
+  }
+]

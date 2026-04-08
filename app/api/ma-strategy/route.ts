@@ -1,5 +1,5 @@
 import { streamText } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { getModel } from "@/lib/ai-model";
 
 export const maxDuration = 60;
 
@@ -58,7 +58,7 @@ ${company.description || "なし"}
 - PMI（統合後）の課題`;
 
   const result = streamText({
-    model: anthropic("claude-sonnet-4-5"),
+    model: getModel("sonnet"),
     system:
       "あなたはM&A（合併・買収）戦略の専門アナリストです。企業データに基づいた客観的かつ実践的な分析を日本語で提供してください。推測には必ず根拠を示してください。",
     prompt,

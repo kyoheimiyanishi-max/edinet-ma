@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { generateText } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { getModel, hasAiCredentials } from "@/lib/ai-model";
 
 /**
  * AIでクエリを拡張し、関連する検索キーワードを生成
@@ -9,11 +9,11 @@ import { anthropic } from "@ai-sdk/anthropic";
  */
 
 async function expandQueryUncached(query: string): Promise<string[]> {
-  if (!process.env.ANTHROPIC_API_KEY) return [query];
+  if (!hasAiCredentials()) return [query];
 
   try {
     const { text } = await generateText({
-      model: anthropic("claude-haiku-4-5-20251001"),
+      model: getModel("haiku"),
       prompt: `あなたは日本の企業データベースの検索アシスタントです。
 ユーザーの検索クエリ「${query}」に対して、関連する企業を見つけるための検索キーワードを5つ生成してください。
 

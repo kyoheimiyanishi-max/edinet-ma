@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { generateObject } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { generateText, Output } from "ai";
+import { getModel } from "@/lib/ai-model";
 import { z } from "zod";
 import { getSeller } from "@/lib/sellers";
 
@@ -80,15 +80,15 @@ ${existingBuyers || "なし"}
 各候補について、なぜマッチするかの具体的な根拠を明記してください。`;
 
   try {
-    const result = await generateObject({
-      model: anthropic("claude-sonnet-4-5"),
-      schema: BuyerSchema,
+    const result = await generateText({
+      model: getModel("sonnet"),
+      output: Output.object({ schema: BuyerSchema }),
       system:
         "あなたは日本のM&A仲介専門家です。売主情報を精査し、実在する日本企業を買い手候補として提案してください。架空の企業名は絶対に使わないこと。",
       prompt,
     });
 
-    return NextResponse.json(result.object);
+    return NextResponse.json(result.output);
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "AI生成失敗" },

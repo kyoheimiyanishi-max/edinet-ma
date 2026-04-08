@@ -29,6 +29,7 @@ export interface FinancialChartData {
   roe?: number | null;
   roa?: number | null;
   market_cap?: number | null;
+  avg_annual_salary?: number | null;
 }
 
 function formatOku(value: number): string {
@@ -52,6 +53,7 @@ const COLORS = {
   roe: "#ef4444",
   roa: "#3b82f6",
   marketCap: "#6366f1",
+  salary: "#ec4899",
 };
 
 export function PLChart({ data }: { data: FinancialChartData[] }) {
@@ -244,6 +246,51 @@ export function MarketCapChart({ data }: { data: FinancialChartData[] }) {
   );
 }
 
+export function SalaryChart({ data }: { data: FinancialChartData[] }) {
+  const withSalary = data.filter(
+    (d) => d.avg_annual_salary != null && d.avg_annual_salary > 0,
+  );
+  if (withSalary.length === 0) return null;
+
+  const chartData = withSalary
+    .sort((a, b) => a.fiscal_year - b.fiscal_year)
+    .map((d) => ({
+      year: `${d.fiscal_year}`,
+      平均年収: d.avg_annual_salary ?? 0,
+    }));
+
+  return (
+    <div>
+      <h4 className="text-sm font-medium text-slate-500 mb-3">平均年収推移</h4>
+      <ResponsiveContainer width="100%" height={250}>
+        <ComposedChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+          <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+          <YAxis tickFormatter={formatOku} tick={{ fontSize: 11 }} width={65} />
+          <Tooltip
+            formatter={(value, name) => [
+              formatOkuYen(Number(value)),
+              String(name),
+            ]}
+            contentStyle={{
+              fontSize: 12,
+              borderRadius: 8,
+              border: "1px solid #e2e8f0",
+            }}
+          />
+          <Area
+            type="monotone"
+            dataKey="平均年収"
+            fill="#fce7f3"
+            stroke={COLORS.salary}
+            strokeWidth={2}
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 export function FinancialCharts({ data }: { data: FinancialChartData[] }) {
   if (data.length === 0) {
     return (
@@ -257,6 +304,7 @@ export function FinancialCharts({ data }: { data: FinancialChartData[] }) {
       <PLChart data={data} />
       <BSChart data={data} />
       <ProfitabilityChart data={data} />
+      <SalaryChart data={data} />
     </div>
   );
 }

@@ -683,7 +683,7 @@ async function CompetitorStartupSection({
     <div className="space-y-2">
       {industry && (
         <a
-          href={`/search?source=gbiz&q=${encodeURIComponent(industry)}`}
+          href={`/search?listed=unlisted&q=${encodeURIComponent(industry)}`}
           className="block p-3 rounded-xl border border-purple-100 bg-purple-50/50 hover:bg-purple-50 transition-all text-sm text-purple-700 font-medium"
         >
           同業種「{industry}」の企業を検索 →

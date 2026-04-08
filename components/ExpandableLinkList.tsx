@@ -8,6 +8,7 @@ export interface LineItem {
   source?: string;
   date?: string;
   description?: string;
+  categories?: string[];
 }
 
 interface Props {

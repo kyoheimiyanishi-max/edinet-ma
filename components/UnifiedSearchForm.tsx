@@ -89,11 +89,11 @@ const PREFECTURES = [
   "沖縄県",
 ];
 
-export type SourceType = "all" | "edinet" | "gbiz";
+export type ListedFilter = "all" | "listed" | "unlisted";
 
 interface Props {
   defaultQ?: string;
-  defaultSource?: SourceType;
+  defaultListed?: ListedFilter;
   defaultIndustry?: string;
   defaultYear?: string;
   defaultYearTo?: string;
@@ -113,7 +113,7 @@ interface Props {
 
 export default function UnifiedSearchForm({
   defaultQ,
-  defaultSource,
+  defaultListed,
   defaultIndustry,
   defaultYear,
   defaultYearTo,
@@ -134,8 +134,8 @@ export default function UnifiedSearchForm({
   const sp = useSearchParams();
 
   const [q, setQ] = useState(sp.get("q") ?? defaultQ ?? "");
-  const [source, setSource] = useState<SourceType>(
-    (sp.get("source") as SourceType) ?? defaultSource ?? "all",
+  const [listed, setListed] = useState<ListedFilter>(
+    (sp.get("listed") as ListedFilter) ?? defaultListed ?? "all",
   );
   const [industry, setIndustry] = useState(
     sp.get("industry") ?? defaultIndustry ?? "",
@@ -178,7 +178,7 @@ export default function UnifiedSearchForm({
 
   const buildUrl = () => {
     const qs = new URLSearchParams();
-    qs.set("source", source);
+    qs.set("listed", listed);
     if (q.trim()) qs.set("q", q.trim());
     if (industry) qs.set("industry", industry);
     if (year) qs.set("year", year);
@@ -205,7 +205,7 @@ export default function UnifiedSearchForm({
 
   const handleReset = () => {
     setQ("");
-    setSource("all");
+    setListed("all");
     setIndustry("");
     setYear("");
     setYearTo("");
@@ -220,7 +220,7 @@ export default function UnifiedSearchForm({
     setCommendation(false);
     setFinance(false);
     setExist(false);
-    router.push("/search?source=all&page=1");
+    router.push("/search?listed=all&page=1");
   };
 
   const inputClass =
@@ -228,21 +228,21 @@ export default function UnifiedSearchForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Source filter */}
+      {/* 上場区分フィルター */}
       <div className="flex gap-2">
         {(
           [
             { value: "all", label: "すべて" },
-            { value: "edinet", label: "上場企業 (EDINET)" },
-            { value: "gbiz", label: "全法人 (gBizINFO 500万社)" },
+            { value: "listed", label: "上場企業のみ" },
+            { value: "unlisted", label: "非上場のみ" },
           ] as const
         ).map((opt) => (
           <button
             key={opt.value}
             type="button"
-            onClick={() => setSource(opt.value)}
+            onClick={() => setListed(opt.value)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-              source === opt.value
+              listed === opt.value
                 ? "bg-blue-600 text-white shadow-md shadow-blue-500/25"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             }`}
@@ -252,66 +252,56 @@ export default function UnifiedSearchForm({
         ))}
       </div>
 
-      {/* Common search */}
+      {/* 共通検索 */}
       <div className="flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-48">
           <label className="block text-xs font-medium text-slate-500 mb-1.5">
-            {source === "edinet" ? "企業名・EDINETコード" : "企業名"}
+            企業名
           </label>
           <input
             type="text"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder={
-              source === "edinet"
-                ? "例: トヨタ、E02143"
-                : "例: メルカリ、AI、テクノロジー"
-            }
+            placeholder="例: トヨタ、メルカリ、AI"
             className={`w-full ${inputClass}`}
           />
         </div>
 
-        {/* Industry (EDINET) */}
-        {(source === "all" || source === "edinet") && (
-          <div className="min-w-40">
-            <label className="block text-xs font-medium text-slate-500 mb-1.5">
-              業種
-            </label>
-            <select
-              value={industry}
-              onChange={(e) => setIndustry(e.target.value)}
-              className={`w-full ${inputClass}`}
-            >
-              <option value="">すべての業種</option>
-              {INDUSTRIES.map((ind) => (
-                <option key={ind} value={ind}>
-                  {ind}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        <div className="min-w-40">
+          <label className="block text-xs font-medium text-slate-500 mb-1.5">
+            業種
+          </label>
+          <select
+            value={industry}
+            onChange={(e) => setIndustry(e.target.value)}
+            className={`w-full ${inputClass}`}
+          >
+            <option value="">すべての業種</option>
+            {INDUSTRIES.map((ind) => (
+              <option key={ind} value={ind}>
+                {ind}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        {/* Prefecture (gBiz) */}
-        {(source === "all" || source === "gbiz") && (
-          <div>
-            <label className="block text-xs font-medium text-slate-500 mb-1.5">
-              都道府県
-            </label>
-            <select
-              value={prefecture}
-              onChange={(e) => setPrefecture(e.target.value)}
-              className={inputClass}
-            >
-              <option value="">全国</option>
-              {PREFECTURES.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        <div>
+          <label className="block text-xs font-medium text-slate-500 mb-1.5">
+            都道府県
+          </label>
+          <select
+            value={prefecture}
+            onChange={(e) => setPrefecture(e.target.value)}
+            className={inputClass}
+          >
+            <option value="">全国</option>
+            {PREFECTURES.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <button
           type="submit"
@@ -328,10 +318,9 @@ export default function UnifiedSearchForm({
         </button>
       </div>
 
-      {/* Advanced filters (gBiz) */}
-      {(source === "all" || source === "gbiz") && (
+      {/* gBizINFO 詳細フィルター: 「上場のみ」のとき以外は出す */}
+      {listed !== "listed" && (
         <div className="space-y-3 pt-3 border-t border-slate-100">
-          {/* 設立年 範囲 */}
           <div className="flex flex-wrap gap-3 items-end">
             <div>
               <label className="block text-xs font-medium text-slate-500 mb-1.5">
@@ -402,7 +391,6 @@ export default function UnifiedSearchForm({
             </div>
           </div>
 
-          {/* 従業員数 範囲 + 事業項目 */}
           <div className="flex flex-wrap gap-3 items-end">
             <div>
               <label className="block text-xs font-medium text-slate-500 mb-1.5">
@@ -442,7 +430,6 @@ export default function UnifiedSearchForm({
             </div>
           </div>
 
-          {/* ブールフラグ */}
           <div className="flex flex-wrap gap-x-5 gap-y-2 items-center">
             <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
               <input
@@ -494,11 +481,11 @@ export default function UnifiedSearchForm({
       )}
 
       <p className="text-xs text-slate-400">
-        {source === "edinet"
-          ? "EDINET上場企業データベース。企業名で検索するか、業種で絞り込んでください。"
-          : source === "gbiz"
-            ? "経済産業省 gBizINFO — 500万社以上の法人データ。設立年・都道府県・資本金・従業員数で絞り込み可能。"
-            : "EDINET（上場企業）と gBizINFO（500万社以上）を横断検索します。"}
+        {listed === "listed"
+          ? "EDINET 上場企業データベース。企業名・業種・都道府県で絞り込み可能。"
+          : listed === "unlisted"
+            ? "gBizINFO 500万社以上の法人データから上場会社を除外して検索。"
+            : ""}
       </p>
     </form>
   );

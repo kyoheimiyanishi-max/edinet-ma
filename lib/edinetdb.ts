@@ -4,6 +4,17 @@ function apiKey(): string {
   return process.env.EDINET_API_KEY || "";
 }
 
+export class EdinetApiError extends Error {
+  status: number;
+  body: string;
+  constructor(status: number, body: string) {
+    super(`EDINET DB API error ${status}: ${body.slice(0, 200)}`);
+    this.name = "EdinetApiError";
+    this.status = status;
+    this.body = body;
+  }
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const key = apiKey();
   if (!key) throw new Error("NO_API_KEY");
@@ -19,7 +30,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`EDINET DB API error ${res.status}: ${text.slice(0, 100)}`);
+    throw new EdinetApiError(res.status, text);
   }
   return res.json();
 }

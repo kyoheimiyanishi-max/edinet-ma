@@ -13,6 +13,17 @@ interface CompanyAssignment {
   assignedAt: string;
 }
 
+interface KPI {
+  id: string;
+  period: string;
+  metric: string;
+  target: number;
+  actual: number;
+  unit: string;
+  note: string;
+  updatedAt: string;
+}
+
 interface Employee {
   id: string;
   name: string;
@@ -22,6 +33,7 @@ interface Employee {
   phone: string;
   createdAt: string;
   assignments: CompanyAssignment[];
+  kpis: KPI[];
 }
 
 const DEPARTMENTS = [
@@ -47,6 +59,32 @@ const POSITIONS = [
 
 const ASSIGNMENT_ROLES = ["主担当", "副担当", "サポート"];
 const ASSIGNMENT_STATUSES = ["アクティブ", "フォロー中", "完了"];
+
+const KPI_PRESETS: ReadonlyArray<{ metric: string; unit: string }> = [
+  { metric: "新規開拓数", unit: "件" },
+  { metric: "面談数", unit: "件" },
+  { metric: "提案数", unit: "件" },
+  { metric: "受託件数", unit: "件" },
+  { metric: "成約件数", unit: "件" },
+  { metric: "受託金額", unit: "円" },
+  { metric: "売上金額", unit: "円" },
+  { metric: "担当企業数", unit: "社" },
+];
+
+function currentPeriod(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function formatKpiValue(value: number, unit: string): string {
+  if (unit === "円") return `¥${value.toLocaleString()}`;
+  return `${value.toLocaleString()}${unit}`;
+}
+
+function kpiProgress(k: KPI): number {
+  if (!k.target) return 0;
+  return Math.min(999, Math.round((k.actual / k.target) * 100));
+}
 
 const ROLE_COLORS: Record<string, string> = {
   主担当: "bg-blue-100 text-blue-700",
@@ -78,6 +116,15 @@ const EMPTY_ASSIGN = {
   note: "",
 };
 
+const EMPTY_KPI = {
+  period: "",
+  metric: "",
+  target: "",
+  actual: "",
+  unit: "件",
+  note: "",
+};
+
 export default function EmployeeManager() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [search, setSearch] = useState("");
@@ -91,6 +138,11 @@ export default function EmployeeManager() {
   // Assignment state
   const [assigningId, setAssigningId] = useState<string | null>(null);
   const [assignForm, setAssignForm] = useState(EMPTY_ASSIGN);
+
+  // KPI state
+  const [kpiEmployeeId, setKpiEmployeeId] = useState<string | null>(null);
+  const [editingKpiId, setEditingKpiId] = useState<string | null>(null);
+  const [kpiForm, setKpiForm] = useState(EMPTY_KPI);
 
   // Expanded employee
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -186,6 +238,77 @@ export default function EmployeeManager() {
       { method: "DELETE" },
     );
     fetchEmployees();
+  }
+
+  // ---- KPI handlers ----
+
+  function openNewKpi(employeeId: string) {
+    setKpiEmployeeId(employeeId);
+    setEditingKpiId(null);
+    setKpiForm({ ...EMPTY_KPI, period: currentPeriod() });
+  }
+
+  function startEditKpi(employeeId: string, kpi: KPI) {
+    setKpiEmployeeId(employeeId);
+    setEditingKpiId(kpi.id);
+    setKpiForm({
+      period: kpi.period,
+      metric: kpi.metric,
+      target: String(kpi.target),
+      actual: String(kpi.actual),
+      unit: kpi.unit,
+      note: kpi.note,
+    });
+  }
+
+  function closeKpiForm() {
+    setKpiEmployeeId(null);
+    setEditingKpiId(null);
+    setKpiForm(EMPTY_KPI);
+  }
+
+  async function handleSubmitKpi(e: React.FormEvent) {
+    e.preventDefault();
+    if (!kpiEmployeeId || !kpiForm.metric.trim() || !kpiForm.period.trim())
+      return;
+
+    const payload = {
+      period: kpiForm.period,
+      metric: kpiForm.metric,
+      target: Number(kpiForm.target) || 0,
+      actual: Number(kpiForm.actual) || 0,
+      unit: kpiForm.unit,
+      note: kpiForm.note,
+    };
+
+    if (editingKpiId) {
+      await fetch(`/api/employees/${kpiEmployeeId}/kpis/${editingKpiId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } else {
+      await fetch(`/api/employees/${kpiEmployeeId}/kpis`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    }
+
+    closeKpiForm();
+    fetchEmployees();
+  }
+
+  async function handleDeleteKpi(employeeId: string, kpiId: string) {
+    if (!confirm("このKPIを削除しますか？")) return;
+    await fetch(`/api/employees/${employeeId}/kpis/${kpiId}`, {
+      method: "DELETE",
+    });
+    fetchEmployees();
+  }
+
+  function applyKpiPreset(preset: { metric: string; unit: string }) {
+    setKpiForm((f) => ({ ...f, metric: preset.metric, unit: preset.unit }));
   }
 
   // ---- Render ----
@@ -420,6 +543,11 @@ export default function EmployeeManager() {
                     {emp.assignments.length > 0 && (
                       <span className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 font-medium">
                         {emp.assignments.length}社担当
+                      </span>
+                    )}
+                    {emp.kpis.length > 0 && (
+                      <span className="text-xs px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600 font-medium">
+                        KPI {emp.kpis.length}
                       </span>
                     )}
                     <button
@@ -667,6 +795,264 @@ export default function EmployeeManager() {
                       ))}
                     </div>
                   )}
+
+                  {/* KPI section */}
+                  <div className="mt-6 pt-5 border-t border-slate-200/70">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-sm font-semibold text-slate-700">
+                        KPI
+                      </h4>
+                      <button
+                        onClick={() => openNewKpi(emp.id)}
+                        className="text-xs px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors font-medium"
+                      >
+                        + KPIを追加
+                      </button>
+                    </div>
+
+                    {/* KPI form */}
+                    {kpiEmployeeId === emp.id && (
+                      <form
+                        onSubmit={handleSubmitKpi}
+                        className="bg-white rounded-xl border border-indigo-200 p-4 mb-3 space-y-3"
+                      >
+                        <div className="flex flex-wrap gap-1.5">
+                          {KPI_PRESETS.map((p) => (
+                            <button
+                              key={p.metric}
+                              type="button"
+                              onClick={() => applyKpiPreset(p)}
+                              className={`text-[10px] px-2 py-1 rounded-full border transition-colors ${
+                                kpiForm.metric === p.metric
+                                  ? "bg-indigo-600 border-indigo-600 text-white"
+                                  : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
+                              }`}
+                            >
+                              {p.metric}
+                            </button>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                              期間 <span className="text-red-400">*</span>
+                            </label>
+                            <input
+                              type="month"
+                              required
+                              value={kpiForm.period}
+                              onChange={(e) =>
+                                setKpiForm({
+                                  ...kpiForm,
+                                  period: e.target.value,
+                                })
+                              }
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                              指標 <span className="text-red-400">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={kpiForm.metric}
+                              onChange={(e) =>
+                                setKpiForm({
+                                  ...kpiForm,
+                                  metric: e.target.value,
+                                })
+                              }
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              placeholder="例: 新規開拓数"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                              目標
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={kpiForm.target}
+                              onChange={(e) =>
+                                setKpiForm({
+                                  ...kpiForm,
+                                  target: e.target.value,
+                                })
+                              }
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                              実績
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={kpiForm.actual}
+                              onChange={(e) =>
+                                setKpiForm({
+                                  ...kpiForm,
+                                  actual: e.target.value,
+                                })
+                              }
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                              単位
+                            </label>
+                            <input
+                              type="text"
+                              value={kpiForm.unit}
+                              onChange={(e) =>
+                                setKpiForm({
+                                  ...kpiForm,
+                                  unit: e.target.value,
+                                })
+                              }
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              placeholder="件 / 円 / 社"
+                            />
+                          </div>
+                          <div className="col-span-2 sm:col-span-3">
+                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                              メモ
+                            </label>
+                            <input
+                              type="text"
+                              value={kpiForm.note}
+                              onChange={(e) =>
+                                setKpiForm({
+                                  ...kpiForm,
+                                  note: e.target.value,
+                                })
+                              }
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              placeholder="補足・進捗コメント"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={closeKpiForm}
+                            className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-700"
+                          >
+                            キャンセル
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-4 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                          >
+                            {editingKpiId ? "更新" : "追加"}
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
+                    {/* KPI list */}
+                    {emp.kpis.length === 0 ? (
+                      <p className="text-xs text-slate-400 py-2">
+                        KPIが登録されていません
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {[...emp.kpis]
+                          .sort((a, b) =>
+                            a.period === b.period
+                              ? a.metric.localeCompare(b.metric)
+                              : b.period.localeCompare(a.period),
+                          )
+                          .map((k) => {
+                            const progress = kpiProgress(k);
+                            const barColor =
+                              progress >= 100
+                                ? "bg-emerald-500"
+                                : progress >= 70
+                                  ? "bg-blue-500"
+                                  : progress >= 40
+                                    ? "bg-amber-500"
+                                    : "bg-rose-500";
+                            return (
+                              <div
+                                key={k.id}
+                                className="bg-white rounded-xl border border-slate-200 p-3"
+                              >
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="text-[10px] font-mono text-slate-400">
+                                        {k.period}
+                                      </span>
+                                      <span className="text-sm font-semibold text-slate-800">
+                                        {k.metric}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-baseline gap-1.5 mt-1">
+                                      <span className="text-sm font-bold text-slate-800">
+                                        {formatKpiValue(k.actual, k.unit)}
+                                      </span>
+                                      <span className="text-xs text-slate-400">
+                                        / {formatKpiValue(k.target, k.unit)}
+                                      </span>
+                                      <span
+                                        className={`text-[10px] font-medium ml-1 ${
+                                          progress >= 100
+                                            ? "text-emerald-600"
+                                            : progress >= 70
+                                              ? "text-blue-600"
+                                              : progress >= 40
+                                                ? "text-amber-600"
+                                                : "text-rose-600"
+                                        }`}
+                                      >
+                                        {progress}%
+                                      </span>
+                                    </div>
+                                    <div className="h-1.5 bg-slate-100 rounded-full mt-2 overflow-hidden">
+                                      <div
+                                        className={`h-full ${barColor} transition-all`}
+                                        style={{
+                                          width: `${Math.min(100, progress)}%`,
+                                        }}
+                                      />
+                                    </div>
+                                    {k.note && (
+                                      <p className="text-[10px] text-slate-400 mt-1.5">
+                                        {k.note}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    <button
+                                      onClick={() => startEditKpi(emp.id, k)}
+                                      className="text-xs text-slate-400 hover:text-indigo-600 transition-colors px-2 py-1"
+                                    >
+                                      編集
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteKpi(emp.id, k.id)
+                                      }
+                                      className="text-xs text-slate-400 hover:text-red-500 transition-colors px-2 py-1"
+                                    >
+                                      削除
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

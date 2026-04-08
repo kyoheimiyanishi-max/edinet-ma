@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { createHash } from "crypto";
-import { generateObject } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { generateText, Output } from "ai";
+import { getModel } from "@/lib/ai-model";
 import { z } from "zod";
 import type { WikidataInfo } from "./enrich";
 
@@ -141,9 +141,9 @@ async function extractCompaniesUncached(
   focused: string,
 ): Promise<GroupCompany[]> {
   try {
-    const result = await generateObject({
-      model: anthropic("claude-sonnet-4-5"),
-      schema: ExtractSchema,
+    const result = await generateText({
+      model: getModel("sonnet"),
+      output: Output.object({ schema: ExtractSchema }),
       system: `あなたは企業情報の構造化抽出専門家です。与えられたテキストから、対象企業「${targetCompanyName}」の親会社・子会社・関連会社（グループ会社）を抽出してください。
 
 厳守事項:
@@ -160,7 +160,7 @@ async function extractCompaniesUncached(
 ${focused}`,
     });
 
-    return result.object.companies
+    return result.output.companies
       .filter((c) => c.name && c.name.trim() !== targetCompanyName)
       .map((c) => ({
         name: c.name.trim(),
