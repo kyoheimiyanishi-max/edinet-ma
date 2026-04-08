@@ -6,6 +6,7 @@ import {
   getAllMaServices,
 } from "@/lib/d6e/repos/banks";
 import { PREFECTURES } from "@/lib/gbiz";
+import { normalizeCompanyLookupUrl } from "@/lib/company-lookup-url";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
 
@@ -77,16 +78,18 @@ async function TypeFilter({
 
 function BankCard({ bank }: { bank: Bank }) {
   const badgeColor = TYPE_COLORS[bank.type] ?? "bg-slate-100 text-slate-700";
+  const link = bank.url ? normalizeCompanyLookupUrl(bank.url) : null;
 
   return (
     <div className="card-hover bg-white rounded-2xl border border-slate-200/60 p-5 shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          {bank.url ? (
+          {link ? (
             <a
-              href={bank.url}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={link.href}
+              {...(link.isInternal
+                ? {}
+                : { target: "_blank", rel: "noopener noreferrer" })}
               className="font-semibold text-slate-800 hover:text-blue-600 transition-colors inline-flex items-center gap-1.5"
             >
               <span>{bank.name}</span>

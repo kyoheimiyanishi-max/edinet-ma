@@ -279,7 +279,13 @@ export default async function SearchPage({ searchParams }: Props) {
   const finance = params.finance === "1" ? true : undefined;
   const exist = params.exist === "1" ? true : undefined;
 
+  // UnifiedSearchForm は submit 時に必ず page=1 を付けるので、page パラメータの
+  // 有無で「ユーザーが検索ボタンを押したか」を判別する。これにより空欄で
+  // 検索された場合も EDINET の全件リスト (listEdinet) フローに進める。
+  const formSubmitted = params.page !== undefined;
+
   const hasAnyInput =
+    formSubmitted ||
     Boolean(q) ||
     Boolean(industry) ||
     year != null ||
