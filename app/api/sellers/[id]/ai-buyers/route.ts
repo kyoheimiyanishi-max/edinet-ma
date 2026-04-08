@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { generateText, Output } from "ai";
 import { getModel } from "@/lib/ai-model";
 import { z } from "zod";
-import { getSeller } from "@/lib/sellers";
+import { findById as getSeller } from "@/lib/d6e/repos/sellers";
 
 export const maxDuration = 120;
 
@@ -30,7 +30,7 @@ interface Ctx {
 
 export async function POST(_req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
-  const seller = getSeller(id);
+  const seller = await getSeller(id);
   if (!seller) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

@@ -1,12 +1,11 @@
 import { Suspense } from "react";
+import type { MaAdvisor, MaAdvisorType } from "@/lib/ma-advisors";
 import {
-  searchMaAdvisors,
+  search as searchMaAdvisors,
   getAllMaAdvisorServices,
   getAllMaAdvisorTargetSizes,
   getPresentMaAdvisorTypes,
-  type MaAdvisor,
-  type MaAdvisorType,
-} from "@/lib/ma-advisors";
+} from "@/lib/d6e/repos/ma-advisors";
 import { PREFECTURES } from "@/lib/gbiz";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
@@ -30,7 +29,7 @@ const TYPE_COLORS: Record<string, string> = {
   地域特化: "bg-emerald-100 text-emerald-700",
 };
 
-function TypeFilter({
+async function TypeFilter({
   current,
   searchQ,
   prefecture,
@@ -45,7 +44,7 @@ function TypeFilter({
   listed?: string;
   targetSize?: string;
 }) {
-  const types = getPresentMaAdvisorTypes();
+  const types = await getPresentMaAdvisorTypes();
   const buildHref = (type?: string) => {
     const params = new URLSearchParams();
     if (searchQ) params.set("q", searchQ);
@@ -169,16 +168,18 @@ export default async function MaAdvisorsPage({ searchParams }: Props) {
   const listed = params.listed === "1" ? "1" : undefined;
   const targetSize = params.targetSize;
 
-  const advisors = searchMaAdvisors({
-    query: q,
-    type,
-    prefecture,
-    service,
-    listedOnly: listed === "1",
-    targetSize,
-  });
-  const allServices = getAllMaAdvisorServices();
-  const allTargetSizes = getAllMaAdvisorTargetSizes();
+  const [advisors, allServices, allTargetSizes] = await Promise.all([
+    searchMaAdvisors({
+      query: q,
+      type,
+      prefecture,
+      service,
+      listedOnly: listed === "1",
+      targetSize,
+    }),
+    getAllMaAdvisorServices(),
+    getAllMaAdvisorTargetSizes(),
+  ]);
 
   return (
     <div className="space-y-6">

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { addDocument, deleteDocument } from "@/lib/sellers";
+import { addDocument, deleteDocument } from "@/lib/d6e/repos/sellers";
 
 interface Ctx {
   params: Promise<{ id: string }>;
@@ -14,7 +14,7 @@ export async function POST(req: Request, ctx: Ctx) {
       { status: 400 },
     );
   }
-  const seller = addDocument(id, {
+  const seller = await addDocument(id, {
     title: body.title.trim(),
     content: body.content ?? "",
   });
@@ -34,7 +34,7 @@ export async function DELETE(req: Request, ctx: Ctx) {
       { status: 400 },
     );
   }
-  const seller = deleteDocument(id, documentId);
+  const seller = await deleteDocument(id, documentId);
   if (!seller) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

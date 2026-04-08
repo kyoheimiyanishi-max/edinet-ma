@@ -1,12 +1,11 @@
 import { Suspense } from "react";
+import type { FinancialPlanner, FpType } from "@/lib/financial-planners";
 import {
-  searchFinancialPlanners,
+  search as searchFinancialPlanners,
   getAllFpServices,
   getAllFpTargetClients,
   getPresentFpTypes,
-  type FinancialPlanner,
-  type FpType,
-} from "@/lib/financial-planners";
+} from "@/lib/d6e/repos/financial-planners";
 import { PREFECTURES } from "@/lib/gbiz";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
@@ -31,7 +30,7 @@ const TYPE_COLORS: Record<string, string> = {
   FP事務所: "bg-amber-100 text-amber-700",
 };
 
-function TypeFilter({
+async function TypeFilter({
   current,
   searchQ,
   prefecture,
@@ -46,7 +45,7 @@ function TypeFilter({
   listed?: string;
   targetClients?: string;
 }) {
-  const types = getPresentFpTypes();
+  const types = await getPresentFpTypes();
   const buildHref = (type?: string) => {
     const params = new URLSearchParams();
     if (searchQ) params.set("q", searchQ);
@@ -183,16 +182,18 @@ export default async function FinancialPlannersPage({ searchParams }: Props) {
   const listed = sp.listed === "1" ? "1" : undefined;
   const targetClients = sp.targetClients;
 
-  const planners = searchFinancialPlanners({
-    query: q,
-    type,
-    prefecture,
-    service,
-    listedOnly: listed === "1",
-    targetClients,
-  });
-  const allServices = getAllFpServices();
-  const allTargetClients = getAllFpTargetClients();
+  const [planners, allServices, allTargetClients] = await Promise.all([
+    searchFinancialPlanners({
+      query: q,
+      type,
+      prefecture,
+      service,
+      listedOnly: listed === "1",
+      targetClients,
+    }),
+    getAllFpServices(),
+    getAllFpTargetClients(),
+  ]);
 
   return (
     <div className="space-y-6">

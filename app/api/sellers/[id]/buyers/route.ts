@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { addBuyer, updateBuyer, deleteBuyer } from "@/lib/sellers";
+import { addBuyer, updateBuyer, deleteBuyer } from "@/lib/d6e/repos/sellers";
 
 interface Ctx {
   params: Promise<{ id: string }>;
@@ -11,7 +11,7 @@ export async function POST(req: Request, ctx: Ctx) {
   if (!body.companyName?.trim()) {
     return NextResponse.json({ error: "企業名は必須です" }, { status: 400 });
   }
-  const seller = addBuyer(id, {
+  const seller = await addBuyer(id, {
     companyCode: body.companyCode?.trim() || "",
     companyName: body.companyName.trim(),
     industry: body.industry || undefined,
@@ -32,7 +32,7 @@ export async function PUT(req: Request, ctx: Ctx) {
     return NextResponse.json({ error: "buyerIdが必要です" }, { status: 400 });
   }
   const { buyerId, ...updates } = body;
-  const seller = updateBuyer(id, buyerId, updates);
+  const seller = await updateBuyer(id, buyerId, updates);
   if (!seller) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -49,7 +49,7 @@ export async function DELETE(req: Request, ctx: Ctx) {
       { status: 400 },
     );
   }
-  const seller = deleteBuyer(id, buyerId);
+  const seller = await deleteBuyer(id, buyerId);
   if (!seller) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

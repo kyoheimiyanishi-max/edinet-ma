@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAllSellers, createSeller, type SellerInput } from "@/lib/sellers";
+import type { SellerInput } from "@/lib/sellers";
+import { findAll, create } from "@/lib/d6e/repos/sellers";
 
 export async function GET() {
-  return NextResponse.json(getAllSellers());
+  return NextResponse.json(await findAll());
 }
 
 export async function POST(req: Request) {
@@ -10,7 +11,7 @@ export async function POST(req: Request) {
   if (!body.companyName?.trim()) {
     return NextResponse.json({ error: "企業名は必須です" }, { status: 400 });
   }
-  const seller = createSeller({
+  const seller = await create({
     companyName: body.companyName.trim(),
     companyCode: body.companyCode?.trim() || undefined,
     industry: body.industry?.trim() || undefined,

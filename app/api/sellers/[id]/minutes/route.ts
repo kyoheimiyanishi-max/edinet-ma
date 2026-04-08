@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { addMinute, deleteMinute } from "@/lib/sellers";
+import { addMinute, deleteMinute } from "@/lib/d6e/repos/sellers";
 
 interface Ctx {
   params: Promise<{ id: string }>;
@@ -11,7 +11,7 @@ export async function POST(req: Request, ctx: Ctx) {
   if (!body.title?.trim()) {
     return NextResponse.json({ error: "タイトルは必須です" }, { status: 400 });
   }
-  const seller = addMinute(id, {
+  const seller = await addMinute(id, {
     title: body.title.trim(),
     date: body.date || new Date().toISOString().split("T")[0],
     participants: Array.isArray(body.participants) ? body.participants : [],
@@ -33,7 +33,7 @@ export async function DELETE(req: Request, ctx: Ctx) {
       { status: 400 },
     );
   }
-  const seller = deleteMinute(id, minuteId);
+  const seller = await deleteMinute(id, minuteId);
   if (!seller) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
