@@ -1,11 +1,10 @@
 import { Suspense } from "react";
+import type { Bank, BankType } from "@/lib/banks";
 import {
-  searchBanks,
+  search as searchBanks,
   getAllTypes,
   getAllMaServices,
-  type Bank,
-  type BankType,
-} from "@/lib/banks";
+} from "@/lib/d6e/repos/banks";
 import { PREFECTURES } from "@/lib/gbiz";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
@@ -31,7 +30,7 @@ const TYPE_COLORS: Record<string, string> = {
   信用金庫: "bg-rose-100 text-rose-700",
 };
 
-function TypeFilter({
+async function TypeFilter({
   current,
   searchQ,
   prefecture,
@@ -44,7 +43,7 @@ function TypeFilter({
   service?: string;
   hasMaTeam?: string;
 }) {
-  const types = getAllTypes();
+  const types = await getAllTypes();
   const buildHref = (type?: string) => {
     const params = new URLSearchParams();
     if (searchQ) params.set("q", searchQ);
@@ -164,14 +163,16 @@ export default async function BanksPage({ searchParams }: Props) {
   const prefecture = params.prefecture;
   const service = params.service;
   const hasMaTeam = params.hasMaTeam === "1" ? "1" : undefined;
-  const banks = searchBanks({
-    query: q,
-    type,
-    prefecture,
-    service,
-    hasMaTeam: hasMaTeam === "1",
-  });
-  const allServices = getAllMaServices();
+  const [banks, allServices] = await Promise.all([
+    searchBanks({
+      query: q,
+      type,
+      prefecture,
+      service,
+      hasMaTeam: hasMaTeam === "1",
+    }),
+    getAllMaServices(),
+  ]);
 
   return (
     <div className="space-y-6">

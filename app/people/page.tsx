@@ -1,11 +1,11 @@
 import { Suspense } from "react";
+import { CATEGORIES } from "@/lib/people";
+import type { Person } from "@/lib/people";
 import {
-  searchPeople,
-  CATEGORIES,
+  search as searchPeople,
   getAllOrganizations,
   getAllNotableDeals,
-} from "@/lib/people";
-import type { Person } from "@/lib/people";
+} from "@/lib/d6e/repos/people";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 
 interface Props {
@@ -155,16 +155,17 @@ export default async function PeoplePage({ searchParams }: Props) {
   const deal = params.deal;
   const hasLinks = params.hasLinks === "1" ? "1" : undefined;
 
-  const people = searchPeople({
-    query: q,
-    category,
-    organization,
-    deal,
-    hasLinks: hasLinks === "1",
-  });
-
-  const allOrgs = getAllOrganizations();
-  const allDeals = getAllNotableDeals();
+  const [people, allOrgs, allDeals] = await Promise.all([
+    searchPeople({
+      query: q,
+      category,
+      organization,
+      deal,
+      hasLinks: hasLinks === "1",
+    }),
+    getAllOrganizations(),
+    getAllNotableDeals(),
+  ]);
   const current = { q, category, organization, deal, hasLinks };
 
   return (

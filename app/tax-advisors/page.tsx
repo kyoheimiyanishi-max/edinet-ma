@@ -1,12 +1,11 @@
 import { Suspense } from "react";
+import type { TaxAdvisor, AdvisorType } from "@/lib/tax-advisors";
 import {
-  searchAdvisors,
+  search as searchAdvisors,
   getAllTypes,
   getAllSpecialties,
   getAllSizes,
-  type TaxAdvisor,
-  type AdvisorType,
-} from "@/lib/tax-advisors";
+} from "@/lib/d6e/repos/tax-advisors";
 import { PREFECTURES } from "@/lib/gbiz";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
@@ -30,7 +29,7 @@ const TYPE_COLORS: Record<string, string> = {
   "M&A特化": "bg-indigo-100 text-indigo-700",
 };
 
-function TypeFilter({
+async function TypeFilter({
   current,
   searchQ,
   prefecture,
@@ -43,7 +42,7 @@ function TypeFilter({
   specialty?: string;
   size?: string;
 }) {
-  const types = getAllTypes();
+  const types = await getAllTypes();
   const buildHref = (type?: string) => {
     const params = new URLSearchParams();
     if (searchQ) params.set("q", searchQ);
@@ -157,15 +156,17 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
   const prefecture = params.prefecture;
   const specialty = params.specialty;
   const size = params.size;
-  const advisors = searchAdvisors({
-    query: q,
-    type,
-    prefecture,
-    specialty,
-    size,
-  });
-  const allSpecialties = getAllSpecialties();
-  const allSizes = getAllSizes();
+  const [advisors, allSpecialties, allSizes] = await Promise.all([
+    searchAdvisors({
+      query: q,
+      type,
+      prefecture,
+      specialty,
+      size,
+    }),
+    getAllSpecialties(),
+    getAllSizes(),
+  ]);
 
   return (
     <div className="space-y-6">

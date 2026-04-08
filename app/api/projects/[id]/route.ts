@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  getProject,
-  updateProject,
-  deleteProject,
-  type ProjectInput,
-} from "@/lib/projects";
+import type { ProjectInput } from "@/lib/projects";
+import { findById, update, remove } from "@/lib/d6e/repos/projects";
 
 interface Ctx {
   params: Promise<{ id: string }>;
@@ -12,7 +8,7 @@ interface Ctx {
 
 export async function GET(_req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
-  const project = getProject(id);
+  const project = await findById(id);
   if (!project) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -25,7 +21,7 @@ export async function PUT(req: Request, ctx: Ctx) {
   if ("sellerId" in body && !body.sellerId) {
     body.sellerId = undefined;
   }
-  const project = updateProject(id, body);
+  const project = await update(id, body);
   if (!project) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -34,7 +30,7 @@ export async function PUT(req: Request, ctx: Ctx) {
 
 export async function DELETE(_req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
-  const ok = deleteProject(id);
+  const ok = await remove(id);
   if (!ok) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

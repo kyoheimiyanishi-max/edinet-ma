@@ -1,5 +1,5 @@
 import { streamText, tool, stepCountIs, convertToModelMessages } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { getModel } from "@/lib/ai-model";
 import { z } from "zod";
 
 import {
@@ -13,29 +13,31 @@ import { searchNews } from "@/lib/news";
 import { searchLaws } from "@/lib/legal";
 import { searchPapers } from "@/lib/research";
 import { searchVideos } from "@/lib/youtube";
-import { searchSeminars } from "@/lib/seminars";
-import { searchPeople } from "@/lib/people";
-import { searchCommunities } from "@/lib/communities";
-import { searchAdvisors, type AdvisorType } from "@/lib/tax-advisors";
-import { searchBanks, type BankType } from "@/lib/banks";
+import { search as searchSeminars } from "@/lib/d6e/repos/seminars";
+import { search as searchPeople } from "@/lib/d6e/repos/people";
+import { search as searchCommunities } from "@/lib/d6e/repos/communities";
+import type { AdvisorType } from "@/lib/tax-advisors";
+import { search as searchAdvisors } from "@/lib/d6e/repos/tax-advisors";
+import type { BankType } from "@/lib/banks";
+import { search as searchBanks } from "@/lib/d6e/repos/banks";
 import {
-  searchMinutes,
-  getMinutesByProject,
-  getMinutesByParticipant,
-  getAllMinutes,
-  updateMinute,
-} from "@/lib/minutes";
+  search as searchMinutes,
+  findByProject as getMinutesByProject,
+  findByParticipant as getMinutesByParticipant,
+  findAll as getAllMinutes,
+  update as updateMinute,
+} from "@/lib/d6e/repos/minutes";
+import type { ProjectStatus } from "@/lib/projects";
 import {
-  searchProjects,
-  getAllProjects,
-  updateProject,
-  type ProjectStatus,
-} from "@/lib/projects";
+  search as searchProjects,
+  findAll as getAllProjects,
+  update as updateProject,
+} from "@/lib/d6e/repos/projects";
+import type { CompanyAssignment } from "@/lib/employees";
 import {
-  getAllEmployees,
+  findAll as getAllEmployees,
   addAssignment,
-  type CompanyAssignment,
-} from "@/lib/employees";
+} from "@/lib/d6e/repos/employees";
 
 const SYSTEM_PROMPT = `あなたはM&A（合併・買収）の専門AIアシスタントです。日本のM&A市場に精通しており、以下のデータベースにアクセスできます：
 
@@ -75,7 +77,7 @@ export async function POST(req: Request) {
   const { messages } = await req.json();
 
   const result = streamText({
-    model: anthropic("claude-sonnet-4-5"),
+    model: getModel("sonnet"),
     system: SYSTEM_PROMPT,
     messages: await convertToModelMessages(messages),
     tools: {
@@ -246,7 +248,7 @@ export async function POST(req: Request) {
         }),
         execute: async ({ keyword }) => {
           try {
-            const events = await searchSeminars(keyword);
+            const events = await searchSeminars({ query: keyword });
             return { events: events.slice(0, 10), total: events.length };
           } catch {
             return { error: "セミナー検索に失敗" };
@@ -261,7 +263,7 @@ export async function POST(req: Request) {
           query: z.string().optional().describe("名前・組織名・カテゴリで検索"),
         }),
         execute: async ({ query }) => {
-          const people = searchPeople(query);
+          const people = await searchPeople({ query });
           return { people: people.slice(0, 15), total: people.length };
         },
       }),
@@ -273,7 +275,7 @@ export async function POST(req: Request) {
           prefecture: z.string().optional().describe("都道府県で絞り込み"),
         }),
         execute: async ({ query, prefecture }) => {
-          const communities = searchCommunities(query, prefecture);
+          const communities = await searchCommunities({ query, prefecture });
           return {
             communities: communities.slice(0, 15),
             total: communities.length,
@@ -297,11 +299,11 @@ export async function POST(req: Request) {
           prefecture: z.string().optional().describe("都道府県"),
         }),
         execute: async ({ query, type, prefecture }) => {
-          const advisors = searchAdvisors(
+          const advisors = await searchAdvisors({
             query,
-            type as AdvisorType | undefined,
+            type: type as AdvisorType | undefined,
             prefecture,
-          );
+          });
           return { advisors: advisors.slice(0, 15), total: advisors.length };
         },
       }),
@@ -321,11 +323,11 @@ export async function POST(req: Request) {
           prefecture: z.string().optional().describe("都道府県"),
         }),
         execute: async ({ query, type, prefecture }) => {
-          const banks = searchBanks(
+          const banks = await searchBanks({
             query,
-            type as BankType | undefined,
+            type: type as BankType | undefined,
             prefecture,
-          );
+          });
           return { banks: banks.slice(0, 15), total: banks.length };
         },
       }),
@@ -342,7 +344,9 @@ export async function POST(req: Request) {
             .describe("検索キーワード（タイトル、内容、参加者名等）"),
         }),
         execute: async ({ query }) => {
-          const results = query ? searchMinutes(query) : getAllMinutes();
+          const results = await (query
+            ? searchMinutes(query)
+            : getAllMinutes());
           return { minutes: results.slice(0, 20), total: results.length };
         },
       }),
@@ -353,7 +357,7 @@ export async function POST(req: Request) {
           projectId: z.string().describe("プロジェクトID"),
         }),
         execute: async ({ projectId }) => {
-          const results = getMinutesByProject(projectId);
+          const results = await getMinutesByProject(projectId);
           return { minutes: results, total: results.length };
         },
       }),
@@ -364,7 +368,7 @@ export async function POST(req: Request) {
           name: z.string().describe("参加者名"),
         }),
         execute: async ({ name }) => {
-          const results = getMinutesByParticipant(name);
+          const results = await getMinutesByParticipant(name);
           return { minutes: results.slice(0, 20), total: results.length };
         },
       }),
@@ -379,7 +383,9 @@ export async function POST(req: Request) {
             .describe("検索キーワード（プロジェクト名、ステータス、企業名等）"),
         }),
         execute: async ({ query }) => {
-          const results = query ? searchProjects(query) : getAllProjects();
+          const results = await (query
+            ? searchProjects(query)
+            : getAllProjects());
           return { projects: results.slice(0, 20), total: results.length };
         },
       }),
@@ -393,7 +399,7 @@ export async function POST(req: Request) {
             .describe("社員名や部署で絞り込み（省略で全件）"),
         }),
         execute: async ({ query }) => {
-          const all = getAllEmployees();
+          const all = await getAllEmployees();
           if (!query) return { employees: all, total: all.length };
           const q = query.toLowerCase();
           const filtered = all.filter(
@@ -420,7 +426,7 @@ export async function POST(req: Request) {
             .describe("ステータス変更の理由（どの議事録のどの決定に基づくか）"),
         }),
         execute: async ({ projectId, status, reason }) => {
-          const result = updateProject(projectId, {
+          const result = await updateProject(projectId, {
             status: status as ProjectStatus,
           });
           if (!result)
@@ -455,10 +461,10 @@ export async function POST(req: Request) {
           status,
           note,
         }) => {
-          const employees = getAllEmployees();
+          const employees = await getAllEmployees();
           const emp = employees.find((e) => e.name === employeeName);
           if (!emp) return { error: `社員「${employeeName}」が見つかりません` };
-          const result = addAssignment(emp.id, {
+          const result = await addAssignment(emp.id, {
             companyCode,
             companyName,
             role: role as CompanyAssignment["role"],
@@ -489,7 +495,8 @@ export async function POST(req: Request) {
             .describe("新しいステータス（未着手/進行中/完了）"),
         }),
         execute: async ({ minuteId, actionIndex, newStatus }) => {
-          const minute = searchMinutes().find((m) => m.id === minuteId);
+          const all = await getAllMinutes();
+          const minute = all.find((m) => m.id === minuteId);
           if (!minute) return { error: "議事録が見つかりません" };
           if (actionIndex < 0 || actionIndex >= minute.actionItems.length)
             return { error: "アクションアイテムのインデックスが不正です" };
@@ -498,7 +505,7 @@ export async function POST(req: Request) {
             ...updatedActions[actionIndex],
             status: newStatus as "未着手" | "進行中" | "完了",
           };
-          const result = updateMinute(minuteId, {
+          const result = await updateMinute(minuteId, {
             actionItems: updatedActions,
           });
           if (!result) return { error: "更新に失敗しました" };

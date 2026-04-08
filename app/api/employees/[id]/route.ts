@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  getEmployee,
-  updateEmployee,
-  deleteEmployee,
-  type EmployeeInput,
-} from "@/lib/employees";
+import type { EmployeeInput } from "@/lib/employees";
+import { findById, update, remove } from "@/lib/d6e/repos/employees";
 
 interface Ctx {
   params: Promise<{ id: string }>;
@@ -12,7 +8,7 @@ interface Ctx {
 
 export async function GET(_req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
-  const emp = getEmployee(id);
+  const emp = await findById(id);
   if (!emp) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -22,7 +18,7 @@ export async function GET(_req: Request, ctx: Ctx) {
 export async function PUT(req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
   const body = (await req.json()) as Partial<EmployeeInput>;
-  const emp = updateEmployee(id, body);
+  const emp = await update(id, body);
   if (!emp) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -31,7 +27,7 @@ export async function PUT(req: Request, ctx: Ctx) {
 
 export async function DELETE(_req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
-  const ok = deleteEmployee(id);
+  const ok = await remove(id);
   if (!ok) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

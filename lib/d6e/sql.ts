@@ -10,8 +10,13 @@ import { D6E_WORKSPACE_ID, workspaceTablePrefix } from "./config";
  * to avoid SQL injection. Identifier names should always come from
  * compile-time constants in repository modules — never from user input.
  *
- * The escape logic is ported from d6e-frontend so behaviour matches the
- * server's expectations exactly.
+ * Important: d6e-api **auto-prefixes** workspace tables. The user-facing
+ * SQL must reference tables by their **unprefixed** logical name (e.g.
+ * `"banks"`), and the server rewrites it to
+ * `user_data.ws_<workspace_id>_banks` before execution. Passing a fully
+ * prefixed name from this side hits a 23-character validation cap and
+ * is rejected. The escape logic and prefix handling are ported from
+ * d6e-frontend so behaviour matches the server's expectations exactly.
  */
 
 export function escapeSqlIdentifier(identifier: string): string {
@@ -62,17 +67,32 @@ export function escapeSqlValue(
 }
 
 /**
- * Build the fully-qualified, quoted reference for a workspace-scoped table.
+ * Build a SQL identifier reference to a workspace-scoped table.
  *
- * Example: `qualifiedTable("companies")`
- *       → `user_data."ws_019c94f0_33ea_7392_831a_021b1143f12f_companies"`
+ * Returns the **unprefixed** quoted name. d6e-api will resolve it to the
+ * workspace's actual table at execution time.
+ *
+ * Example: `tableRef("companies")`  →  `"companies"`
+ *          d6e-api executes against:  `user_data."ws_019c94f0_..._companies"`
  *
  * `tableName` MUST be a constant from repo modules — never user input.
  */
-export function qualifiedTable(
+export function tableRef(tableName: string): string {
+  return `"${escapeSqlIdentifier(tableName)}"`;
+}
+
+/**
+ * Compute the fully-prefixed table name as a STRING VALUE (not an
+ * identifier). Use this only when the table name needs to appear as a
+ * string literal in a query — typically `information_schema.tables`
+ * lookups, where d6e-api will not auto-prefix.
+ *
+ * Example: `workspaceTableNameValue("companies")`
+ *       → `ws_019c94f0_33ea_7392_831a_021b1143f12f_companies`
+ */
+export function workspaceTableNameValue(
   tableName: string,
   workspaceId: string = D6E_WORKSPACE_ID,
 ): string {
-  const full = `${workspaceTablePrefix(workspaceId)}${tableName}`;
-  return `user_data."${escapeSqlIdentifier(full)}"`;
+  return `${workspaceTablePrefix(workspaceId)}${tableName}`;
 }

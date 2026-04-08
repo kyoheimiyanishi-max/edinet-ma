@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
-import {
-  getAllProjects,
-  createProject,
-  type ProjectInput,
-} from "@/lib/projects";
+import type { ProjectInput } from "@/lib/projects";
+import { findAll, create } from "@/lib/d6e/repos/projects";
 
 export async function GET() {
-  return NextResponse.json(getAllProjects());
+  return NextResponse.json(await findAll());
 }
 
 export async function POST(req: Request) {
@@ -19,7 +16,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const project = createProject({
+  const project = await create({
     name: body.name.trim(),
     description: body.description ?? "",
     status: body.status ?? "企画中",

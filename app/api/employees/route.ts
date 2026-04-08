@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
-import {
-  getAllEmployees,
-  createEmployee,
-  type EmployeeInput,
-} from "@/lib/employees";
+import type { EmployeeInput } from "@/lib/employees";
+import { findAll, create } from "@/lib/d6e/repos/employees";
 
 export async function GET() {
-  return NextResponse.json(getAllEmployees());
+  return NextResponse.json(await findAll());
 }
 
 export async function POST(req: Request) {
@@ -16,7 +13,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "名前は必須です" }, { status: 400 });
   }
 
-  const employee = createEmployee({
+  const employee = await create({
     name: body.name.trim(),
     email: body.email?.trim() ?? "",
     department: body.department ?? "",

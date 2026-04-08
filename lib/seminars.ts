@@ -1,6 +1,11 @@
 import seminarsData from "@/data/seminars.json";
 
 // ---- Types ----
+//
+// d6e is the source of truth for seminars data — see
+// `lib/d6e/repos/seminars.ts` for read/write operations. The exports
+// below provide the type system, display helpers, and the curated JSON
+// dataset that the seeder (`scripts/seed-seminars.ts`) loads into d6e.
 
 export interface SeminarEvent {
   event_id: number;
@@ -17,46 +22,54 @@ export interface SeminarEvent {
   limit: number | null;
   event_type: string;
   category: string;
+  /** Content-derived tags. Multiple tags per seminar. */
+  tags?: string[];
 }
 
-const ALL_SEMINARS: SeminarEvent[] = seminarsData as SeminarEvent[];
+/** タグの公式リスト。フィルター UI で表示順を保つために配列で管理。 */
+export const SEMINAR_TAGS = [
+  "M&A",
+  "事業承継",
+  "PMI",
+  "デューデリジェンス",
+  "バリュエーション",
+  "PE・ファンド",
+  "VC・ベンチャー投資",
+  "IPO・上場",
+  "TOB・公開買付",
+  "MBO",
+  "カーブアウト",
+  "クロスボーダー",
+  "スタートアップ",
+  "資金調達",
+  "経営戦略",
+  "ガバナンス",
+  "DX",
+  "財務・会計",
+  "税務",
+  "法務",
+  "人事・組織",
+  "マーケティング",
+] as const;
 
-// ---- Search ----
+export type SeminarTag = (typeof SEMINAR_TAGS)[number];
 
-export async function searchSeminars(
-  keyword?: string,
-): Promise<SeminarEvent[]> {
-  let results = ALL_SEMINARS;
-
-  if (keyword && keyword.trim()) {
-    const q = keyword.trim().toLowerCase();
-    results = results.filter(
-      (s) =>
-        s.title.toLowerCase().includes(q) ||
-        s.catch.toLowerCase().includes(q) ||
-        s.description.toLowerCase().includes(q) ||
-        s.category.toLowerCase().includes(q) ||
-        s.owner_display_name.toLowerCase().includes(q),
-    );
-  }
-
-  // Sort: upcoming first by date asc, then past by date desc
-  const now = Date.now();
-  const sorted = [...results].sort((a, b) => {
-    const da = new Date(a.started_at).getTime() || 0;
-    const db = new Date(b.started_at).getTime() || 0;
-    const aFuture = da > now;
-    const bFuture = db > now;
-    if (aFuture && !bFuture) return -1;
-    if (!aFuture && bFuture) return 1;
-    if (aFuture) return da - db;
-    return db - da;
-  });
-
-  return sorted;
+export interface SeminarFilters {
+  query?: string;
+  /** Match seminars whose tags include ANY of the specified tags. */
+  tags?: string[];
+  /** When true, require ALL specified tags. */
+  matchAllTags?: boolean;
 }
 
-// ---- Helpers ----
+// ---- Seed data ----
+// Used only by `scripts/seed-seminars.ts` to bulk-insert into d6e. The
+// runtime app reads from d6e via `lib/d6e/repos/seminars.ts`, never
+// from this array.
+
+export const ALL_SEMINARS: SeminarEvent[] = seminarsData as SeminarEvent[];
+
+// ---- Display helpers ----
 
 export function formatEventDate(dateStr: string): string {
   if (!dateStr) return "";

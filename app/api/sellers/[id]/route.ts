@@ -5,7 +5,7 @@ import {
   deleteSeller,
   type SellerInput,
 } from "@/lib/sellers";
-import { clearSellerFromProjects } from "@/lib/projects";
+import { clearSellerFromProjects } from "@/lib/d6e/repos/projects";
 
 interface Ctx {
   params: Promise<{ id: string }>;
@@ -36,6 +36,6 @@ export async function DELETE(_req: Request, ctx: Ctx) {
   if (!ok) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  clearSellerFromProjects(id);
+  await clearSellerFromProjects(id);
   return NextResponse.json({ ok: true });
 }

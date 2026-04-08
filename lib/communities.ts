@@ -1,6 +1,12 @@
 import communitiesData from "@/data/communities.json";
 
 // ---- Types ----
+//
+// d6e is the source of truth for community data — see
+// `lib/d6e/repos/communities.ts` for read/write operations. The exports
+// below only provide the type system used by the repo and the curated
+// JSON dataset that the seeder (`scripts/seed-communities.ts`) loads
+// into d6e.
 
 export type CommunityType =
   | "経営者団体"
@@ -35,12 +41,6 @@ export const COMMUNITY_TYPES: readonly CommunityType[] = [
   "アカデミア",
 ] as const;
 
-// ---- Data ----
-
-export const COMMUNITIES: Community[] = communitiesData as Community[];
-
-// ---- Search ----
-
 export interface CommunityFilters {
   query?: string;
   prefecture?: string;
@@ -51,92 +51,9 @@ export interface CommunityFilters {
   establishedTo?: number;
 }
 
-export function searchCommunities(
-  queryOrFilters?: string | CommunityFilters,
-  prefecture?: string,
-): Community[] {
-  const filters: CommunityFilters =
-    typeof queryOrFilters === "object"
-      ? queryOrFilters
-      : { query: queryOrFilters, prefecture };
+// ---- Seed data ----
+// Used only by `scripts/seed-communities.ts` to bulk-insert into d6e.
+// The runtime app reads from d6e via `lib/d6e/repos/communities.ts`,
+// never from this array.
 
-  let results: Community[] = COMMUNITIES;
-
-  if (filters.prefecture) {
-    results = results.filter((c) => c.prefecture === filters.prefecture);
-  }
-
-  if (filters.type) {
-    results = results.filter((c) => c.type === filters.type);
-  }
-
-  if (filters.focusArea) {
-    const f = filters.focusArea.toLowerCase();
-    results = results.filter((c) =>
-      c.focusAreas.some((a) => a.toLowerCase().includes(f)),
-    );
-  }
-
-  if (filters.minMembers != null) {
-    results = results.filter(
-      (c) => c.memberCount != null && c.memberCount >= filters.minMembers!,
-    );
-  }
-
-  if (filters.establishedFrom != null) {
-    results = results.filter(
-      (c) => c.established != null && c.established >= filters.establishedFrom!,
-    );
-  }
-
-  if (filters.establishedTo != null) {
-    results = results.filter(
-      (c) => c.established != null && c.established <= filters.establishedTo!,
-    );
-  }
-
-  if (filters.query && filters.query.trim()) {
-    const q = filters.query.trim().toLowerCase();
-    results = results.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.description.toLowerCase().includes(q) ||
-        c.type.toLowerCase().includes(q) ||
-        c.focusAreas.some((f) => f.toLowerCase().includes(q)),
-    );
-  }
-
-  return results;
-}
-
-export function getAllFocusAreas(): string[] {
-  const set = new Set<string>();
-  for (const c of COMMUNITIES) {
-    for (const f of c.focusAreas) set.add(f);
-  }
-  return Array.from(set).sort();
-}
-
-// ---- Helpers ----
-
-export function getCommunitiesByType(type: CommunityType): Community[] {
-  return COMMUNITIES.filter((c) => c.type === type);
-}
-
-export function getCommunitiesByPrefecture(prefecture: string): Community[] {
-  return COMMUNITIES.filter((c) => c.prefecture === prefecture);
-}
-
-export function getAllTypes(): CommunityType[] {
-  return [...new Set(COMMUNITIES.map((c) => c.type))];
-}
-
-export function getAllPrefectures(): string[] {
-  return [
-    ...new Set(
-      COMMUNITIES.filter((c) => c.prefecture).map(
-        (c) => c.prefecture as string,
-      ),
-    ),
-  ];
-}
+export const COMMUNITIES: Community[] = communitiesData as Community[];

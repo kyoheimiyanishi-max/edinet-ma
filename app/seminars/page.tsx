@@ -1,13 +1,14 @@
 import { Suspense } from "react";
 import {
-  searchSeminars,
   formatEventDate,
   formatCapacity,
   isUpcoming,
   eventTypeLabel,
   getSeminarCategoryColor,
+  SEMINAR_TAGS,
   type SeminarEvent,
 } from "@/lib/seminars";
+import { search as searchSeminars } from "@/lib/d6e/repos/seminars";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 
 interface Props {
@@ -18,6 +19,10 @@ interface Props {
     category?: string;
     availability?: string;
     owner?: string;
+    /** カンマ区切りタグ。複数指定で OR マッチ。 */
+    tags?: string;
+    /** "all" 指定で AND マッチ。 */
+    tagMode?: string;
   }>;
 }
 
@@ -148,6 +153,19 @@ function SeminarCard({ seminar }: { seminar: SeminarEvent }) {
           </span>
         )}
       </div>
+
+      {seminar.tags && seminar.tags.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1">
+          {seminar.tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-block px-1.5 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-600 font-medium"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -171,8 +189,17 @@ export default async function SeminarsPage({ searchParams }: Props) {
   const availability: SeminarAvailability =
     params.availability === "available" ? "available" : "all";
   const owner = params.owner;
+  const selectedTags = (params.tags ?? "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+  const tagMode: "any" | "all" = params.tagMode === "all" ? "all" : "any";
 
-  const allSeminars = await searchSeminars(q);
+  const allSeminars = await searchSeminars({
+    query: q,
+    tags: selectedTags.length > 0 ? selectedTags : undefined,
+    matchAllTags: tagMode === "all",
+  });
 
   // Apply filters
   let filtered = allSeminars;
@@ -217,6 +244,8 @@ export default async function SeminarsPage({ searchParams }: Props) {
       category,
       availability: availability === "all" ? undefined : availability,
       owner,
+      tags: selectedTags.length > 0 ? selectedTags.join(",") : undefined,
+      tagMode: tagMode === "all" ? "all" : undefined,
       ...override,
     };
     const sp = new URLSearchParams();
@@ -225,6 +254,13 @@ export default async function SeminarsPage({ searchParams }: Props) {
     }
     const qs = sp.toString();
     return qs ? `/seminars?${qs}` : "/seminars";
+  };
+
+  const buildTagToggleHref = (tag: string) => {
+    const next = selectedTags.includes(tag)
+      ? selectedTags.filter((t) => t !== tag)
+      : [...selectedTags, tag];
+    return buildHref({ tags: next.length > 0 ? next.join(",") : undefined });
   };
 
   return (
@@ -298,6 +334,52 @@ export default async function SeminarsPage({ searchParams }: Props) {
           </div>
         </div>
 
+        {/* Tags (内容ベース) */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-semibold text-slate-500">
+              内容タグ
+              {selectedTags.length > 0 && (
+                <span className="ml-2 text-slate-400">
+                  {selectedTags.length}件選択中 (
+                  {tagMode === "all" ? "すべて含む" : "いずれか含む"})
+                </span>
+              )}
+            </div>
+            {selectedTags.length >= 2 && (
+              <a
+                href={buildHref({
+                  tagMode: tagMode === "all" ? undefined : "all",
+                })}
+                className="text-xs px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium"
+              >
+                {tagMode === "all" ? "→ いずれか" : "→ すべて"}
+              </a>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <FilterChip
+              active={selectedTags.length === 0}
+              href={buildHref({ tags: undefined, tagMode: undefined })}
+            >
+              すべて
+            </FilterChip>
+            {SEMINAR_TAGS.map((tag) => {
+              const active = selectedTags.includes(tag);
+              return (
+                <FilterChip
+                  key={tag}
+                  active={active}
+                  href={buildTagToggleHref(tag)}
+                >
+                  {active ? "✓ " : ""}
+                  {tag}
+                </FilterChip>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Category */}
         {allCategories.length > 0 && (
           <div className="space-y-2">
@@ -351,6 +433,12 @@ export default async function SeminarsPage({ searchParams }: Props) {
             {availability === "available" && (
               <input type="hidden" name="availability" value="available" />
             )}
+            {selectedTags.length > 0 && (
+              <input type="hidden" name="tags" value={selectedTags.join(",")} />
+            )}
+            {tagMode === "all" && (
+              <input type="hidden" name="tagMode" value="all" />
+            )}
             <select
               name="owner"
               defaultValue={owner || ""}
@@ -375,7 +463,8 @@ export default async function SeminarsPage({ searchParams }: Props) {
             format !== "all" ||
             category ||
             availability === "available" ||
-            owner) && (
+            owner ||
+            selectedTags.length > 0) && (
             <a
               href={buildHref({
                 status: undefined,
@@ -383,6 +472,8 @@ export default async function SeminarsPage({ searchParams }: Props) {
                 category: undefined,
                 availability: undefined,
                 owner: undefined,
+                tags: undefined,
+                tagMode: undefined,
               })}
               className="text-xs font-medium text-rose-600 hover:bg-rose-50 px-3 py-1.5 rounded-lg"
             >

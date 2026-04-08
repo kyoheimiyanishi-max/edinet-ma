@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
-import {
-  getAllMinutes,
-  createMinute,
-  type MeetingMinuteInput,
-} from "@/lib/minutes";
+import type { MeetingMinuteInput } from "@/lib/minutes";
+import { findAll, create } from "@/lib/d6e/repos/minutes";
 
 export async function GET() {
-  return NextResponse.json(getAllMinutes());
+  return NextResponse.json(await findAll());
 }
 
 export async function POST(req: Request) {
@@ -16,7 +13,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "タイトルは必須です" }, { status: 400 });
   }
 
-  const minute = createMinute({
+  const minute = await create({
     title: body.title.trim(),
     date: body.date ?? new Date().toISOString().split("T")[0],
     participants: body.participants ?? [],

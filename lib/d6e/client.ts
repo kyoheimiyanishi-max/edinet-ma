@@ -1,14 +1,15 @@
 import "server-only";
 
+import { getAccessToken } from "./auth";
 import { D6E_API_URL, D6E_WORKSPACE_ID } from "./config";
 
 /**
  * Typed HTTP client for d6e-api.
  *
  * d6e-api expects `Authorization: Bearer <JWT>` on every endpoint.
- * The JWT is issued by d6e-auth (https://www.d6e.ai). For local
- * development we read it from `D6E_DEV_ACCESS_TOKEN`. A real OAuth
- * flow will replace this in a follow-up.
+ * The JWT is issued by d6e-auth (https://www.d6e.ai). The `./auth`
+ * module handles refreshing the token automatically using the
+ * OAuth2 refresh-token grant; see that file for the full lifecycle.
  */
 
 export class D6eApiError extends Error {
@@ -29,38 +30,19 @@ interface RequestOptions {
   headers?: Record<string, string>;
 }
 
-/**
- * Resolve the access token used for the current request.
- *
- * Today: dev token from env. Tomorrow: per-request JWT from a session
- * cookie set by an OAuth callback. The signature already accepts an
- * explicit override so callers in route handlers can pass through a
- * user-scoped token without changing this module.
- */
-export function getAccessToken(override?: string): string {
-  if (override) return override;
-  const token = process.env.D6E_DEV_ACCESS_TOKEN;
-  if (!token) {
-    throw new D6eApiError(
-      "No d6e access token available. Set D6E_DEV_ACCESS_TOKEN in .env.local " +
-        "(see Chrome DevTools → Cookies → jp-force.d6e.ai → 'auth-token').",
-      401,
-      "NO_TOKEN",
-    );
-  }
-  return token;
-}
+export { getAccessToken };
 
 async function apiRequest<T>(
   path: string,
-  token: string,
+  token: string | undefined,
   options: RequestOptions = {},
 ): Promise<T> {
+  const bearer = await getAccessToken(token);
   const response = await fetch(`${D6E_API_URL}${path}`, {
     method: options.method ?? "GET",
     body: options.body,
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${bearer}`,
       "Content-Type": "application/json",
       ...options.headers,
     },
@@ -106,9 +88,14 @@ async function apiRequest<T>(
 // ---- SQL execution ----
 
 export interface SqlResult<Row = Record<string, unknown>> {
-  rows: Row[];
-  // d6e-api may return additional metadata (rowCount, etc.). We capture
-  // unknowns loosely so future fields don't break callers.
+  /** Present for SELECT statements. */
+  rows?: Row[];
+  /** Present for INSERT/UPDATE/DELETE. d6e-api strips `RETURNING` clauses. */
+  affected_rows?: number;
+  /** The query as actually executed by d6e (after policy injection). */
+  executed_sql?: string;
+  // d6e-api may return additional metadata. We capture unknowns loosely
+  // so future fields don't break callers.
   [key: string]: unknown;
 }
 
@@ -124,11 +111,10 @@ export async function executeSql<Row = Record<string, unknown>>(
   sql: string,
   options?: { token?: string; workspaceId?: string },
 ): Promise<SqlResult<Row>> {
-  const token = getAccessToken(options?.token);
   const workspaceId = options?.workspaceId ?? D6E_WORKSPACE_ID;
   return apiRequest<SqlResult<Row>>(
     `/api/v1/workspaces/${workspaceId}/sql`,
-    token,
+    options?.token,
     {
       method: "POST",
       body: JSON.stringify({ sql }),
@@ -145,5 +131,5 @@ export interface Workspace {
 }
 
 export async function listWorkspaces(token?: string): Promise<Workspace[]> {
-  return apiRequest<Workspace[]>("/api/v1/workspaces", getAccessToken(token));
+  return apiRequest<Workspace[]>("/api/v1/workspaces", token);
 }

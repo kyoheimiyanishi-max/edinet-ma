@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { addAssignment, removeAssignment } from "@/lib/employees";
+import { addAssignment, removeAssignment } from "@/lib/d6e/repos/employees";
 
 interface Ctx {
   params: Promise<{ id: string }>;
@@ -16,7 +16,7 @@ export async function POST(req: Request, ctx: Ctx) {
     );
   }
 
-  const emp = addAssignment(id, {
+  const emp = await addAssignment(id, {
     companyCode: body.companyCode,
     companyName: body.companyName,
     role: body.role ?? "主担当",
@@ -45,7 +45,7 @@ export async function DELETE(req: Request, ctx: Ctx) {
     );
   }
 
-  const emp = removeAssignment(id, companyCode);
+  const emp = await removeAssignment(id, companyCode);
   if (!emp) {
     return NextResponse.json(
       { error: "社員が見つかりません" },

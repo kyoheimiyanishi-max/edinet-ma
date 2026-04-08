@@ -1,11 +1,10 @@
 import { Suspense } from "react";
+import type { Community, CommunityType } from "@/lib/communities";
+import { COMMUNITY_TYPES } from "@/lib/communities";
 import {
-  searchCommunities,
-  COMMUNITY_TYPES,
+  search as searchCommunities,
   getAllFocusAreas,
-  type Community,
-  type CommunityType,
-} from "@/lib/communities";
+} from "@/lib/d6e/repos/communities";
 import { PREFECTURES } from "@/lib/gbiz";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
@@ -126,16 +125,18 @@ export default async function CommunitiesPage({ searchParams }: Props) {
   const estFrom = params.estFrom ? parseInt(params.estFrom, 10) : undefined;
   const estTo = params.estTo ? parseInt(params.estTo, 10) : undefined;
 
-  const communities = searchCommunities({
-    query: q,
-    prefecture,
-    type,
-    focusArea,
-    minMembers,
-    establishedFrom: estFrom,
-    establishedTo: estTo,
-  });
-  const allFocusAreas = getAllFocusAreas();
+  const [communities, allFocusAreas] = await Promise.all([
+    searchCommunities({
+      query: q,
+      prefecture,
+      type,
+      focusArea,
+      minMembers,
+      establishedFrom: estFrom,
+      establishedTo: estTo,
+    }),
+    getAllFocusAreas(),
+  ]);
 
   const grouped = new Map<string, Community[]>();
   for (const type of COMMUNITY_TYPES) {
