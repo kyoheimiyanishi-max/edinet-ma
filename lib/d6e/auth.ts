@@ -6,7 +6,7 @@ import { dirname } from "node:path";
 import { D6E_API_URL } from "./config";
 
 /**
- * Dev-only access token lifecycle for the d6e-api.
+ * Access token lifecycle for the d6e-api.
  *
  * Responsibilities:
  *   1. Read the initial refresh (and optional access) token from env.
@@ -14,18 +14,29 @@ import { D6E_API_URL } from "./config";
  *   3. Persist the rotated refresh token so server restarts can resume.
  *   4. Single-flight refreshes so concurrent requests share one call.
  *
- * This replaces the previous "paste a fresh JWT every hour" workflow.
- * Production should replace this with a proper OAuth callback flow.
- *
  * Refresh protocol (reverse-engineered from d6e-frontend auth chunk):
  *   POST {D6E_API_URL}/api/v1/auth/token
  *   body: { grant_type: "refresh_token", refresh_token }
  *   response: { access_token, refresh_token, expires_in }
  *
- * Note that the refresh token rotates on every call — the old value
- * becomes invalid and must be replaced with the new one. We persist to
- * `.next/cache/d6e-dev-tokens.json` so restarts don't lose the chain.
+ * d6e の refresh token は 1 回使うとローテート（元の値は無効化）される。
+ * そのため環境ごとに持続的な動作モードが異なる:
+ *
+ *   - ローカル開発 (dev):
+ *       `.next/cache/d6e-dev-tokens.json` に新しい refresh token を
+ *       書き戻して次回以降も回せる。D6E_DEV_REFRESH_TOKEN があればそれを
+ *       初期シードとして使い、以降はファイルを優先する。
+ *
+ *   - Vercel サーバレス (prod/preview):
+ *       ファイルシステムは揮発・共有不可で refresh token のローテートが
+ *       Lambda インスタンス間で競合するため、refresh フローは使わず、
+ *       `D6E_DEV_ACCESS_TOKEN` を直接 (in-memory) 使うモードで動く。
+ *       アクセストークンが失効したら 401 が返るので、Vercel の env を
+ *       手動更新するか、後日 KV 系ストア (Upstash Redis / Vercel Blob
+ *       等) を導入してローテート対応を追加する必要がある。
  */
+
+const IS_VERCEL = !!process.env.VERCEL;
 
 interface TokenState {
   accessToken: string;
@@ -59,6 +70,7 @@ function decodeExp(jwt: string): number | null {
 }
 
 async function readCacheFile(): Promise<TokenState | null> {
+  if (IS_VERCEL) return null; // サーバレスでは使わない
   try {
     const raw = await readFile(CACHE_FILE, "utf-8");
     const parsed = JSON.parse(raw) as Partial<TokenState>;
@@ -76,6 +88,7 @@ async function readCacheFile(): Promise<TokenState | null> {
 }
 
 async function writeCacheFile(state: TokenState): Promise<void> {
+  if (IS_VERCEL) return; // サーバレスでは永続化しない
   try {
     await mkdir(dirname(CACHE_FILE), { recursive: true });
     await writeFile(CACHE_FILE, JSON.stringify(state, null, 2), "utf-8");
@@ -123,6 +136,24 @@ async function callRefresh(refreshToken: string): Promise<TokenState> {
 async function bootstrapFromEnv(): Promise<TokenState | null> {
   const envAccess = process.env.D6E_DEV_ACCESS_TOKEN;
   const envRefresh = process.env.D6E_DEV_REFRESH_TOKEN;
+
+  // Vercel サーバレスでは refresh ローテートが Lambda 間競合を起こす
+  // ため、ACCESS_TOKEN が設定されていればそちらを優先する (REFRESH は無視)。
+  if (IS_VERCEL && envAccess) {
+    const exp = decodeExp(envAccess);
+    if (exp === null) {
+      console.error(
+        "[d6e-auth] D6E_DEV_ACCESS_TOKEN is set but its `exp` claim " +
+          "could not be decoded. Check that the token is a valid JWT.",
+      );
+      return null;
+    }
+    return {
+      accessToken: envAccess,
+      refreshToken: "",
+      expiresAt: exp - SAFETY_BUFFER_SECONDS,
+    };
+  }
 
   if (envRefresh) {
     // Preferred path: call refresh immediately to obtain a verified pair.
