@@ -1,9 +1,13 @@
 import { streamText } from "ai";
 import { getModel } from "@/lib/ai-model";
+import { aiRateLimitGate } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+  const limited = await aiRateLimitGate(req, "ma-strategy");
+  if (limited) return limited;
+
   const { company } = await req.json();
 
   const prompt = `以下の企業データを分析し、M&A戦略を推察してください。

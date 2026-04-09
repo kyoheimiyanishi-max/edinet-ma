@@ -1,6 +1,7 @@
 import { streamText, tool, stepCountIs, convertToModelMessages } from "ai";
 import { getModel } from "@/lib/ai-model";
 import { z } from "zod";
+import { aiRateLimitGate } from "@/lib/rate-limit";
 
 import {
   searchCompanies as searchEdinetCompanies,
@@ -74,6 +75,9 @@ const SYSTEM_PROMPT = `あなたはM&A（合併・買収）の専門AIアシス�
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+  const limited = await aiRateLimitGate(req, "chat");
+  if (limited) return limited;
+
   const { messages } = await req.json();
 
   const result = streamText({

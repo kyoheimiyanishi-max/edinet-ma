@@ -3,6 +3,7 @@ import { generateText, Output } from "ai";
 import { getModel } from "@/lib/ai-model";
 import { z } from "zod";
 import { findById as getSeller } from "@/lib/d6e/repos/sellers";
+import { aiRateLimitGate } from "@/lib/rate-limit";
 
 export const maxDuration = 120;
 
@@ -33,7 +34,10 @@ interface Ctx {
   params: Promise<{ id: string }>;
 }
 
-export async function POST(_req: Request, ctx: Ctx) {
+export async function POST(req: Request, ctx: Ctx) {
+  const limited = await aiRateLimitGate(req, "sellers-ai-buyers");
+  if (limited) return limited;
+
   const { id } = await ctx.params;
   const seller = await getSeller(id);
   if (!seller) {
