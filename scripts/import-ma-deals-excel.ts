@@ -12,10 +12,12 @@
  */
 
 import { readFileSync } from "node:fs";
-import type { SellerStage } from "../lib/sellers";
+import type { MediatorType, SellerRank, SellerStage } from "../lib/sellers";
+import { MEDIATOR_TYPES, SELLER_RANKS } from "../lib/sellers";
 import {
   create as createSeller,
   findAll as findAllSellers,
+  remove as removeSeller,
 } from "../lib/d6e/repos/sellers";
 
 interface DealRow {
@@ -35,6 +37,27 @@ interface DealRow {
   adContract: string | null;
   status: string | null; // freeform
   nextAction: string | null;
+  folderUrl: string | null;
+}
+
+function toRank(v: string | null): SellerRank | undefined {
+  if (!v) return undefined;
+  return (SELLER_RANKS as readonly string[]).includes(v)
+    ? (v as SellerRank)
+    : undefined;
+}
+
+function toMediator(v: string | null): MediatorType | undefined {
+  if (!v) return undefined;
+  if ((MEDIATOR_TYPES as readonly string[]).includes(v))
+    return v as MediatorType;
+  if (v === "仲介/FA") return "両面";
+  return undefined;
+}
+
+function isFlagged(v: string | null): boolean {
+  if (!v) return false;
+  return /○|◯|済|有|完了/.test(v);
 }
 
 const JP_PREFECTURES = new Set([
@@ -162,19 +185,30 @@ async function main(): Promise<void> {
   console.log(`📥  Loaded ${deals.length} deals from /tmp/deals.json`);
 
   const existing = await findAllSellers();
-  const existingNames = new Set(existing.map((s) => s.companyName));
+  const byName = new Map(existing.map((s) => [s.companyName, s.id]));
   console.log(`📊  d6e currently has ${existing.length} sellers`);
+
+  const excelNames = new Set(deals.map((d) => d.companyName));
+  // 既存の同名 seller は削除して再投入 (構造化カラムを新規挿入するため)。
+  // Excel に無いものはユーザー手入力データなので残す。
+  let wiped = 0;
+  for (const [name, id] of byName.entries()) {
+    if (excelNames.has(name)) {
+      await removeSeller(id);
+      wiped++;
+    }
+  }
+  if (wiped > 0) {
+    console.log(
+      `🧹  wiped ${wiped} existing sellers (Excel に存在する名前のみ) — 再投入する`,
+    );
+  }
 
   let inserted = 0;
   let skipped = 0;
   let failed = 0;
 
   for (const d of deals) {
-    if (existingNames.has(d.companyName)) {
-      skipped++;
-      continue;
-    }
-
     const prefecture = normalizePrefecture(d.area);
     const input = {
       companyName: d.companyName,
@@ -184,13 +218,28 @@ async function main(): Promise<void> {
       profile: buildProfile(d),
       desiredTerms: buildDesiredTerms(d),
       stage: mapStage(d.status),
+      ...(d.priority ? { priority: d.priority } : {}),
+      ...((): { rank?: SellerRank } => {
+        const r = toRank(d.rank);
+        return r ? { rank: r } : {};
+      })(),
+      ...(d.assignee ? { assignedTo: d.assignee } : {}),
+      ...((): { mediatorType?: MediatorType } => {
+        const m = toMediator(d.dealType);
+        return m ? { mediatorType: m } : {};
+      })(),
+      ...(d.introSource ? { introSource: d.introSource } : {}),
+      ...(d.feeEstimate ? { feeEstimate: d.feeEstimate } : {}),
+      ndaSigned: isFlagged(d.nda),
+      adSigned: isFlagged(d.adContract),
+      ...(d.folderUrl ? { folderUrl: d.folderUrl } : {}),
     };
 
     try {
       await createSeller(input);
       inserted++;
       console.log(
-        `  ✅ ${d.companyName} [${input.stage}] ${prefecture ?? "(海外?)"}`,
+        `  ✅ ${d.companyName} [${input.stage}] ${prefecture ?? "(海外?)"} ${d.rank ?? ""} ${d.priority ?? ""}`.trim(),
       );
     } catch (e) {
       failed++;

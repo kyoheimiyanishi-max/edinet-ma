@@ -56,6 +56,9 @@ export type SellerStage =
   | "成約"
   | "見送り";
 
+export type SellerRank = "A" | "B" | "C" | "D";
+export type MediatorType = "仲介" | "買FA" | "FA" | "両面";
+
 export interface Seller {
   id: string;
   companyName: string;
@@ -66,6 +69,16 @@ export interface Seller {
   profile: string; // AI-generated or manual summary
   desiredTerms: string; // 売主の希望条件（価格・時期・条件など）
   stage: SellerStage;
+  // 構造化カラム (Excel 案件管理表由来)
+  priority?: string; // "★" or undefined
+  rank?: SellerRank;
+  assignedTo?: string; // 担当者
+  mediatorType?: MediatorType; // 仲介 / 買FA / FA / 両面
+  introSource?: string; // 紹介元
+  feeEstimate?: string; // 手数料想定 (freeform)
+  ndaSigned: boolean;
+  adSigned: boolean;
+  folderUrl?: string; // Google Drive 等のフォルダリンク
   minutes: SellerMinute[];
   documents: SellerDocument[];
   buyers: BuyerCandidate[];
@@ -83,7 +96,18 @@ export type SellerInput = Pick<
   | "profile"
   | "desiredTerms"
   | "stage"
->;
+  | "priority"
+  | "rank"
+  | "assignedTo"
+  | "mediatorType"
+  | "introSource"
+  | "feeEstimate"
+  | "folderUrl"
+> & {
+  // これらは Seller 型上 required だが、Input では optional (デフォルト false)
+  ndaSigned?: boolean;
+  adSigned?: boolean;
+};
 
 export const SELLER_STAGES: SellerStage[] = [
   "初回面談",
@@ -94,6 +118,10 @@ export const SELLER_STAGES: SellerStage[] = [
   "成約",
   "見送り",
 ];
+
+export const SELLER_RANKS: SellerRank[] = ["A", "B", "C", "D"];
+
+export const MEDIATOR_TYPES: MediatorType[] = ["仲介", "買FA", "FA", "両面"];
 
 export const BUYER_STATUSES: BuyerStatus[] = [
   "候補",

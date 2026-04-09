@@ -22,8 +22,12 @@ import {
 } from "@/lib/people";
 import {
   BUYER_STATUSES,
+  MEDIATOR_TYPES,
+  SELLER_RANKS,
   SELLER_STAGES,
   type BuyerStatus,
+  type MediatorType,
+  type SellerRank,
   type SellerStage,
 } from "@/lib/sellers";
 import { ADVISOR_TYPES, type AdvisorType } from "@/lib/tax-advisors";
@@ -73,6 +77,27 @@ export function toSellerStage(v: string | null | undefined): SellerStage {
 
 export function toBuyerStatus(v: string | null | undefined): BuyerStatus {
   return narrow(v, BUYER_STATUSES, "候補", "BuyerStatus");
+}
+
+/** Optional: null when DB value is missing or invalid (不明 = 未設定). */
+export function toSellerRank(
+  v: string | null | undefined,
+): SellerRank | undefined {
+  if (v === null || v === undefined || v === "") return undefined;
+  if ((SELLER_RANKS as readonly string[]).includes(v)) return v as SellerRank;
+  console.warn(`[d6e enum] unexpected SellerRank ${JSON.stringify(v)}`);
+  return undefined;
+}
+
+export function toMediatorType(
+  v: string | null | undefined,
+): MediatorType | undefined {
+  if (v === null || v === undefined || v === "") return undefined;
+  if ((MEDIATOR_TYPES as readonly string[]).includes(v)) {
+    return v as MediatorType;
+  }
+  console.warn(`[d6e enum] unexpected MediatorType ${JSON.stringify(v)}`);
+  return undefined;
 }
 
 // ---- Internal-only enums (not exported from a user lib) ----

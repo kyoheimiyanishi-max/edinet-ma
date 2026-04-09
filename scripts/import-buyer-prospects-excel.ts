@@ -24,6 +24,8 @@
 
 import { readFileSync } from "node:fs";
 import {
+  BUYER_PROSPECT_STATUSES,
+  type BuyerProspectStatus,
   create as createCompany,
   findByCorporateNumber,
   search as searchCompanies,
@@ -47,22 +49,30 @@ interface ProspectRow {
   ndaDate: string | null;
 }
 
+function toBuyerStatus(v: string | null): BuyerProspectStatus | undefined {
+  if (!v) return undefined;
+  if ((BUYER_PROSPECT_STATUSES as readonly string[]).includes(v)) {
+    return v as BuyerProspectStatus;
+  }
+  return undefined;
+}
+
+function toBool(v: string | null): boolean {
+  if (!v) return false;
+  return /●|○|◯|有|Strong|true|yes/i.test(v);
+}
+
+/** 構造化カラムに入らない補足情報だけ notes にまとめる */
 function buildNotes(p: ProspectRow): string {
-  const lines: string[] = ["## 買手開拓"];
-  if (p.status) lines.push(`ステータス: ${p.status}`);
-  if (p.strongBuyerFlag) lines.push(`ストロングバイヤー: ${p.strongBuyerFlag}`);
-  if (p.targetDeal) lines.push(`対象案件: ${p.targetDeal}`);
-  if (p.approachDate) lines.push(`アプローチ日: ${p.approachDate}`);
-  if (p.approachMethod) lines.push(`アプローチ方法: ${p.approachMethod}`);
+  const lines: string[] = [];
+  if (p.contactPerson) lines.push(`連絡担当者: ${p.contactPerson}`);
   if (p.contactName || p.department) {
     lines.push(
-      `担当者: ${[p.contactName, p.department].filter(Boolean).join(" / ")}`,
+      `先方担当: ${[p.contactName, p.department].filter(Boolean).join(" / ")}`,
     );
   }
-  if (p.contactPerson) lines.push(`連絡担当者: ${p.contactPerson}`);
   if (p.appointmentDate) lines.push(`アポイント日: ${p.appointmentDate}`);
-  if (p.ndaDate) lines.push(`NDA締結日: ${p.ndaDate}`);
-  return lines.join("\n");
+  return lines.length > 0 ? "## 買手開拓\n" + lines.join("\n") : "";
 }
 
 function sanitizeUrl(url: string | null): string | undefined {
@@ -108,22 +118,33 @@ async function main(): Promise<void> {
         if (exact) existingId = exact.id;
       }
 
+      const buyerStatus = toBuyerStatus(p.status);
+      const structured: Partial<CompanyInput> = {
+        isBuyer: true,
+        isProspect: true,
+        strongBuyer: toBool(p.strongBuyerFlag),
+        ...(buyerStatus ? { buyerStatus } : {}),
+        ...(p.targetDeal ? { targetDeal: p.targetDeal } : {}),
+        ...(p.approachDate ? { lastApproachDate: p.approachDate } : {}),
+        ...(p.approachMethod ? { lastApproachMethod: p.approachMethod } : {}),
+        ...(p.ndaDate ? { ndaDate: p.ndaDate } : {}),
+        ...(p.contactPerson ? { buyerAssignedTo: p.contactPerson } : {}),
+      };
+
       if (existingId) {
         const patch: Partial<CompanyInput> = {
-          isBuyer: true,
-          isProspect: true,
-          notes,
+          ...structured,
+          ...(notes ? { notes } : {}),
+          ...(website ? { website } : {}),
         };
-        if (website) patch.website = website;
         await updateCompany(existingId, patch);
         updated++;
       } else {
         // 新規作成: 法人番号があれば入れる、無ければ名前のみ
         const input: CompanyInput = {
           name: p.companyName,
-          isBuyer: true,
-          isProspect: true,
-          notes,
+          ...structured,
+          ...(notes ? { notes } : {}),
           ...(p.corporateNumber ? { corporateNumber: p.corporateNumber } : {}),
           ...(website ? { website } : {}),
         };

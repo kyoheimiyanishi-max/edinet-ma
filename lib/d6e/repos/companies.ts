@@ -29,6 +29,23 @@ export type ListingStatus =
   | "tokyo_growth"
   | "other";
 
+export type BuyerProspectStatus =
+  | "未接触"
+  | "アプローチ中"
+  | "NDAやり取り中"
+  | "開拓済"
+  | "開拓済（NDA締結済み）"
+  | "アポfix";
+
+export const BUYER_PROSPECT_STATUSES: BuyerProspectStatus[] = [
+  "未接触",
+  "アプローチ中",
+  "NDAやり取り中",
+  "開拓済",
+  "開拓済（NDA締結済み）",
+  "アポfix",
+];
+
 /**
  * d6e-persisted company record (the CRM/tracking layer).
  *
@@ -65,6 +82,14 @@ export interface Company {
   isSeller: boolean;
   isBuyer: boolean;
   isProspect: boolean;
+  // 買手開拓用の構造化カラム
+  buyerStatus?: BuyerProspectStatus;
+  strongBuyer: boolean;
+  targetDeal?: string;
+  lastApproachDate?: string;
+  lastApproachMethod?: string;
+  ndaDate?: string;
+  buyerAssignedTo?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -94,6 +119,13 @@ interface CompanyRow {
   is_seller: boolean | null;
   is_buyer: boolean | null;
   is_prospect: boolean | null;
+  buyer_status: string | null;
+  strong_buyer: boolean | null;
+  target_deal: string | null;
+  last_approach_date: string | null;
+  last_approach_method: string | null;
+  nda_date: string | null;
+  buyer_assigned_to: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -103,8 +135,20 @@ const SELECT_COLUMNS = `
   industry, industry_detail, listing_status, address, postal_code, phone,
   email, website, representative, capital, employee_count, founded_date,
   business_summary, notes, is_seller, is_buyer, is_prospect,
+  buyer_status, strong_buyer, target_deal, last_approach_date,
+  last_approach_method, nda_date, buyer_assigned_to,
   created_at, updated_at
 `;
+
+function toBuyerProspectStatus(
+  v: string | null,
+): BuyerProspectStatus | undefined {
+  if (!v) return undefined;
+  if ((BUYER_PROSPECT_STATUSES as readonly string[]).includes(v)) {
+    return v as BuyerProspectStatus;
+  }
+  return undefined;
+}
 
 function rowToCompany(row: CompanyRow): Company {
   return {
@@ -137,6 +181,22 @@ function rowToCompany(row: CompanyRow): Company {
     isSeller: row.is_seller ?? false,
     isBuyer: row.is_buyer ?? false,
     isProspect: row.is_prospect ?? false,
+    ...((): { buyerStatus?: BuyerProspectStatus } => {
+      const bs = toBuyerProspectStatus(row.buyer_status);
+      return bs ? { buyerStatus: bs } : {};
+    })(),
+    strongBuyer: row.strong_buyer ?? false,
+    ...(row.target_deal ? { targetDeal: row.target_deal } : {}),
+    ...(row.last_approach_date
+      ? { lastApproachDate: row.last_approach_date }
+      : {}),
+    ...(row.last_approach_method
+      ? { lastApproachMethod: row.last_approach_method }
+      : {}),
+    ...(row.nda_date ? { ndaDate: row.nda_date } : {}),
+    ...(row.buyer_assigned_to
+      ? { buyerAssignedTo: row.buyer_assigned_to }
+      : {}),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -166,6 +226,13 @@ export interface CompanyInput {
   isSeller?: boolean;
   isBuyer?: boolean;
   isProspect?: boolean;
+  buyerStatus?: BuyerProspectStatus;
+  strongBuyer?: boolean;
+  targetDeal?: string;
+  lastApproachDate?: string;
+  lastApproachMethod?: string;
+  ndaDate?: string;
+  buyerAssignedTo?: string;
 }
 
 // ---- Reads ----
@@ -218,6 +285,9 @@ export interface CompanyFilters {
   isSeller?: boolean;
   isBuyer?: boolean;
   isProspect?: boolean;
+  buyerStatus?: BuyerProspectStatus;
+  strongBuyer?: boolean;
+  buyerAssignedTo?: string;
   limit?: number;
 }
 
@@ -251,6 +321,17 @@ export async function search(filters: CompanyFilters = {}): Promise<Company[]> {
   }
   if (filters.isProspect !== undefined) {
     conditions.push(`is_prospect = ${filters.isProspect ? "TRUE" : "FALSE"}`);
+  }
+  if (filters.buyerStatus) {
+    conditions.push(`buyer_status = ${escapeSqlValue(filters.buyerStatus)}`);
+  }
+  if (filters.strongBuyer !== undefined) {
+    conditions.push(`strong_buyer = ${filters.strongBuyer ? "TRUE" : "FALSE"}`);
+  }
+  if (filters.buyerAssignedTo) {
+    conditions.push(
+      `buyer_assigned_to = ${escapeSqlValue(filters.buyerAssignedTo)}`,
+    );
   }
 
   const where =
@@ -316,6 +397,13 @@ function inputToColumnsAndValues(input: CompanyInput): {
       "is_seller",
       "is_buyer",
       "is_prospect",
+      "buyer_status",
+      "strong_buyer",
+      "target_deal",
+      "last_approach_date",
+      "last_approach_method",
+      "nda_date",
+      "buyer_assigned_to",
     ],
     values: [
       escapeSqlValue(input.name),
@@ -341,6 +429,13 @@ function inputToColumnsAndValues(input: CompanyInput): {
       escapeSqlValue(input.isSeller ?? false),
       escapeSqlValue(input.isBuyer ?? false),
       escapeSqlValue(input.isProspect ?? false),
+      escapeSqlValue(input.buyerStatus),
+      escapeSqlValue(input.strongBuyer ?? false),
+      escapeSqlValue(input.targetDeal),
+      escapeSqlValue(input.lastApproachDate),
+      escapeSqlValue(input.lastApproachMethod),
+      escapeSqlValue(input.ndaDate),
+      escapeSqlValue(input.buyerAssignedTo),
     ],
   };
 }
@@ -402,6 +497,14 @@ export async function update(
     assignments.push(`is_buyer = ${patch.isBuyer ? "TRUE" : "FALSE"}`);
   if (patch.isProspect !== undefined)
     assignments.push(`is_prospect = ${patch.isProspect ? "TRUE" : "FALSE"}`);
+  set("buyer_status", patch.buyerStatus);
+  if (patch.strongBuyer !== undefined)
+    assignments.push(`strong_buyer = ${patch.strongBuyer ? "TRUE" : "FALSE"}`);
+  set("target_deal", patch.targetDeal);
+  set("last_approach_date", patch.lastApproachDate);
+  set("last_approach_method", patch.lastApproachMethod);
+  set("nda_date", patch.ndaDate);
+  set("buyer_assigned_to", patch.buyerAssignedTo);
 
   if (assignments.length === 0) return findById(id);
   assignments.push("updated_at = now()");

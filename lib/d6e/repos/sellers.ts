@@ -10,7 +10,13 @@ import type {
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
-import { toBuyerSource, toBuyerStatus, toSellerStage } from "./_enums";
+import {
+  toBuyerSource,
+  toBuyerStatus,
+  toMediatorType,
+  toSellerRank,
+  toSellerStage,
+} from "./_enums";
 
 /**
  * d6e-backed repository for the seller aggregate.
@@ -41,6 +47,15 @@ interface SellerRow {
   profile: string | null;
   desired_terms: string | null;
   stage: string | null;
+  priority: string | null;
+  rank: string | null;
+  assigned_to: string | null;
+  mediator_type: string | null;
+  intro_source: string | null;
+  fee_estimate: string | null;
+  nda_signed: boolean | null;
+  ad_signed: boolean | null;
+  folder_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -77,7 +92,7 @@ interface BuyerRow {
 }
 
 const SELLER_COLUMNS =
-  "id, company_name, company_id, industry, prefecture, description, profile, desired_terms, stage, created_at, updated_at";
+  "id, company_name, company_id, industry, prefecture, description, profile, desired_terms, stage, priority, rank, assigned_to, mediator_type, intro_source, fee_estimate, nda_signed, ad_signed, folder_url, created_at, updated_at";
 
 // ---- Row → aggregate helpers ----
 
@@ -121,6 +136,8 @@ function rowToSeller(
   documents: SellerDocument[],
   buyers: BuyerCandidate[],
 ): Seller {
+  const rank = toSellerRank(row.rank);
+  const mediatorType = toMediatorType(row.mediator_type);
   return {
     id: row.id,
     companyName: row.company_name,
@@ -131,6 +148,15 @@ function rowToSeller(
     profile: row.profile ?? "",
     desiredTerms: row.desired_terms ?? "",
     stage: toSellerStage(row.stage),
+    ...(row.priority ? { priority: row.priority } : {}),
+    ...(rank ? { rank } : {}),
+    ...(row.assigned_to ? { assignedTo: row.assigned_to } : {}),
+    ...(mediatorType ? { mediatorType } : {}),
+    ...(row.intro_source ? { introSource: row.intro_source } : {}),
+    ...(row.fee_estimate ? { feeEstimate: row.fee_estimate } : {}),
+    ndaSigned: row.nda_signed ?? false,
+    adSigned: row.ad_signed ?? false,
+    ...(row.folder_url ? { folderUrl: row.folder_url } : {}),
     minutes,
     documents,
     buyers,
@@ -244,7 +270,9 @@ export async function create(input: SellerInput): Promise<Seller> {
   const id = crypto.randomUUID();
   const result = await executeSql(
     `INSERT INTO ${tableRef("sellers")}
-       (id, company_name, industry, prefecture, description, profile, desired_terms, stage)
+       (id, company_name, industry, prefecture, description, profile, desired_terms, stage,
+        priority, rank, assigned_to, mediator_type, intro_source, fee_estimate,
+        nda_signed, ad_signed, folder_url)
      VALUES (
        ${escapeSqlValue(id)},
        ${escapeSqlValue(input.companyName)},
@@ -253,7 +281,16 @@ export async function create(input: SellerInput): Promise<Seller> {
        ${escapeSqlValue(input.description)},
        ${escapeSqlValue(input.profile)},
        ${escapeSqlValue(input.desiredTerms)},
-       ${escapeSqlValue(input.stage)}
+       ${escapeSqlValue(input.stage)},
+       ${escapeSqlValue(input.priority)},
+       ${escapeSqlValue(input.rank)},
+       ${escapeSqlValue(input.assignedTo)},
+       ${escapeSqlValue(input.mediatorType)},
+       ${escapeSqlValue(input.introSource)},
+       ${escapeSqlValue(input.feeEstimate)},
+       ${escapeSqlValue(input.ndaSigned ?? false)},
+       ${escapeSqlValue(input.adSigned ?? false)},
+       ${escapeSqlValue(input.folderUrl)}
      )`,
   );
   if ((result.affected_rows ?? 0) < 1) {
@@ -289,6 +326,24 @@ export async function update(
     assignments.push(`desired_terms = ${escapeSqlValue(patch.desiredTerms)}`);
   if (patch.stage !== undefined)
     assignments.push(`stage = ${escapeSqlValue(patch.stage)}`);
+  if (patch.priority !== undefined)
+    assignments.push(`priority = ${escapeSqlValue(patch.priority)}`);
+  if (patch.rank !== undefined)
+    assignments.push(`rank = ${escapeSqlValue(patch.rank)}`);
+  if (patch.assignedTo !== undefined)
+    assignments.push(`assigned_to = ${escapeSqlValue(patch.assignedTo)}`);
+  if (patch.mediatorType !== undefined)
+    assignments.push(`mediator_type = ${escapeSqlValue(patch.mediatorType)}`);
+  if (patch.introSource !== undefined)
+    assignments.push(`intro_source = ${escapeSqlValue(patch.introSource)}`);
+  if (patch.feeEstimate !== undefined)
+    assignments.push(`fee_estimate = ${escapeSqlValue(patch.feeEstimate)}`);
+  if (patch.ndaSigned !== undefined)
+    assignments.push(`nda_signed = ${patch.ndaSigned ? "TRUE" : "FALSE"}`);
+  if (patch.adSigned !== undefined)
+    assignments.push(`ad_signed = ${patch.adSigned ? "TRUE" : "FALSE"}`);
+  if (patch.folderUrl !== undefined)
+    assignments.push(`folder_url = ${escapeSqlValue(patch.folderUrl)}`);
 
   if (assignments.length === 0) return findById(id);
   assignments.push("updated_at = now()");

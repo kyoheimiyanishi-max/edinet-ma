@@ -20,6 +20,15 @@ export async function POST(req: Request) {
     profile: body.profile ?? "",
     desiredTerms: body.desiredTerms ?? "",
     stage: body.stage ?? "初回面談",
+    priority: body.priority?.trim() || undefined,
+    rank: body.rank,
+    assignedTo: body.assignedTo?.trim() || undefined,
+    mediatorType: body.mediatorType,
+    introSource: body.introSource?.trim() || undefined,
+    feeEstimate: body.feeEstimate?.trim() || undefined,
+    ndaSigned: body.ndaSigned ?? false,
+    adSigned: body.adSigned ?? false,
+    folderUrl: body.folderUrl?.trim() || undefined,
   });
   return NextResponse.json(seller, { status: 201 });
 }

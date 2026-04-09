@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { href: "/search", label: "企業検索" },
   { href: "/shareholders", label: "株主名検索" },
   { href: "/deals", label: "売主管理" },
+  { href: "/buyers", label: "買手開拓" },
   { href: "/news", label: "ニュース" },
   { href: "/people", label: "人物DB" },
   { href: "/communities", label: "コミュニティ" },

@@ -20,6 +20,9 @@ type SellerStage =
   | "成約"
   | "見送り";
 
+type SellerRank = "A" | "B" | "C" | "D";
+type MediatorType = "仲介" | "買FA" | "FA" | "両面";
+
 interface BuyerCandidate {
   id: string;
   companyCode: string;
@@ -58,6 +61,16 @@ interface Seller {
   profile: string;
   desiredTerms: string;
   stage: SellerStage;
+  // 構造化メタ
+  priority?: string;
+  rank?: SellerRank;
+  assignedTo?: string;
+  mediatorType?: MediatorType;
+  introSource?: string;
+  feeEstimate?: string;
+  ndaSigned: boolean;
+  adSigned: boolean;
+  folderUrl?: string;
   minutes: SellerMinute[];
   documents: SellerDocument[];
   buyers: BuyerCandidate[];
@@ -85,6 +98,16 @@ const SELLER_STAGES: SellerStage[] = [
   "成約",
   "見送り",
 ];
+
+const SELLER_RANKS: SellerRank[] = ["A", "B", "C", "D"];
+const MEDIATOR_TYPES: MediatorType[] = ["仲介", "買FA", "FA", "両面"];
+
+const RANK_COLORS: Record<SellerRank, string> = {
+  A: "bg-rose-100 text-rose-700",
+  B: "bg-amber-100 text-amber-700",
+  C: "bg-blue-100 text-blue-700",
+  D: "bg-slate-100 text-slate-600",
+};
 
 const BUYER_STATUSES: BuyerStatus[] = [
   "候補",
@@ -127,6 +150,15 @@ const EMPTY_SELLER_FORM = {
   profile: "",
   desiredTerms: "",
   stage: "初回面談" as SellerStage,
+  priority: "" as "" | "★",
+  rank: "" as SellerRank | "",
+  assignedTo: "",
+  mediatorType: "" as MediatorType | "",
+  introSource: "",
+  feeEstimate: "",
+  ndaSigned: false,
+  adSigned: false,
+  folderUrl: "",
 };
 
 export default function SellerManager() {
@@ -135,6 +167,11 @@ export default function SellerManager() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [filterStage, setFilterStage] = useState<SellerStage | "">("");
+  const [filterRank, setFilterRank] = useState<SellerRank | "">("");
+  const [filterPriority, setFilterPriority] = useState<"" | "★">("");
+  const [filterAssignee, setFilterAssignee] = useState<string>("");
+  const [filterMediator, setFilterMediator] = useState<MediatorType | "">("");
   const [showNewForm, setShowNewForm] = useState(false);
   const [newForm, setNewForm] = useState(EMPTY_SELLER_FORM);
   const [activeTab, setActiveTab] = useState<Tab>("profile");
@@ -178,16 +215,43 @@ export default function SellerManager() {
     [sellers, selectedId],
   );
 
+  const assigneeOptions = useMemo(() => {
+    const set = new Set<string>();
+    sellers.forEach((s) => {
+      if (s.assignedTo) set.add(s.assignedTo);
+    });
+    return Array.from(set).sort();
+  }, [sellers]);
+
   const filtered = useMemo(() => {
-    if (!search) return sellers;
     const q = search.toLowerCase();
-    return sellers.filter(
-      (s) =>
-        s.companyName.toLowerCase().includes(q) ||
-        s.industry?.toLowerCase().includes(q) ||
-        s.description.toLowerCase().includes(q),
-    );
-  }, [sellers, search]);
+    return sellers.filter((s) => {
+      if (q) {
+        const hit =
+          s.companyName.toLowerCase().includes(q) ||
+          s.industry?.toLowerCase().includes(q) ||
+          s.description.toLowerCase().includes(q) ||
+          s.profile.toLowerCase().includes(q) ||
+          s.assignedTo?.toLowerCase().includes(q) ||
+          s.introSource?.toLowerCase().includes(q);
+        if (!hit) return false;
+      }
+      if (filterStage && s.stage !== filterStage) return false;
+      if (filterRank && s.rank !== filterRank) return false;
+      if (filterPriority && s.priority !== filterPriority) return false;
+      if (filterAssignee && s.assignedTo !== filterAssignee) return false;
+      if (filterMediator && s.mediatorType !== filterMediator) return false;
+      return true;
+    });
+  }, [
+    sellers,
+    search,
+    filterStage,
+    filterRank,
+    filterPriority,
+    filterAssignee,
+    filterMediator,
+  ]);
 
   async function handleCreateSeller(e: React.FormEvent) {
     e.preventDefault();
@@ -331,15 +395,97 @@ export default function SellerManager() {
         </div>
       )}
 
-      {/* Search */}
-      <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-4">
+      {/* Search + filters */}
+      <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-4 space-y-3">
         <input
           type="text"
-          placeholder="企業名・業種で検索..."
+          placeholder="企業名・業種・担当者・紹介元で検索..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <select
+            value={filterStage}
+            onChange={(e) => setFilterStage(e.target.value as SellerStage | "")}
+            className="px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">stage 全て</option>
+            {SELLER_STAGES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterRank}
+            onChange={(e) => setFilterRank(e.target.value as SellerRank | "")}
+            className="px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">ランク 全て</option>
+            {SELLER_RANKS.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterPriority}
+            onChange={(e) => setFilterPriority(e.target.value as "" | "★")}
+            className="px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">優先度 全て</option>
+            <option value="★">★ のみ</option>
+          </select>
+          <select
+            value={filterMediator}
+            onChange={(e) =>
+              setFilterMediator(e.target.value as MediatorType | "")
+            }
+            className="px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">仲介/FA 全て</option>
+            {MEDIATOR_TYPES.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterAssignee}
+            onChange={(e) => setFilterAssignee(e.target.value)}
+            className="px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">担当者 全て</option>
+            {assigneeOptions.map((a) => (
+              <option key={a} value={a}>
+                {a}
+              </option>
+            ))}
+          </select>
+        </div>
+        {(filterStage ||
+          filterRank ||
+          filterPriority ||
+          filterAssignee ||
+          filterMediator) && (
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span className="font-medium">{filtered.length} 件</span>
+            <button
+              type="button"
+              onClick={() => {
+                setFilterStage("");
+                setFilterRank("");
+                setFilterPriority("");
+                setFilterAssignee("");
+                setFilterMediator("");
+              }}
+              className="px-2 py-0.5 rounded text-rose-600 hover:bg-rose-50 font-medium"
+            >
+              フィルタクリア
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Master-detail layout */}
@@ -373,13 +519,34 @@ export default function SellerManager() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-slate-800 truncate">
-                        {s.companyName}
-                      </p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {s.priority === "★" && (
+                          <span className="text-amber-500 text-sm shrink-0">
+                            ★
+                          </span>
+                        )}
+                        <p className="font-semibold text-slate-800 truncate">
+                          {s.companyName}
+                        </p>
+                        {s.rank && (
+                          <span
+                            className={`text-[9px] px-1.5 py-0.5 rounded font-bold shrink-0 ${RANK_COLORS[s.rank]}`}
+                          >
+                            {s.rank}
+                          </span>
+                        )}
+                      </div>
                       {s.industry && (
                         <p className="text-xs text-slate-500 mt-0.5">
                           {s.industry}
                           {s.prefecture && ` / ${s.prefecture}`}
+                          {s.mediatorType && ` / ${s.mediatorType}`}
+                        </p>
+                      )}
+                      {s.assignedTo && (
+                        <p className="text-[10px] text-slate-400 mt-0.5">
+                          担当: {s.assignedTo}
+                          {s.introSource && ` / 紹介: ${s.introSource}`}
                         </p>
                       )}
                     </div>
@@ -400,6 +567,17 @@ export default function SellerManager() {
                         PJ {projCount}
                       </span>
                     )}
+                    {s.ndaSigned && (
+                      <span className="text-emerald-600 font-semibold">
+                        NDA✓
+                      </span>
+                    )}
+                    {s.adSigned && (
+                      <span className="text-emerald-600 font-semibold">
+                        AD✓
+                      </span>
+                    )}
+                    {s.folderUrl && <span className="text-purple-500">📁</span>}
                   </div>
                 </button>
               );
@@ -547,13 +725,31 @@ function ProfilePanel({
     profile: seller.profile,
     desiredTerms: seller.desiredTerms,
     stage: seller.stage,
+    priority: seller.priority ?? "",
+    rank: seller.rank ?? ("" as SellerRank | ""),
+    assignedTo: seller.assignedTo ?? "",
+    mediatorType: seller.mediatorType ?? ("" as MediatorType | ""),
+    introSource: seller.introSource ?? "",
+    feeEstimate: seller.feeEstimate ?? "",
+    ndaSigned: seller.ndaSigned,
+    adSigned: seller.adSigned,
+    folderUrl: seller.folderUrl ?? "",
   });
 
   async function handleSave() {
     await fetch(`/api/sellers/${seller.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        ...form,
+        priority: form.priority || undefined,
+        rank: form.rank || undefined,
+        assignedTo: form.assignedTo || undefined,
+        mediatorType: form.mediatorType || undefined,
+        introSource: form.introSource || undefined,
+        feeEstimate: form.feeEstimate || undefined,
+        folderUrl: form.folderUrl || undefined,
+      }),
     });
     setEditing(false);
     await onRefresh();
@@ -562,23 +758,153 @@ function ProfilePanel({
   if (editing) {
     return (
       <div className="space-y-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              ステージ
+            </label>
+            <select
+              value={form.stage}
+              onChange={(e) =>
+                setForm({ ...form, stage: e.target.value as SellerStage })
+              }
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+            >
+              {SELLER_STAGES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              優先
+            </label>
+            <select
+              value={form.priority}
+              onChange={(e) => setForm({ ...form, priority: e.target.value })}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+            >
+              <option value="">-</option>
+              <option value="★">★</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              ランク
+            </label>
+            <select
+              value={form.rank}
+              onChange={(e) =>
+                setForm({ ...form, rank: e.target.value as SellerRank | "" })
+              }
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+            >
+              <option value="">-</option>
+              {SELLER_RANKS.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              仲介/FA
+            </label>
+            <select
+              value={form.mediatorType}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  mediatorType: e.target.value as MediatorType | "",
+                })
+              }
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+            >
+              <option value="">-</option>
+              {MEDIATOR_TYPES.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              担当者
+            </label>
+            <input
+              type="text"
+              value={form.assignedTo}
+              onChange={(e) => setForm({ ...form, assignedTo: e.target.value })}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              紹介元
+            </label>
+            <input
+              type="text"
+              value={form.introSource}
+              onChange={(e) =>
+                setForm({ ...form, introSource: e.target.value })
+              }
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1">
+              手数料想定
+            </label>
+            <input
+              type="text"
+              value={form.feeEstimate}
+              onChange={(e) =>
+                setForm({ ...form, feeEstimate: e.target.value })
+              }
+              placeholder="例: 3750万"
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+            />
+          </div>
+          <div className="flex items-center gap-3 col-span-2 sm:col-span-1">
+            <label className="flex items-center gap-1.5 text-xs text-slate-600">
+              <input
+                type="checkbox"
+                checked={form.ndaSigned}
+                onChange={(e) =>
+                  setForm({ ...form, ndaSigned: e.target.checked })
+                }
+                className="rounded"
+              />
+              NDA
+            </label>
+            <label className="flex items-center gap-1.5 text-xs text-slate-600">
+              <input
+                type="checkbox"
+                checked={form.adSigned}
+                onChange={(e) =>
+                  setForm({ ...form, adSigned: e.target.checked })
+                }
+                className="rounded"
+              />
+              AD契約
+            </label>
+          </div>
+        </div>
         <div>
           <label className="block text-xs font-medium text-slate-500 mb-1">
-            ステージ
+            フォルダリンク (Google Drive 等)
           </label>
-          <select
-            value={form.stage}
-            onChange={(e) =>
-              setForm({ ...form, stage: e.target.value as SellerStage })
-            }
+          <input
+            type="url"
+            value={form.folderUrl}
+            onChange={(e) => setForm({ ...form, folderUrl: e.target.value })}
+            placeholder="https://drive.google.com/..."
             className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-          >
-            {SELLER_STAGES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+          />
         </div>
         <Textarea
           label="概要"
@@ -587,13 +913,13 @@ function ProfilePanel({
           rows={3}
         />
         <Textarea
-          label="プロフィール（事業モデル・強み・財務ハイライト）"
+          label="プロフィール（現況・経緯・今後のアクション）"
           value={form.profile}
           onChange={(v) => setForm({ ...form, profile: v })}
-          rows={5}
+          rows={6}
         />
         <Textarea
-          label="希望条件（価格・時期・条件）"
+          label="希望条件（想定譲渡対価・ストラクチャー・時期）"
           value={form.desiredTerms}
           onChange={(v) => setForm({ ...form, desiredTerms: v })}
           rows={3}
@@ -626,6 +952,7 @@ function ProfilePanel({
           編集
         </button>
       </div>
+      <StructuredMetaCard seller={seller} />
       <LinkedProjectsSection
         seller={seller}
         projects={projects}
@@ -634,10 +961,68 @@ function ProfilePanel({
       />
       <Section label="概要" content={seller.description} />
       <Section
-        label="プロフィール（事業モデル・強み）"
+        label="プロフィール（事業モデル・強み・現況）"
         content={seller.profile}
       />
       <Section label="希望条件" content={seller.desiredTerms} />
+    </div>
+  );
+}
+
+function StructuredMetaCard({ seller }: { seller: Seller }) {
+  const items: Array<{ label: string; value: React.ReactNode }> = [];
+  if (seller.priority) items.push({ label: "優先", value: seller.priority });
+  if (seller.rank)
+    items.push({
+      label: "ランク",
+      value: (
+        <span
+          className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${RANK_COLORS[seller.rank]}`}
+        >
+          {seller.rank}
+        </span>
+      ),
+    });
+  if (seller.mediatorType)
+    items.push({ label: "仲介/FA", value: seller.mediatorType });
+  if (seller.assignedTo)
+    items.push({ label: "担当者", value: seller.assignedTo });
+  if (seller.introSource)
+    items.push({ label: "紹介元", value: seller.introSource });
+  if (seller.feeEstimate)
+    items.push({ label: "手数料想定", value: seller.feeEstimate });
+  items.push({
+    label: "NDA",
+    value: seller.ndaSigned ? "✓ 締結済" : "未",
+  });
+  items.push({
+    label: "AD契約",
+    value: seller.adSigned ? "✓ 締結済" : "未",
+  });
+
+  if (items.length === 0 && !seller.folderUrl) return null;
+
+  return (
+    <div className="bg-slate-50/80 rounded-xl border border-slate-100 p-4 space-y-2">
+      <p className="text-xs font-semibold text-slate-500 mb-2">案件メタ</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        {items.map((it, i) => (
+          <div key={i}>
+            <p className="text-slate-400">{it.label}</p>
+            <p className="text-slate-700 font-medium mt-0.5">{it.value}</p>
+          </div>
+        ))}
+      </div>
+      {seller.folderUrl && (
+        <a
+          href={seller.folderUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 mt-2 text-xs text-purple-600 hover:text-purple-800 font-medium"
+        >
+          📁 案件フォルダを開く
+        </a>
+      )}
     </div>
   );
 }
