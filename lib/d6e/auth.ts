@@ -1,9 +1,7 @@
 import "server-only";
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
-
 import { D6E_API_URL } from "./config";
+import { getTokenStore, type TokenState } from "./token-store";
 
 /**
  * Access token lifecycle for the d6e-api.
@@ -11,43 +9,28 @@ import { D6E_API_URL } from "./config";
  * Responsibilities:
  *   1. Read the initial refresh (and optional access) token from env.
  *   2. Call the d6e refresh endpoint automatically before expiry.
- *   3. Persist the rotated refresh token so server restarts can resume.
- *   4. Single-flight refreshes so concurrent requests share one call.
+ *   3. Persist the rotated refresh token through a pluggable TokenStore
+ *      so server restarts / serverless cold starts can resume.
+ *   4. Single-flight refreshes via in-memory gate + (on Vercel) a Redis
+ *      SET NX lock so concurrent Lambda instances share one refresh.
  *
  * Refresh protocol (reverse-engineered from d6e-frontend auth chunk):
  *   POST {D6E_API_URL}/api/v1/auth/token
  *   body: { grant_type: "refresh_token", refresh_token }
  *   response: { access_token, refresh_token, expires_in }
  *
- * d6e の refresh token は 1 回使うとローテート（元の値は無効化）される。
- * そのため環境ごとに持続的な動作モードが異なる:
+ * d6e の refresh token は使い捨て回転型 (1 回使うと無効化される) な
+ * ので、複数プロセス / 複数 Lambda インスタンス間でも「誰か 1 人だけ
+ * refresh を呼び、他は待つ」ような協調が必要。分散ロックとストアは
+ * token-store.ts の TokenStore 実装に任せている:
  *
- *   - ローカル開発 (dev):
- *       `.next/cache/d6e-dev-tokens.json` に新しい refresh token を
- *       書き戻して次回以降も回せる。D6E_DEV_REFRESH_TOKEN があればそれを
- *       初期シードとして使い、以降はファイルを優先する。
- *
- *   - Vercel サーバレス (prod/preview):
- *       ファイルシステムは揮発・共有不可で refresh token のローテートが
- *       Lambda インスタンス間で競合するため、refresh フローは使わず、
- *       `D6E_DEV_ACCESS_TOKEN` を直接 (in-memory) 使うモードで動く。
- *       アクセストークンが失効したら 401 が返るので、Vercel の env を
- *       手動更新するか、後日 KV 系ストア (Upstash Redis / Vercel Blob
- *       等) を導入してローテート対応を追加する必要がある。
+ *   - local dev: `.next/cache/d6e-dev-tokens.json` (FileTokenStore)
+ *   - Vercel prod/preview: Upstash Redis (RedisTokenStore)
  */
 
-const IS_VERCEL = !!process.env.VERCEL;
-
-interface TokenState {
-  accessToken: string;
-  refreshToken: string;
-  /** Epoch seconds. Includes a safety buffer applied at write time. */
-  expiresAt: number;
-}
-
-const CACHE_FILE = ".next/cache/d6e-dev-tokens.json";
 const SAFETY_BUFFER_SECONDS = 60;
 const PRE_REFRESH_WINDOW_SECONDS = 30;
+const REFRESH_LOCK_TTL_SECONDS = 30;
 
 let cached: TokenState | null = null;
 let inflightRefresh: Promise<TokenState> | null = null;
@@ -66,34 +49,6 @@ function decodeExp(jwt: string): number | null {
     return typeof payload.exp === "number" ? payload.exp : null;
   } catch {
     return null;
-  }
-}
-
-async function readCacheFile(): Promise<TokenState | null> {
-  if (IS_VERCEL) return null; // サーバレスでは使わない
-  try {
-    const raw = await readFile(CACHE_FILE, "utf-8");
-    const parsed = JSON.parse(raw) as Partial<TokenState>;
-    if (
-      typeof parsed.accessToken === "string" &&
-      typeof parsed.refreshToken === "string" &&
-      typeof parsed.expiresAt === "number"
-    ) {
-      return parsed as TokenState;
-    }
-  } catch {
-    // missing or invalid — fall through
-  }
-  return null;
-}
-
-async function writeCacheFile(state: TokenState): Promise<void> {
-  if (IS_VERCEL) return; // サーバレスでは永続化しない
-  try {
-    await mkdir(dirname(CACHE_FILE), { recursive: true });
-    await writeFile(CACHE_FILE, JSON.stringify(state, null, 2), "utf-8");
-  } catch {
-    // non-fatal; the next refresh will try again
   }
 }
 
@@ -137,37 +92,17 @@ async function bootstrapFromEnv(): Promise<TokenState | null> {
   const envAccess = process.env.D6E_DEV_ACCESS_TOKEN;
   const envRefresh = process.env.D6E_DEV_REFRESH_TOKEN;
 
-  // Vercel サーバレスでは refresh ローテートが Lambda 間競合を起こす
-  // ため、ACCESS_TOKEN が設定されていればそちらを優先する (REFRESH は無視)。
-  if (IS_VERCEL && envAccess) {
-    const exp = decodeExp(envAccess);
-    if (exp === null) {
-      console.error(
-        "[d6e-auth] D6E_DEV_ACCESS_TOKEN is set but its `exp` claim " +
-          "could not be decoded. Check that the token is a valid JWT.",
-      );
-      return null;
-    }
-    return {
-      accessToken: envAccess,
-      refreshToken: "",
-      expiresAt: exp - SAFETY_BUFFER_SECONDS,
-    };
-  }
-
   if (envRefresh) {
     // Preferred path: call refresh immediately to obtain a verified pair.
     const fresh = await callRefresh(envRefresh);
-    await writeCacheFile(fresh);
+    await getTokenStore().write(fresh);
     return fresh;
   }
 
   if (envAccess) {
     // Legacy path: only the access token is available. Use it until
-    // it expires, then fail loudly so the developer knows to add a
-    // refresh token. If the exp claim cannot be decoded the token is
-    // malformed — refuse to bootstrap rather than silently granting a
-    // 5-minute lifetime.
+    // it expires, then fail loudly. Refuse to bootstrap if the exp
+    // claim cannot be decoded (malformed token).
     const exp = decodeExp(envAccess);
     if (exp === null) {
       console.error(
@@ -180,7 +115,7 @@ async function bootstrapFromEnv(): Promise<TokenState | null> {
     console.warn(
       "[d6e-auth] Running in legacy access-token mode. This token will " +
         "expire and cannot be refreshed automatically; set " +
-        "D6E_DEV_REFRESH_TOKEN for persistent dev sessions.",
+        "D6E_DEV_REFRESH_TOKEN for persistent sessions.",
     );
     return {
       accessToken: envAccess,
@@ -194,28 +129,30 @@ async function bootstrapFromEnv(): Promise<TokenState | null> {
 
 async function refreshIfNeeded(): Promise<TokenState> {
   const now = nowSeconds();
+  const store = getTokenStore();
 
   // In-process cache still valid.
   if (cached && cached.expiresAt > now + PRE_REFRESH_WINDOW_SECONDS) {
     return cached;
   }
 
-  // Single-flight: concurrent callers share one refresh.
+  // In-process single-flight: concurrent callers in the SAME process
+  // share one promise. Cross-process coordination is handled by the
+  // store's distributed lock below.
   if (inflightRefresh) {
     return inflightRefresh;
   }
 
   inflightRefresh = (async () => {
     try {
-      // Reload from file in case another process refreshed. Single
-      // file read: the result is used both to short-circuit (if still
-      // valid) and as the source of the refresh token (if expired).
+      // Re-read from the store in case another process/instance
+      // already refreshed while we were queueing.
       if (!cached) {
-        const fromFile = await readCacheFile();
-        if (fromFile) {
-          cached = fromFile;
-          if (fromFile.expiresAt > now + PRE_REFRESH_WINDOW_SECONDS) {
-            return fromFile;
+        const fromStore = await store.read();
+        if (fromStore) {
+          cached = fromStore;
+          if (fromStore.expiresAt > now + PRE_REFRESH_WINDOW_SECONDS) {
+            return fromStore;
           }
         }
       }
@@ -227,8 +164,7 @@ async function refreshIfNeeded(): Promise<TokenState> {
         "";
 
       if (!refreshToken) {
-        // No refresh token anywhere. Try env bootstrap (might succeed
-        // if the user just added D6E_DEV_ACCESS_TOKEN in legacy mode).
+        // No refresh token anywhere. Try env bootstrap.
         const bootstrapped = await bootstrapFromEnv();
         if (bootstrapped) {
           cached = bootstrapped;
@@ -236,14 +172,33 @@ async function refreshIfNeeded(): Promise<TokenState> {
         }
         throw new Error(
           "d6e access token expired and no refresh token available. " +
-            "Set D6E_DEV_REFRESH_TOKEN in .env (paste the 'auth-refresh' cookie " +
-            "from https://jp-force.d6e.ai in Chrome DevTools → Cookies).",
+            "Set D6E_DEV_REFRESH_TOKEN or provide a Redis-backed token " +
+            "store populated with a valid refresh token.",
         );
       }
 
-      const fresh = await callRefresh(refreshToken);
+      // Cross-process single-flight: the store's lock ensures only one
+      // Lambda/process calls d6e refresh at a time. If we lose the lock
+      // race, the store polls for the winner's result and returns it.
+      const fresh = await store.withRefreshLock(
+        REFRESH_LOCK_TTL_SECONDS,
+        async () => {
+          // Double-check inside the lock: the peer might have refreshed
+          // between the outer read and our lock acquisition.
+          const latest = await store.read();
+          if (
+            latest &&
+            latest.expiresAt > nowSeconds() + PRE_REFRESH_WINDOW_SECONDS
+          ) {
+            return latest;
+          }
+          const tokenToUse = (latest && latest.refreshToken) || refreshToken;
+          const minted = await callRefresh(tokenToUse);
+          await store.write(minted);
+          return minted;
+        },
+      );
       cached = fresh;
-      await writeCacheFile(fresh);
       return fresh;
     } finally {
       inflightRefresh = null;
@@ -263,11 +218,11 @@ async function refreshIfNeeded(): Promise<TokenState> {
 export async function getAccessToken(override?: string): Promise<string> {
   if (override) return override;
 
-  // Cold start: try file cache → env bootstrap.
+  // Cold start: try store → env bootstrap.
   if (!cached) {
-    const fromFile = await readCacheFile();
-    if (fromFile) {
-      cached = fromFile;
+    const fromStore = await getTokenStore().read();
+    if (fromStore) {
+      cached = fromStore;
     } else {
       const bootstrapped = await bootstrapFromEnv();
       if (bootstrapped) cached = bootstrapped;
