@@ -187,6 +187,118 @@ async function UnifiedResults({
           />
         ))}
       </div>
+
+      {/* ページネーション */}
+      {result.meta.edinetTotal > PAGE_SIZE && (
+        <Pagination
+          currentPage={page}
+          totalItems={result.meta.edinetTotal}
+          pageSize={PAGE_SIZE}
+          q={q}
+          listed={listed}
+          industry={industry}
+        />
+      )}
+    </div>
+  );
+}
+
+function Pagination({
+  currentPage,
+  totalItems,
+  pageSize,
+  q,
+  listed,
+  industry,
+}: {
+  currentPage: number;
+  totalItems: number;
+  pageSize: number;
+  q?: string;
+  listed?: string;
+  industry?: string;
+}) {
+  const totalPages = Math.ceil(totalItems / pageSize);
+  if (totalPages <= 1) return null;
+
+  const delta = 3;
+  let start = Math.max(1, currentPage - delta);
+  let end = Math.min(totalPages, currentPage + delta);
+  if (end - start < delta * 2) {
+    if (start === 1) end = Math.min(totalPages, start + delta * 2);
+    else start = Math.max(1, end - delta * 2);
+  }
+  const pages: number[] = [];
+  for (let i = start; i <= end; i++) pages.push(i);
+
+  function pageUrl(p: number): string {
+    const qs = new URLSearchParams();
+    if (q) qs.set("q", q);
+    if (listed) qs.set("listed", listed);
+    if (industry) qs.set("industry", industry);
+    qs.set("page", String(p));
+    return `/search?${qs}`;
+  }
+
+  return (
+    <div className="flex items-center justify-center gap-1 pt-4">
+      {currentPage > 1 && (
+        <a
+          href={pageUrl(currentPage - 1)}
+          className="px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+        >
+          ← 前
+        </a>
+      )}
+      {start > 1 && (
+        <>
+          <a
+            href={pageUrl(1)}
+            className="px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+          >
+            1
+          </a>
+          {start > 2 && <span className="px-1 text-slate-400">…</span>}
+        </>
+      )}
+      {pages.map((p) => (
+        <a
+          key={p}
+          href={pageUrl(p)}
+          className={`px-3 py-2 text-sm rounded-lg font-medium ${
+            p === currentPage
+              ? "bg-blue-600 text-white shadow-sm"
+              : "text-slate-600 hover:bg-slate-100"
+          }`}
+        >
+          {p}
+        </a>
+      ))}
+      {end < totalPages && (
+        <>
+          {end < totalPages - 1 && (
+            <span className="px-1 text-slate-400">…</span>
+          )}
+          <a
+            href={pageUrl(totalPages)}
+            className="px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+          >
+            {totalPages}
+          </a>
+        </>
+      )}
+      {currentPage < totalPages && (
+        <a
+          href={pageUrl(currentPage + 1)}
+          className="px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+        >
+          次 →
+        </a>
+      )}
+      <span className="ml-3 text-xs text-slate-400">
+        {currentPage} / {totalPages} ページ（全 {totalItems.toLocaleString()}{" "}
+        件）
+      </span>
     </div>
   );
 }
