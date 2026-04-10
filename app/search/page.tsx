@@ -2,8 +2,9 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { searchUnified, type ListedFilter } from "@/lib/unified-company";
 import type { UnifiedCompany } from "@/lib/unified-company";
-import { creditColor, formatYenM } from "@/lib/edinetdb";
+import { creditColor, formatYen, formatYenM } from "@/lib/edinetdb";
 import { formatCapital } from "@/lib/gbiz";
+import { fetchMarketCap } from "@/lib/market";
 
 // 売上 (百万円) を「N億円 / N兆円 / N百万円」表記に
 const formatRevenueMillion = (m: number | null | undefined): string =>
@@ -138,6 +139,20 @@ async function UnifiedResults({
     );
   }
 
+  // 上場企業の時価総額を並列フェッチ (kabutan キャッシュ付き)
+  const listedCompanies = result.companies.filter(
+    (c) => c.isListed && c.secCode,
+  );
+  const marketCaps = new Map<string, number | null>();
+  if (listedCompanies.length > 0) {
+    const caps = await Promise.all(
+      listedCompanies.map((c) => fetchMarketCap(c.secCode)),
+    );
+    listedCompanies.forEach((c, i) => {
+      marketCaps.set(c.id, caps[i]);
+    });
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 text-sm text-slate-500 flex-wrap">
@@ -165,14 +180,24 @@ async function UnifiedResults({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {result.companies.map((c) => (
-          <UnifiedCard key={c.id} company={c} />
+          <UnifiedCard
+            key={c.id}
+            company={c}
+            marketCap={marketCaps.get(c.id) ?? null}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function UnifiedCard({ company: c }: { company: UnifiedCompany }) {
+function UnifiedCard({
+  company: c,
+  marketCap,
+}: {
+  company: UnifiedCompany;
+  marketCap: number | null;
+}) {
   const accentColor = c.isListed ? "blue" : "purple";
   const detailHref = `/company/${c.id}`;
 
@@ -237,8 +262,15 @@ function UnifiedCard({ company: c }: { company: UnifiedCompany }) {
       {(c.capitalStock != null ||
         c.employeeNumber != null ||
         c.location ||
-        c.revenueMillion != null) && (
+        c.revenueMillion != null ||
+        marketCap != null) && (
         <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 text-xs text-slate-500">
+          {marketCap != null && (
+            <span className="inline-flex items-center gap-1 font-semibold text-blue-700">
+              <span className="w-1 h-1 rounded-full bg-blue-400" />
+              時価総額 {formatYen(marketCap)}
+            </span>
+          )}
           {c.revenueMillion != null && c.revenueMillion > 0 && (
             <span className="inline-flex items-center gap-1 font-medium text-emerald-700">
               <span className={`w-1 h-1 rounded-full bg-${accentColor}-300`} />
