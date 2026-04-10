@@ -3,6 +3,7 @@ import "server-only";
 import {
   searchCompanies as searchEdinet,
   listCompanies as listEdinet,
+  screenerStartups,
   type Company as EdinetCompany,
 } from "./edinetdb";
 import {
@@ -50,6 +51,10 @@ export interface UnifiedCompany {
   creditRating?: string;
   creditScore?: number;
   businessTags?: string[];
+  /** EDINET screener API 由来の売上 (百万円) */
+  revenueMillion?: number | null;
+  /** EDINET screener API 由来の最終会計年度 */
+  fiscalYear?: number;
 
   // gBizINFO 由来
   capitalStock?: number | null;
@@ -77,6 +82,12 @@ export interface UnifiedSearchParams {
   page?: number;
   /** 1ソースあたりの上限件数 (デフォルト30)。 */
   perSourceLimit?: number;
+  /** 売上下限 (百万円) — EDINET screener API 経由 */
+  revenueMillionGte?: number;
+  /** 売上上限 (百万円) — EDINET screener API 経由 */
+  revenueMillionLte?: number;
+  /** 内部留保 (純資産) 下限 (百万円) — EDINET screener API 経由 */
+  equityMillionGte?: number;
 }
 
 export interface UnifiedSearchResult {
@@ -112,6 +123,87 @@ function edinetToUnified(
     businessTags: (c as EdinetCompany & { business_tags?: string[] })
       .business_tags,
   };
+}
+
+/** EDINET screener API レスポンスを UnifiedCompany に変換 */
+function screenerToUnified(c: {
+  edinetCode: string;
+  filerName: string;
+  secCode: string;
+  industry: string;
+  name_en?: string | null;
+  fiscalYear: number;
+  accountingStandard: string;
+  revenue?: number;
+  business_tags?: string[];
+}): UnifiedCompany {
+  const codelistEntry = getByEdinetCode(c.edinetCode);
+  const corporateNumber = codelistEntry?.corporateNumber;
+  return {
+    id: corporateNumber || c.edinetCode,
+    source: "edinet",
+    isListed: Boolean(c.secCode),
+    name: c.filerName,
+    industry: c.industry,
+    edinetCode: c.edinetCode,
+    corporateNumber,
+    secCode: c.secCode,
+    businessTags: c.business_tags,
+    revenueMillion: c.revenue ?? null,
+    fiscalYear: c.fiscalYear,
+  };
+}
+
+/** 全角/半角・スペース・記号を除去して比較用に正規化 */
+function normalizeForMatch(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[\s　・･,\.\-‐ー－（）()「」『』【】\[\]]/g, "")
+    .replace(/[株式会社|（株）|有限会社|合同会社|合名会社|合資会社]/g, "")
+    .normalize("NFKC");
+}
+
+/**
+ * 「企業名検索」のスコア。0=不一致 / 1=完全一致 / 中間=部分一致。
+ * gBizINFO の API は緩めの部分一致を返すので、関係ない会社が混じる
+ * のを抑えるためにアプリ側で再度スコアリングする。
+ */
+function nameMatchScore(name: string, query: string): number {
+  const n = normalizeForMatch(name);
+  const q = normalizeForMatch(query);
+  if (!q) return 1;
+  if (n === q) return 1;
+  if (n.startsWith(q)) return 0.9;
+  if (n.includes(q)) return 0.8;
+  // 逆方向 (略称検索: "メルカリ" → "株式会社メルカリ" など): query が name を含む
+  if (q.includes(n) && n.length >= 2) return 0.7;
+  return 0;
+}
+
+/**
+ * 事業項目クエリが company に当たるか。
+ * - 会社名 (name) も検索対象に含める。これにより「ソフトウェア」が
+ *   "○○ソフトウェア株式会社" にも当たる。
+ * - haystack が空なら true を返す (false negative を避ける)。
+ */
+function businessMatches(
+  c: UnifiedCompany,
+  query: string | undefined,
+): boolean {
+  if (!query) return true;
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const haystack = [
+    c.name,
+    c.industry,
+    c.businessSummary,
+    ...(c.businessTags ?? []),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  if (!haystack) return true;
+  return haystack.includes(q);
 }
 
 function gbizToUnified(c: GBizCompany): UnifiedCompany {
@@ -188,36 +280,104 @@ function mergeRows(
 export async function searchUnified(
   params: UnifiedSearchParams,
 ): Promise<UnifiedSearchResult> {
-  const { q, listed, industry, gbiz, page = 1, perSourceLimit = 30 } = params;
+  const {
+    q,
+    listed,
+    industry,
+    gbiz,
+    page = 1,
+    perSourceLimit = 30,
+    revenueMillionGte,
+    revenueMillionLte,
+    equityMillionGte,
+  } = params;
+
+  const useScreener =
+    revenueMillionGte != null ||
+    revenueMillionLte != null ||
+    equityMillionGte != null;
 
   const wantEdinet = listed !== "unlisted";
-  const wantGbiz = listed !== "listed" && (Boolean(q) || hasGbizFilter(gbiz));
+  // 売上/内部留保フィルタが指定されているときは gBizINFO を呼ばない
+  // (screener API 経由の EDINET 結果のみで絞り込む方が精度が高い)
+  const wantGbiz =
+    !useScreener && listed !== "listed" && (Boolean(q) || hasGbizFilter(gbiz));
+
+  // ユーザーが事業項目だけで検索したとき (q 無し): EDINET listing から
+  // 多めに取得して post-merge フィルタで絞り込めるよう、フェッチ数を
+  // 拡張する。
+  const broadFetchForBusiness = !q && Boolean(gbiz?.business_item);
+  const edinetFetchLimit = broadFetchForBusiness
+    ? perSourceLimit * 10
+    : perSourceLimit;
 
   // EDINET fetch
+  // - 売上/内部留保フィルタが指定されているときは screener エンドポイント
+  //   経由 (revenue_gte / revenue_lte / equity_gte をネイティブ対応)
+  // - クエリがあるときは search エンドポイント
+  // - なければ listCompanies で全件
   const edinetPromise: Promise<{
-    rows: EdinetCompany[];
+    unified: UnifiedCompany[];
     total: number;
   }> = wantEdinet
     ? (async () => {
         try {
-          if (q) {
-            const rows = await searchEdinet(q);
-            return { rows: rows.slice(0, perSourceLimit), total: rows.length };
+          if (useScreener) {
+            const result = await screenerStartups({
+              ...(revenueMillionGte != null
+                ? { revenueGte: revenueMillionGte }
+                : {}),
+              ...(revenueMillionLte != null
+                ? { revenueLte: revenueMillionLte }
+                : {}),
+              ...(equityMillionGte != null
+                ? { equityGte: equityMillionGte }
+                : {}),
+              ...(industry ? { industry } : {}),
+              sortBy: "revenue",
+              limit: perSourceLimit * 4, // 後段の name/business フィルタで削れるので多めに取る
+            });
+            const unified = (result.companies ?? []).map(screenerToUnified);
+            return { unified, total: result.total ?? unified.length };
+          }
+          // q が無く business だけが指定されているときは business を
+          // EDINET の name 検索クエリとしても使う (社名に該当キーワードを
+          // 含む会社を引き当てる)。EDINET 業種コードは粒度が粗く、
+          // gBizINFO 側 API は name 必須なので、これがない場合は何も
+          // 引っかけられないため。
+          const effectiveQ =
+            q || (broadFetchForBusiness ? gbiz?.business_item : undefined);
+          if (effectiveQ) {
+            const rows = await searchEdinet(effectiveQ);
+            const limited = rows.slice(0, perSourceLimit);
+            const codelistMap = getManyByEdinetCode(
+              limited.map((r) => r.edinet_code),
+            );
+            const unified = limited.map((c) =>
+              edinetToUnified(c, codelistMap.get(c.edinet_code) ?? null),
+            );
+            return { unified, total: rows.length };
           }
           const result = await listEdinet({
             industry,
-            limit: perSourceLimit,
+            limit: edinetFetchLimit,
             page,
           });
+          const codelistMap = getManyByEdinetCode(
+            result.data.map((r) => r.edinet_code),
+          );
+          const unified = result.data.map((c) =>
+            edinetToUnified(c, codelistMap.get(c.edinet_code) ?? null),
+          );
           return {
-            rows: result.data,
+            unified,
             total: result.meta?.pagination?.total ?? result.data.length,
           };
         } catch {
-          return { rows: [], total: 0 };
+          return { unified: [], total: 0 };
         }
       })()
-    : Promise.resolve({ rows: [], total: 0 });
+    : Promise.resolve({ unified: [], total: 0 });
 
   // gBizINFO fetch
   const gbizPromise: Promise<{ rows: GBizCompany[]; total: number }> = wantGbiz
@@ -242,13 +402,7 @@ export async function searchUnified(
     gbizPromise,
   ]);
 
-  // EDINET 結果をユニファイド化 (codelist で法人番号付与)
-  const codelistMap = getManyByEdinetCode(
-    edinetSide.rows.map((r) => r.edinet_code),
-  );
-  const edinetUnified = edinetSide.rows.map((c) =>
-    edinetToUnified(c, codelistMap.get(c.edinet_code) ?? null),
-  );
+  const edinetUnified = edinetSide.unified;
 
   // gBizINFO 結果をユニファイド化 (codelist で sec_code 付与)
   const gbizUnified = gbizSide.rows.map(gbizToUnified);
@@ -289,12 +443,43 @@ export async function searchUnified(
     merged = merged.filter((c) => !c.industry || c.industry === industry);
   }
 
-  // 並び順: 上場 → 非上場、内部は credit_score 降順 → 名前
+  // 事業項目フィルター (gBizINFO API は緩めの部分一致を返すので、
+  // EDINET 結果も含めてアプリ側で再フィルタ)
+  if (gbiz?.business_item) {
+    merged = merged.filter((c) => businessMatches(c, gbiz.business_item));
+  }
+
+  // 企業名検索の精度向上: クエリがあるとき、name にスコア付けして
+  // しきい値以下を捨てる + スコア降順でソート。これで「ソフト」検索
+  // で「流山ソフト開発」が混ざる問題を緩和する。
+  let nameScores: Map<string, number> | null = null;
+  if (q && q.trim()) {
+    nameScores = new Map();
+    const filtered: UnifiedCompany[] = [];
+    for (const c of merged) {
+      const score = nameMatchScore(c.name, q);
+      if (score >= 0.7) {
+        nameScores.set(c.id, score);
+        filtered.push(c);
+      }
+    }
+    merged = filtered;
+  }
+
+  // 並び順:
+  //  クエリ検索時 → name match score 降順 → credit_score 降順 → 名前
+  //  それ以外     → 上場 → 非上場、内部は credit_score 降順 → 名前
   merged.sort((a, b) => {
-    if (a.isListed !== b.isListed) return a.isListed ? -1 : 1;
-    const sa = a.creditScore ?? -1;
-    const sb = b.creditScore ?? -1;
-    if (sa !== sb) return sb - sa;
+    if (nameScores) {
+      const sa = nameScores.get(a.id) ?? 0;
+      const sb = nameScores.get(b.id) ?? 0;
+      if (sa !== sb) return sb - sa;
+    } else {
+      if (a.isListed !== b.isListed) return a.isListed ? -1 : 1;
+    }
+    const csa = a.creditScore ?? -1;
+    const csb = b.creditScore ?? -1;
+    if (csa !== csb) return csb - csa;
     return a.name.localeCompare(b.name, "ja");
   });
 

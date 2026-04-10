@@ -42,6 +42,18 @@ interface LoadedCodelist {
   count: number;
   byEdinetCode: Map<string, EdinetCodelistEntry>;
   byCorporateNumber: Map<string, EdinetCodelistEntry>;
+  /** 名前正規化キー → entry。グループ会社の名寄せに使う */
+  byNormalizedName: Map<string, EdinetCodelistEntry>;
+}
+
+/** 全角/半角・スペース・記号・法人接尾辞を除去して比較用に正規化 */
+function normalizeName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[\s　・･,\.\-‐ー－（）()「」『』【】\[\]]/g, "")
+    .replace(/株式会社|（株）|有限会社|合同会社|合名会社|合資会社/g, "")
+    .normalize("NFKC")
+    .trim();
 }
 
 let cached: LoadedCodelist | null = null;
@@ -59,11 +71,19 @@ function load(): LoadedCodelist | null {
 
     const byEdinetCode = new Map<string, EdinetCodelistEntry>();
     const byCorporateNumber = new Map<string, EdinetCodelistEntry>();
+    const byNormalizedName = new Map<string, EdinetCodelistEntry>();
 
     for (const entry of parsed.entries) {
       byEdinetCode.set(entry.edinetCode, entry);
       if (entry.corporateNumber) {
         byCorporateNumber.set(entry.corporateNumber, entry);
+      }
+      const normalized = normalizeName(entry.name);
+      if (normalized) {
+        // 同名衝突時は最初に出てきた (= JSON 順) を優先
+        if (!byNormalizedName.has(normalized)) {
+          byNormalizedName.set(normalized, entry);
+        }
       }
     }
 
@@ -72,6 +92,7 @@ function load(): LoadedCodelist | null {
       count: parsed.count,
       byEdinetCode,
       byCorporateNumber,
+      byNormalizedName,
     };
     return cached;
   } catch (e) {
@@ -98,6 +119,18 @@ export function getByCorporateNumber(
 ): EdinetCodelistEntry | null {
   const cl = load();
   return cl?.byCorporateNumber.get(corporateNumber) ?? null;
+}
+
+/**
+ * 会社名からエントリを取得。正規化 (株式会社・空白・記号除去) して
+ * 照合する。グループ会社の名寄せに使う。
+ */
+export function getByName(name: string): EdinetCodelistEntry | null {
+  const cl = load();
+  if (!cl) return null;
+  const normalized = normalizeName(name);
+  if (!normalized) return null;
+  return cl.byNormalizedName.get(normalized) ?? null;
 }
 
 /**

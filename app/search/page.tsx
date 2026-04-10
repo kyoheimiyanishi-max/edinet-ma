@@ -2,8 +2,12 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { searchUnified, type ListedFilter } from "@/lib/unified-company";
 import type { UnifiedCompany } from "@/lib/unified-company";
-import { creditColor } from "@/lib/edinetdb";
+import { creditColor, formatYenM } from "@/lib/edinetdb";
 import { formatCapital } from "@/lib/gbiz";
+
+// 売上 (百万円) を「N億円 / N兆円 / N百万円」表記に
+const formatRevenueMillion = (m: number | null | undefined): string =>
+  formatYenM(m);
 import UnifiedSearchForm from "@/components/UnifiedSearchForm";
 import AddToSellerButton from "@/components/AddToSellerButton";
 
@@ -25,6 +29,11 @@ interface Props {
     commendation?: string;
     finance?: string;
     exist?: string;
+    /** 売上下限 (億円) — UI 表記はわかりやすいので億単位、内部で百万円に変換 */
+    revenue_oku_from?: string;
+    revenue_oku_to?: string;
+    /** 内部留保 (純資産) 下限 (億円) */
+    equity_oku_from?: string;
     page?: string;
   }>;
 }
@@ -62,6 +71,9 @@ async function UnifiedResults({
   commendation,
   finance,
   exist,
+  revenueOkuFrom,
+  revenueOkuTo,
+  equityOkuFrom,
   page,
 }: {
   q?: string;
@@ -80,14 +92,27 @@ async function UnifiedResults({
   commendation?: boolean;
   finance?: boolean;
   exist?: boolean;
+  /** 売上下限 (億円) */
+  revenueOkuFrom?: number;
+  /** 売上上限 (億円) */
+  revenueOkuTo?: number;
+  /** 内部留保下限 (億円) */
+  equityOkuFrom?: number;
   page: number;
 }) {
+  // 億円 → 百万円 (×100)
+  const okuToMillion = (oku: number | undefined): number | undefined =>
+    oku != null ? oku * 100 : undefined;
+
   const result = await searchUnified({
     q,
     listed,
     industry,
     page,
     perSourceLimit: PAGE_SIZE,
+    revenueMillionGte: okuToMillion(revenueOkuFrom),
+    revenueMillionLte: okuToMillion(revenueOkuTo),
+    equityMillionGte: okuToMillion(equityOkuFrom),
     gbiz: {
       founded_year_from: year,
       founded_year_to: yearTo,
@@ -209,8 +234,22 @@ function UnifiedCard({ company: c }: { company: UnifiedCompany }) {
         </div>
       </div>
 
-      {(c.capitalStock != null || c.employeeNumber != null || c.location) && (
+      {(c.capitalStock != null ||
+        c.employeeNumber != null ||
+        c.location ||
+        c.revenueMillion != null) && (
         <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 text-xs text-slate-500">
+          {c.revenueMillion != null && c.revenueMillion > 0 && (
+            <span className="inline-flex items-center gap-1 font-medium text-emerald-700">
+              <span className={`w-1 h-1 rounded-full bg-${accentColor}-300`} />
+              売上 {formatRevenueMillion(c.revenueMillion)}
+              {c.fiscalYear && (
+                <span className="text-[10px] text-slate-400">
+                  ({c.fiscalYear})
+                </span>
+              )}
+            </span>
+          )}
           {c.capitalStock != null && (
             <span className="inline-flex items-center gap-1">
               <span className={`w-1 h-1 rounded-full bg-${accentColor}-300`} />
@@ -278,6 +317,9 @@ export default async function SearchPage({ searchParams }: Props) {
   const commendation = params.commendation === "1" ? true : undefined;
   const finance = params.finance === "1" ? true : undefined;
   const exist = params.exist === "1" ? true : undefined;
+  const revenueOkuFrom = parseIntOrUndefined(params.revenue_oku_from);
+  const revenueOkuTo = parseIntOrUndefined(params.revenue_oku_to);
+  const equityOkuFrom = parseIntOrUndefined(params.equity_oku_from);
 
   // UnifiedSearchForm は submit 時に必ず page=1 を付けるので、page パラメータの
   // 有無で「ユーザーが検索ボタンを押したか」を判別する。これにより空欄で
@@ -301,6 +343,9 @@ export default async function SearchPage({ searchParams }: Props) {
     Boolean(commendation) ||
     Boolean(finance) ||
     Boolean(exist) ||
+    revenueOkuFrom != null ||
+    revenueOkuTo != null ||
+    equityOkuFrom != null ||
     listed === "listed";
 
   return (
@@ -328,6 +373,9 @@ export default async function SearchPage({ searchParams }: Props) {
             defaultCommendation={commendation}
             defaultFinance={finance}
             defaultExist={exist}
+            defaultRevenueOkuFrom={params.revenue_oku_from}
+            defaultRevenueOkuTo={params.revenue_oku_to}
+            defaultEquityOkuFrom={params.equity_oku_from}
             currentYear={CURRENT_YEAR}
           />
         </Suspense>
@@ -352,6 +400,9 @@ export default async function SearchPage({ searchParams }: Props) {
             commendation={commendation}
             finance={finance}
             exist={exist}
+            revenueOkuFrom={revenueOkuFrom}
+            revenueOkuTo={revenueOkuTo}
+            equityOkuFrom={equityOkuFrom}
             page={page}
           />
         </Suspense>

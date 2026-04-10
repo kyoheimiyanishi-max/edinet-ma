@@ -91,7 +91,8 @@ export interface GBizCompany {
 }
 
 export interface GBizResponse {
-  message: string;
+  message?: string;
+  errors?: unknown[];
   "hojin-infos": GBizCompany[];
 }
 
@@ -156,8 +157,14 @@ export interface SearchParams {
 export async function searchCompanies(
   params: SearchParams,
 ): Promise<GBizResponse> {
+  // gBizINFO API は name か corporate_number が必須。name 無しで他の
+  // フィルタ単独だと 400 Bad Request を返すので、その場合は空レス
+  // ポンスを返す (アプリ側で EDINET 結果を post-merge フィルタする)。
+  if (!params.name) {
+    return { "hojin-infos": [], errors: [] };
+  }
   const qs = new URLSearchParams();
-  if (params.name) qs.set("name", params.name);
+  qs.set("name", params.name);
   if (params.founded_year_from)
     qs.set("founded_year", String(params.founded_year_from));
   if (params.founded_year_to)

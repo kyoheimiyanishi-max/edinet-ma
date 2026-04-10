@@ -45,6 +45,7 @@ import AddToSellerButton from "@/components/AddToSellerButton";
 import AiRunButton from "@/components/AiRunButton";
 import { notFound, redirect } from "next/navigation";
 import { parseCompanyId } from "@/lib/unified-company";
+import { getByName as findEdinetByName } from "@/lib/edinet-codelist";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -74,8 +75,15 @@ function MetricCard({
 function GroupCompanyChip({ company }: { company: GroupCompany }) {
   const style = relationChipStyle(company.relation);
   const letter = relationBadgeLetter(company.relation);
+  // EDINET codelist で名寄せ: 一致したら直接 /company/{id} へ、無ければ
+  // 既存の検索ページ経由 (フォールバック)
+  const edinetEntry = findEdinetByName(company.name);
+  const href = edinetEntry
+    ? `/company/${edinetEntry.corporateNumber ?? edinetEntry.edinetCode}`
+    : `/search?q=${encodeURIComponent(company.name)}`;
+  const matched = Boolean(edinetEntry);
   const title = [
-    `${company.name} を検索`,
+    matched ? `${company.name} の詳細を開く` : `${company.name} を検索`,
     company.ownershipPct != null ? `出資比率: ${company.ownershipPct}%` : "",
     company.description || "",
     `出典: ${company.sources.join(", ")}`,
@@ -84,7 +92,7 @@ function GroupCompanyChip({ company }: { company: GroupCompany }) {
     .join("\n");
   return (
     <Link
-      href={`/search?q=${encodeURIComponent(company.name)}`}
+      href={href}
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${style}`}
       title={title}
     >
@@ -92,6 +100,11 @@ function GroupCompanyChip({ company }: { company: GroupCompany }) {
         {letter}
       </span>
       <span>{company.name}</span>
+      {matched && (
+        <span className="text-[9px] text-emerald-600" title="EDINET登録あり">
+          ●
+        </span>
+      )}
       {company.ownershipPct != null && (
         <span className="text-[10px] opacity-70 tabular-nums">
           {company.ownershipPct}%
@@ -1362,18 +1375,6 @@ export default async function CompanyPage({ params, searchParams }: Props) {
             </Suspense>
           </SectionCard>
 
-          {/* ===== 関連ニュース（M&A/業績/リリースのフィルタ付き） ===== */}
-          <Suspense
-            fallback={
-              <SummarySectionSkeleton title="関連ニュース" badge="自動検索" />
-            }
-          >
-            <CompanyNewsSection
-              companyName={company.name}
-              aiEnabled={aiEnabled}
-            />
-          </Suspense>
-
           {/* ===== AI分析 + M&A戦略推察（上部の一括AI実行ボタンから連動） ===== */}
           <CompanyAnalysis />
 
@@ -1418,6 +1419,14 @@ export default async function CompanyPage({ params, searchParams }: Props) {
                   />
                 )}
               </div>
+              {f.edinet_filing_url && (
+                <div className="mt-4 pt-3 border-t border-slate-100">
+                  <SourceLink
+                    url={f.edinet_filing_url}
+                    name={`有価証券報告書 (${f.fiscal_year}年度)`}
+                  />
+                </div>
+              )}
             </SectionCard>
           )}
 
@@ -1452,6 +1461,14 @@ export default async function CompanyPage({ params, searchParams }: Props) {
                   />
                 )}
               </div>
+              {f.edinet_filing_url && (
+                <div className="mt-4 pt-3 border-t border-slate-100">
+                  <SourceLink
+                    url={f.edinet_filing_url}
+                    name={`有価証券報告書 (${f.fiscal_year}年度)`}
+                  />
+                </div>
+              )}
             </SectionCard>
           )}
 
@@ -1641,9 +1658,18 @@ export default async function CompanyPage({ params, searchParams }: Props) {
                   </tbody>
                 </table>
               </div>
-              <p className="text-[10px] text-slate-400 mt-3 pt-2 border-t border-slate-100">
-                出典: 有価証券報告書（EDINET）
-              </p>
+              <div className="mt-3 pt-2 border-t border-slate-100">
+                {f?.edinet_filing_url ? (
+                  <SourceLink
+                    url={f.edinet_filing_url}
+                    name={`有価証券報告書 (${f.fiscal_year}年度)`}
+                  />
+                ) : (
+                  <p className="text-[10px] text-slate-400">
+                    出典: 有価証券報告書（EDINET）
+                  </p>
+                )}
+              </div>
             </SectionCard>
           )}
 
@@ -1841,6 +1867,18 @@ export default async function CompanyPage({ params, searchParams }: Props) {
             <EnrichedSections
               name={company.name}
               companyUrl={wd?.officialWebsite}
+              aiEnabled={aiEnabled}
+            />
+          </Suspense>
+
+          {/* ===== 関連ニュース（ページ後段） ===== */}
+          <Suspense
+            fallback={
+              <SummarySectionSkeleton title="関連ニュース" badge="自動検索" />
+            }
+          >
+            <CompanyNewsSection
+              companyName={company.name}
               aiEnabled={aiEnabled}
             />
           </Suspense>

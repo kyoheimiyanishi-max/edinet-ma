@@ -239,6 +239,8 @@ export async function screenerStartups(params: {
   revenueLte?: number;
   revenueGte?: number;
   rndGte?: number;
+  /** 純資産 (内部留保の代理) 下限。EDINET screener の equity_gte を使用 */
+  equityGte?: number;
   industry?: string;
   sortBy?: string;
   limit?: number;
@@ -249,6 +251,8 @@ export async function screenerStartups(params: {
   if (params.revenueGte != null)
     qs.set("revenue_gte", String(params.revenueGte));
   if (params.rndGte != null) qs.set("rnd_expenses_gte", String(params.rndGte));
+  if (params.equityGte != null) qs.set("equity_gte", String(params.equityGte));
+  if (params.industry) qs.set("industry", params.industry);
   if (params.sortBy) qs.set("sort_by", params.sortBy);
   qs.set("sort_order", "desc");
   qs.set("limit", String(params.limit ?? 50));

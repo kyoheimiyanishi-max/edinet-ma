@@ -108,6 +108,9 @@ interface Props {
   defaultFinance?: boolean;
   defaultExist?: boolean;
   defaultBusiness?: string;
+  defaultRevenueOkuFrom?: string;
+  defaultRevenueOkuTo?: string;
+  defaultEquityOkuFrom?: string;
   currentYear: number;
 }
 
@@ -128,6 +131,9 @@ export default function UnifiedSearchForm({
   defaultFinance,
   defaultExist,
   defaultBusiness,
+  defaultRevenueOkuFrom,
+  defaultRevenueOkuTo,
+  defaultEquityOkuFrom,
   currentYear,
 }: Props) {
   const router = useRouter();
@@ -175,6 +181,15 @@ export default function UnifiedSearchForm({
     sp.get("finance") === "1" || !!defaultFinance,
   );
   const [exist, setExist] = useState(sp.get("exist") === "1" || !!defaultExist);
+  const [revenueOkuFrom, setRevenueOkuFrom] = useState(
+    sp.get("revenue_oku_from") ?? defaultRevenueOkuFrom ?? "",
+  );
+  const [revenueOkuTo, setRevenueOkuTo] = useState(
+    sp.get("revenue_oku_to") ?? defaultRevenueOkuTo ?? "",
+  );
+  const [equityOkuFrom, setEquityOkuFrom] = useState(
+    sp.get("equity_oku_from") ?? defaultEquityOkuFrom ?? "",
+  );
 
   const buildUrl = () => {
     const qs = new URLSearchParams();
@@ -194,6 +209,9 @@ export default function UnifiedSearchForm({
     if (commendation) qs.set("commendation", "1");
     if (finance) qs.set("finance", "1");
     if (exist) qs.set("exist", "1");
+    if (revenueOkuFrom) qs.set("revenue_oku_from", revenueOkuFrom);
+    if (revenueOkuTo) qs.set("revenue_oku_to", revenueOkuTo);
+    if (equityOkuFrom) qs.set("equity_oku_from", equityOkuFrom);
     qs.set("page", "1");
     return `/search?${qs}`;
   };
@@ -220,6 +238,9 @@ export default function UnifiedSearchForm({
     setCommendation(false);
     setFinance(false);
     setExist(false);
+    setRevenueOkuFrom("");
+    setRevenueOkuTo("");
+    setEquityOkuFrom("");
     router.push("/search?listed=all&page=1");
   };
 
@@ -427,6 +448,52 @@ export default function UnifiedSearchForm({
                 placeholder="例: ソフトウェア、コンサルティング"
                 className={`w-full ${inputClass}`}
               />
+            </div>
+          </div>
+
+          {/* 売上 / 内部留保 (EDINET screener API 経由) */}
+          <div className="flex flex-wrap gap-3 items-end">
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                売上 下限（億円）
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={revenueOkuFrom}
+                onChange={(e) => setRevenueOkuFrom(e.target.value)}
+                placeholder="例: 10"
+                className={`w-32 ${inputClass}`}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                売上 上限（億円）
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={revenueOkuTo}
+                onChange={(e) => setRevenueOkuTo(e.target.value)}
+                placeholder="例: 1000"
+                className={`w-32 ${inputClass}`}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1.5">
+                内部留保 下限（億円）
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={equityOkuFrom}
+                onChange={(e) => setEquityOkuFrom(e.target.value)}
+                placeholder="例: 5"
+                className={`w-32 ${inputClass}`}
+              />
+              <p className="text-[10px] text-slate-400 mt-0.5">
+                ※ EDINET 純資産で代理 (上場のみ)
+              </p>
             </div>
           </div>
 

@@ -188,6 +188,21 @@ export default function CompanyAnalysis() {
           </div>
           {ma.status === "loading" ? <Spinner /> : null}
         </div>
+        {/* TL;DR: 本文の最初の段落をサマリとして上部に出す */}
+        {(ma.status === "loading" || ma.status === "success") &&
+          ma.text &&
+          extractTldr(ma.text) && (
+            <div className="px-6 py-3 bg-purple-50/50 border-b border-purple-100/60">
+              <div className="flex items-start gap-2">
+                <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold mt-0.5">
+                  ✨ 要約
+                </span>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {extractTldr(ma.text)}
+                </p>
+              </div>
+            </div>
+          )}
         <div className="p-6">
           {ma.status === "idle" ? (
             <p className="text-sm text-slate-400 text-center py-4">
@@ -213,6 +228,36 @@ export default function CompanyAnalysis() {
       </p>
     </div>
   );
+}
+
+/**
+ * Markdown 本文から「最初の意味のある段落」を抜き出して TL;DR として返す。
+ * - Markdown 見出し (#, ##, ###) はスキップ
+ * - 空行までを 1 段落として扱う
+ * - 200 文字を超える場合は切り詰める
+ */
+function extractTldr(text: string): string | null {
+  if (!text) return null;
+  const lines = text.split("\n");
+  let para: string[] = [];
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) {
+      if (para.length > 0) break;
+      continue;
+    }
+    // 見出し行はスキップ (### 1. M&A戦略の推察 等)
+    if (/^#+\s/.test(line)) continue;
+    // bold/italic だけの行もスキップ
+    if (/^\*+[^*]+\*+\s*$/.test(line)) continue;
+    // bullet list の場合は最初の項目だけ取る
+    para.push(line.replace(/^[-*•]\s*/, ""));
+    if (para.length >= 2) break;
+  }
+  if (para.length === 0) return null;
+  let summary = para.join(" ").replace(/\*\*/g, "").trim();
+  if (summary.length > 200) summary = summary.slice(0, 200) + "…";
+  return summary;
 }
 
 // ---- sub components ----
