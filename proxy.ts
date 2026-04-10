@@ -1,28 +1,17 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { auth } from "@/lib/auth/config";
 
 /**
- * Edge/Node proxy (Next.js 16: 旧 middleware.ts の後継): 全ルートに HTTP
- * Basic Auth を強制する。
+ * Next.js 16 proxy (旧 middleware.ts).
  *
- * 背景:
- *   edinet-ma は d6e の CRM データ (売主/社員/議事録/プロジェクト) を
- *   全件読み書きする。全 /api/* と全ページルートが無認証だったため、
- *   インターネット上の誰でもデータ閲覧・改変・AI エンドポイント呼び出し
- *   (Anthropic 課金) が可能な状態だった。
- *
- *   社内限定 / 信頼できる少人数向けのツールなので、MVP としては Basic
- *   Auth で全体をゲートする。将来的に Google SSO (Auth.js) に差し替え
- *   予定。
- *
- * 環境変数:
- *   APP_AUTH_USER     : Basic Auth ユーザー名
- *   APP_AUTH_PASSWORD : Basic Auth パスワード
- *     どちらも未設定なら proxy はスキップ (開発時の即時試し用)。
- *     production では必ず両方セットすること。
+ * 認証方式の優先度:
+ *   1. Auth.js (Google SSO) — AUTH_GOOGLE_ID が設定されていれば使用
+ *   2. Basic Auth — APP_AUTH_USER が設定されていれば使用
+ *   3. スキップ — どちらも未設定ならオープン (ローカル dev 補助)
  */
 
-const PUBLIC_PATHS = [
+const AUTH_PUBLIC_PATHS = [
   "/_next",
   "/favicon.ico",
   "/robots.txt",
@@ -30,36 +19,45 @@ const PUBLIC_PATHS = [
   "/opengraph-image",
   "/apple-icon",
   "/icon",
+  "/login",
+  "/api/auth",
 ];
 
 function isPublicPath(pathname: string): boolean {
-  return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p));
+  return AUTH_PUBLIC_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(p + "/"),
+  );
 }
 
-function unauthorized(): NextResponse {
-  return new NextResponse("Authentication required", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="edinet-ma", charset="UTF-8"',
-      "Cache-Control": "no-store",
-    },
-  });
-}
+// ---- Auth.js mode ----
 
-export function proxy(request: NextRequest): NextResponse {
+async function authJsProxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
+  if (isPublicPath(pathname)) return NextResponse.next();
 
-  if (isPublicPath(pathname)) {
-    return NextResponse.next();
+  const session = await auth();
+  if (!session?.user) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
+
+  // ヘッダーにユーザー情報を付与 (API ルート側でも利用可能にする)
+  const response = NextResponse.next();
+  response.headers.set("x-user-email", session.user.email ?? "");
+  response.headers.set("x-user-name", session.user.name ?? "");
+  return response;
+}
+
+// ---- Basic Auth mode (fallback) ----
+
+function basicAuthProxy(request: NextRequest): NextResponse {
+  const { pathname } = request.nextUrl;
+  if (isPublicPath(pathname)) return NextResponse.next();
 
   const expectedUser = process.env.APP_AUTH_USER;
   const expectedPass = process.env.APP_AUTH_PASSWORD;
-
-  // 環境変数が両方未設定なら proxy スキップ (ローカル開発補助)
-  if (!expectedUser && !expectedPass) {
-    return NextResponse.next();
-  }
+  if (!expectedUser && !expectedPass) return NextResponse.next();
 
   const header = request.headers.get("authorization");
   if (!header || !header.toLowerCase().startsWith("basic ")) {
@@ -78,12 +76,20 @@ export function proxy(request: NextRequest): NextResponse {
   const user = decoded.slice(0, idx);
   const pass = decoded.slice(idx + 1);
 
-  // 定時間比較でタイミング攻撃対策 (Edge Runtime で crypto module が
-  // 使いづらいので手動比較)
   if (!constantTimeEqual(user, expectedUser ?? "")) return unauthorized();
   if (!constantTimeEqual(pass, expectedPass ?? "")) return unauthorized();
 
   return NextResponse.next();
+}
+
+function unauthorized(): NextResponse {
+  return new NextResponse("Authentication required", {
+    status: 401,
+    headers: {
+      "WWW-Authenticate": 'Basic realm="edinet-ma", charset="UTF-8"',
+      "Cache-Control": "no-store",
+    },
+  });
 }
 
 function constantTimeEqual(a: string, b: string): boolean {
@@ -95,7 +101,17 @@ function constantTimeEqual(a: string, b: string): boolean {
   return result === 0;
 }
 
+// ---- Entrypoint ----
+
+const useAuthJs = !!process.env.AUTH_GOOGLE_ID;
+
+export async function proxy(request: NextRequest): Promise<NextResponse> {
+  if (useAuthJs) {
+    return authJsProxy(request);
+  }
+  return basicAuthProxy(request);
+}
+
 export const proxyConfig = {
-  // 全ルート対象 (Next.js 内部の静的アセットは除外)
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

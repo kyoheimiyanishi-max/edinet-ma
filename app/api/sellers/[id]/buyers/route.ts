@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { addBuyer, updateBuyer, deleteBuyer } from "@/lib/d6e/repos/sellers";
 import { d6eErrorResponse } from "@/lib/d6e/route-utils";
+import { getCurrentUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/audit";
 
 interface Ctx {
   params: Promise<{ id: string }>;
@@ -8,6 +10,7 @@ interface Ctx {
 
 export async function POST(req: Request, ctx: Ctx) {
   try {
+    const user = await getCurrentUser();
     const { id } = await ctx.params;
     const body = await req.json();
     if (!body.companyName?.trim()) {
@@ -24,6 +27,7 @@ export async function POST(req: Request, ctx: Ctx) {
     if (!seller) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+    await writeAudit(user, "create", "seller_buyer", id, body.companyName);
     return NextResponse.json(seller, { status: 201 });
   } catch (err) {
     return d6eErrorResponse(err);
@@ -32,6 +36,7 @@ export async function POST(req: Request, ctx: Ctx) {
 
 export async function PUT(req: Request, ctx: Ctx) {
   try {
+    const user = await getCurrentUser();
     const { id } = await ctx.params;
     const body = await req.json();
     if (!body.buyerId) {
@@ -42,6 +47,7 @@ export async function PUT(req: Request, ctx: Ctx) {
     if (!seller) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+    await writeAudit(user, "update", "seller_buyer", buyerId);
     return NextResponse.json(seller);
   } catch (err) {
     return d6eErrorResponse(err);
@@ -50,6 +56,7 @@ export async function PUT(req: Request, ctx: Ctx) {
 
 export async function DELETE(req: Request, ctx: Ctx) {
   try {
+    const user = await getCurrentUser();
     const { id } = await ctx.params;
     const { searchParams } = new URL(req.url);
     const buyerId = searchParams.get("buyerId");
@@ -63,6 +70,7 @@ export async function DELETE(req: Request, ctx: Ctx) {
     if (!seller) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+    await writeAudit(user, "delete", "seller_buyer", buyerId);
     return NextResponse.json(seller);
   } catch (err) {
     return d6eErrorResponse(err);

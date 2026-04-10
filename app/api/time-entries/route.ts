@@ -7,6 +7,8 @@ import {
   findBySeller,
   findByUser,
 } from "@/lib/d6e/repos/time-entries";
+import { getCurrentUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/audit";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -28,6 +30,7 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
+  const user = await getCurrentUser();
   const created = await create({
     userName: body.userName.trim(),
     date: body.date,
@@ -37,5 +40,12 @@ export async function POST(req: Request) {
     sellerId: body.sellerId,
     description: body.description,
   });
+  await writeAudit(
+    user,
+    "create",
+    "time_entry",
+    created.id,
+    created.userName + " " + created.date,
+  );
   return NextResponse.json(created, { status: 201 });
 }

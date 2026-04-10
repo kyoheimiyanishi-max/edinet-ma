@@ -6,6 +6,8 @@ import {
   findLogsByBuyer,
   findLogsBySeller,
 } from "@/lib/d6e/repos/outreach";
+import { getCurrentUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/audit";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -21,6 +23,7 @@ export async function POST(req: Request) {
   if (!body.channel) {
     return NextResponse.json({ error: "channel は必須です" }, { status: 400 });
   }
+  const user = await getCurrentUser();
   const created = await createLog({
     buyerCompanyId: body.buyerCompanyId,
     sellerId: body.sellerId,
@@ -33,5 +36,12 @@ export async function POST(req: Request) {
     replyText: body.replyText,
     notes: body.notes,
   });
+  await writeAudit(
+    user,
+    "create",
+    "outreach_log",
+    created.id,
+    created.buyerCompanyName ?? "outreach",
+  );
   return NextResponse.json(created, { status: 201 });
 }

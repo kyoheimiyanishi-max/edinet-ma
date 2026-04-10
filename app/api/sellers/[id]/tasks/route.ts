@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import type { SellerTask } from "@/lib/sellers";
 import { addTask, deleteTask, updateTask } from "@/lib/d6e/repos/sellers";
+import { getCurrentUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/audit";
 
 interface Ctx {
   params: Promise<{ id: string }>;
 }
 
 export async function POST(req: Request, ctx: Ctx) {
+  const user = await getCurrentUser();
   const { id } = await ctx.params;
   const body = (await req.json()) as Partial<
     Omit<SellerTask, "id" | "sellerId" | "createdAt" | "updatedAt">
@@ -28,10 +31,12 @@ export async function POST(req: Request, ctx: Ctx) {
   if (!seller) {
     return NextResponse.json({ error: "Seller not found" }, { status: 404 });
   }
+  await writeAudit(user, "create", "seller_task", id, body.title);
   return NextResponse.json(seller, { status: 201 });
 }
 
 export async function PUT(req: Request, ctx: Ctx) {
+  const user = await getCurrentUser();
   const { id } = await ctx.params;
   const body = (await req.json()) as { taskId: string } & Partial<
     Omit<SellerTask, "id" | "sellerId" | "createdAt">
@@ -43,10 +48,12 @@ export async function PUT(req: Request, ctx: Ctx) {
   if (!seller) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+  await writeAudit(user, "update", "seller_task", body.taskId);
   return NextResponse.json(seller);
 }
 
 export async function DELETE(req: Request, ctx: Ctx) {
+  const user = await getCurrentUser();
   const { id } = await ctx.params;
   const body = (await req.json()) as { taskId: string };
   if (!body.taskId) {
@@ -56,5 +63,6 @@ export async function DELETE(req: Request, ctx: Ctx) {
   if (!seller) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+  await writeAudit(user, "delete", "seller_task", body.taskId);
   return NextResponse.json(seller);
 }

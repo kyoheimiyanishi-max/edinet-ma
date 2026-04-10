@@ -4,6 +4,8 @@ import {
   type CompanyInput,
   update as updateCompany,
 } from "@/lib/d6e/repos/companies";
+import { getCurrentUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/audit";
 
 interface Ctx {
   params: Promise<{ id: string }>;

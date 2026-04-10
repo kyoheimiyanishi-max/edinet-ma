@@ -32,31 +32,46 @@ const NAV_ITEMS = [
   { href: "/banks", label: "銀行・金融機関" },
   { href: "/ma-advisors", label: "M&A会社" },
   { href: "/financial-planners", label: "Financial Planner" },
+  { href: "/activity", label: "活動ログ" },
   { href: "/settings", label: "設定" },
 ];
 
-export default function RootLayout({
+import { auth } from "@/lib/auth/config";
+import UserMenu from "@/components/UserMenu";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+  const currentUser = session?.user
+    ? {
+        name: session.user.name ?? session.user.email?.split("@")[0] ?? "",
+        email: session.user.email ?? "",
+        image: session.user.image ?? undefined,
+      }
+    : null;
   return (
     <html lang="ja" className={`${geist.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased">
         <header className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white shadow-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-3">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm shadow-inner">
-                <span className="text-xl font-bold">M</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm shadow-inner">
+                  <span className="text-xl font-bold">M</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold tracking-tight">
+                    EDINET M&amp;A Browser
+                  </h1>
+                  <p className="text-xs text-blue-200 mt-0.5">
+                    M&amp;A 総合データベース
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">
-                  EDINET M&amp;A Browser
-                </h1>
-                <p className="text-xs text-blue-200 mt-0.5">
-                  M&amp;A 総合データベース
-                </p>
-              </div>
+              <UserMenu user={currentUser} />
             </div>
           </div>
           <nav className="max-w-7xl mx-auto px-4 sm:px-6 pb-2">

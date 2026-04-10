@@ -6,6 +6,8 @@ import {
   findBySeller,
   findUpcoming,
 } from "@/lib/d6e/repos/events";
+import { getCurrentUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/audit";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -24,6 +26,7 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
+  const user = await getCurrentUser();
   const created = await create({
     title: body.title.trim(),
     eventType: body.eventType,
@@ -37,5 +40,6 @@ export async function POST(req: Request) {
     description: body.description,
     status: body.status ?? "予定",
   });
+  await writeAudit(user, "create", "event", created.id, created.title);
   return NextResponse.json(created, { status: 201 });
 }
