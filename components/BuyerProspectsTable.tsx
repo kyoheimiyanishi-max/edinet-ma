@@ -5,18 +5,30 @@ import { useState } from "react";
 type BuyerStatus =
   | "未接触"
   | "アプローチ中"
+  | "日程調整中"
+  | "アポfix"
+  | "アポ調整中"
+  | "アポ実施済"
   | "NDAやり取り中"
+  | "NDA締結"
   | "開拓済"
+  | "開拓済（NDAなし）"
   | "開拓済（NDA締結済み）"
-  | "アポfix";
+  | "ペンディング";
 
 const STATUSES: BuyerStatus[] = [
   "未接触",
   "アプローチ中",
-  "NDAやり取り中",
-  "開拓済",
-  "開拓済（NDA締結済み）",
+  "日程調整中",
   "アポfix",
+  "アポ調整中",
+  "アポ実施済",
+  "NDAやり取り中",
+  "NDA締結",
+  "開拓済",
+  "開拓済（NDAなし）",
+  "開拓済（NDA締結済み）",
+  "ペンディング",
 ];
 
 export interface BuyerRow {

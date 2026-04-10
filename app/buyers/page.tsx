@@ -18,10 +18,16 @@ interface Props {
 const STATUS_COLORS: Record<BuyerProspectStatus, string> = {
   未接触: "bg-slate-100 text-slate-600",
   アプローチ中: "bg-blue-100 text-blue-700",
-  NDAやり取り中: "bg-amber-100 text-amber-700",
-  開拓済: "bg-emerald-100 text-emerald-700",
-  "開拓済（NDA締結済み）": "bg-emerald-200 text-emerald-800",
+  日程調整中: "bg-cyan-100 text-cyan-700",
   アポfix: "bg-purple-100 text-purple-700",
+  アポ調整中: "bg-indigo-100 text-indigo-700",
+  アポ実施済: "bg-violet-100 text-violet-700",
+  NDAやり取り中: "bg-amber-100 text-amber-700",
+  NDA締結: "bg-amber-200 text-amber-800",
+  開拓済: "bg-emerald-100 text-emerald-700",
+  "開拓済（NDAなし）": "bg-emerald-100 text-emerald-600",
+  "開拓済（NDA締結済み）": "bg-emerald-200 text-emerald-800",
+  ペンディング: "bg-rose-100 text-rose-700",
 };
 
 export default async function BuyersPage({ searchParams }: Props) {

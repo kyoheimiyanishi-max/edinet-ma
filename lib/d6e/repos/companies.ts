@@ -32,18 +32,31 @@ export type ListingStatus =
 export type BuyerProspectStatus =
   | "未接触"
   | "アプローチ中"
+  | "日程調整中"
+  | "アポfix"
+  | "アポ調整中"
+  | "アポ実施済"
   | "NDAやり取り中"
+  | "NDA締結"
   | "開拓済"
+  | "開拓済（NDAなし）"
   | "開拓済（NDA締結済み）"
-  | "アポfix";
+  | "ペンディング";
 
+/** Excel のワークフロー順 (進行度の昇順) */
 export const BUYER_PROSPECT_STATUSES: BuyerProspectStatus[] = [
   "未接触",
   "アプローチ中",
-  "NDAやり取り中",
-  "開拓済",
-  "開拓済（NDA締結済み）",
+  "日程調整中",
   "アポfix",
+  "アポ調整中",
+  "アポ実施済",
+  "NDAやり取り中",
+  "NDA締結",
+  "開拓済",
+  "開拓済（NDAなし）",
+  "開拓済（NDA締結済み）",
+  "ペンディング",
 ];
 
 /**
