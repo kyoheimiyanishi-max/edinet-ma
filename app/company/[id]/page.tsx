@@ -906,73 +906,81 @@ async function EnrichedSections({
       )}
 
       {/* note 記事 */}
-      {enriched.noteArticles.length > 0 && (
-        <SectionCard
-          title="note 記事"
-          badge={`${enriched.noteArticles.length} 件`}
-        >
-          <div className="space-y-3">
-            {enriched.noteArticles.map((article) => (
-              <a
-                key={article.id}
-                href={article.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 hover:bg-green-50/50 hover:border-green-200 transition-all group"
-              >
-                {article.eyecatch && (
-                  <img
-                    src={article.eyecatch}
-                    alt=""
-                    className="w-16 h-16 rounded-lg object-cover shrink-0"
-                  />
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-800 group-hover:text-green-700 transition-colors line-clamp-2">
-                    {article.title}
-                  </p>
-                  <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-500">
-                    <span className="inline-flex items-center gap-1">
-                      <span className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center text-[8px] text-green-700 font-bold shrink-0">
-                        n
-                      </span>
-                      {article.userName}
+      <SectionCard
+        title="note 記事"
+        badge={
+          enriched.noteArticles.length > 0
+            ? `${enriched.noteArticles.length} 件`
+            : "検索"
+        }
+      >
+        <div className="space-y-3">
+          {enriched.noteArticles.map((article) => (
+            <a
+              key={article.id}
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 hover:bg-green-50/50 hover:border-green-200 transition-all group"
+            >
+              {article.eyecatch && (
+                <img
+                  src={article.eyecatch}
+                  alt=""
+                  className="w-16 h-16 rounded-lg object-cover shrink-0"
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-800 group-hover:text-green-700 transition-colors line-clamp-2">
+                  {article.title}
+                </p>
+                <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-500">
+                  <span className="inline-flex items-center gap-1">
+                    <span className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center text-[8px] text-green-700 font-bold shrink-0">
+                      n
                     </span>
-                    {article.likes > 0 && <span>♡ {article.likes}</span>}
-                    {article.publishedAt && (
-                      <span>
-                        {new Date(article.publishedAt).toLocaleDateString(
-                          "ja-JP",
-                          { year: "numeric", month: "short", day: "numeric" },
-                        )}
-                      </span>
-                    )}
-                  </div>
+                    {article.userName}
+                  </span>
+                  {article.likes > 0 && <span>♡ {article.likes}</span>}
+                  {article.publishedAt && (
+                    <span>
+                      {new Date(article.publishedAt).toLocaleDateString(
+                        "ja-JP",
+                        { year: "numeric", month: "short", day: "numeric" },
+                      )}
+                    </span>
+                  )}
                 </div>
-                <svg
-                  className="w-4 h-4 text-slate-300 group-hover:text-green-400 shrink-0 mt-1 transition-colors"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </a>
-            ))}
-          </div>
-          <div className="mt-3 pt-2 border-t border-slate-100">
-            <SourceLink
-              url={`https://note.com/search?q=${encodeURIComponent(name)}&context=note`}
-              name="note.com で検索"
-            />
-          </div>
-        </SectionCard>
-      )}
+              </div>
+              <svg
+                className="w-4 h-4 text-slate-300 group-hover:text-green-400 shrink-0 mt-1 transition-colors"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+            </a>
+          ))}
+        </div>
+        {enriched.noteArticles.length === 0 && (
+          <p className="text-sm text-slate-400 text-center py-4">
+            note.com で「{name.replace(/株式会社|（株）/g, "").trim()}
+            」の記事を検索できます
+          </p>
+        )}
+        <div className="mt-3 pt-2 border-t border-slate-100">
+          <SourceLink
+            url={`https://note.com/search?q=${encodeURIComponent(name.replace(/株式会社|（株）/g, "").trim())}&context=note`}
+            name="note.com で検索"
+          />
+        </div>
+      </SectionCard>
 
       {/* 関連リンク */}
       {enriched.referenceLinks.length > 0 && (
