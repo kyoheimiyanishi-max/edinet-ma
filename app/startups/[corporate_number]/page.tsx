@@ -828,6 +828,7 @@ async function EnrichedSections({
       pressReleases: [],
       webResults: [],
       referenceLinks: generateReferenceLinks(name, corporateNumber, location),
+      noteArticles: [],
     };
   }
 

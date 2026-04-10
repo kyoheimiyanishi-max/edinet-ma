@@ -38,6 +38,17 @@ export interface WebSearchResult {
   source: string;
 }
 
+export interface NoteArticle {
+  id: number;
+  title: string;
+  url: string;
+  userName: string;
+  userUrl: string;
+  likes: number;
+  publishedAt: string;
+  eyecatch?: string;
+}
+
 export interface EnrichResult {
   companyName: string;
   news: EnrichSource[];
@@ -46,6 +57,7 @@ export interface EnrichResult {
   pressReleases: EnrichSource[];
   webResults: WebSearchResult[];
   referenceLinks: EnrichSource[];
+  noteArticles: NoteArticle[];
 }
 
 // ---- Google News RSS ----
@@ -801,6 +813,56 @@ export async function fetchExternalPatents(
   });
 }
 
+// ---- note.com articles ----
+
+export async function fetchNoteArticles(
+  companyName: string,
+  limit = 10,
+): Promise<NoteArticle[]> {
+  try {
+    const shortName = companyName
+      .replace(/株式会社|（株）|有限会社|合同会社/g, "")
+      .trim();
+    const q = encodeURIComponent(shortName);
+    const url = `https://note.com/api/v3/searches?q=${q}&context=note&size=${limit}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        Accept: "application/json",
+      },
+      next: { revalidate: 86400 },
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return [];
+    const data = await res.json();
+    const notes = data?.data?.notes?.contents ?? data?.data?.contents ?? [];
+    return (notes as Array<Record<string, unknown>>)
+      .filter(
+        (n: Record<string, unknown>) =>
+          n.name && n.key && (n.user as Record<string, unknown>)?.urlname,
+      )
+      .map((n: Record<string, unknown>) => {
+        const user = n.user as Record<string, unknown>;
+        return {
+          id: n.id as number,
+          title: String(n.name),
+          url: `https://note.com/${user.urlname}/${n.key}`,
+          userName: String(user.nickname ?? user.urlname),
+          userUrl: `https://note.com/${user.urlname}`,
+          likes: (n.like_count as number) ?? 0,
+          publishedAt: String(n.publish_at ?? ""),
+          ...(n.eyecatch ? { eyecatch: String(n.eyecatch) } : {}),
+        };
+      });
+  } catch {
+    return [];
+  }
+}
+
 // ---- Main enrichment function ----
 
 export async function enrichCompany(params: {
@@ -813,18 +875,25 @@ export async function enrichCompany(params: {
     .replace(/株式会社|（株）|有限会社|合同会社/g, "")
     .trim();
 
-  const [news, wikipedia, websiteMeta, pressReleases, webResults] =
-    await Promise.allSettled([
-      fetchGoogleNews(params.name),
-      fetchWikipedia(params.name),
-      fetchWebsiteMeta(params.companyUrl),
-      fetchPRTimes(params.name),
-      fetchMultiWebSearch([
-        `${shortName} 会社概要 事業内容`,
-        `${shortName} 採用 求人 エンジニア`,
-        `${shortName} 評判 口コミ 年収`,
-      ]),
-    ]);
+  const [
+    news,
+    wikipedia,
+    websiteMeta,
+    pressReleases,
+    webResults,
+    noteArticles,
+  ] = await Promise.allSettled([
+    fetchGoogleNews(params.name),
+    fetchWikipedia(params.name),
+    fetchWebsiteMeta(params.companyUrl),
+    fetchPRTimes(params.name),
+    fetchMultiWebSearch([
+      `${shortName} 会社概要 事業内容`,
+      `${shortName} 採用 求人 エンジニア`,
+      `${shortName} 評判 口コミ 年収`,
+    ]),
+    fetchNoteArticles(params.name),
+  ]);
 
   const referenceLinks = generateReferenceLinks(
     params.name,
@@ -841,6 +910,7 @@ export async function enrichCompany(params: {
       pressReleases.status === "fulfilled" ? pressReleases.value : [],
     webResults: webResults.status === "fulfilled" ? webResults.value : [],
     referenceLinks,
+    noteArticles: noteArticles.status === "fulfilled" ? noteArticles.value : [],
   };
 }
 
