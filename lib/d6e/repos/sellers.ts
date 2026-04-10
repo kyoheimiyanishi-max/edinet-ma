@@ -2,11 +2,16 @@ import "server-only";
 
 import type {
   BuyerCandidate,
+  RecordType,
   Seller,
   SellerDocument,
   SellerInput,
   SellerMinute,
+  SellerTask,
+  TaskPriority,
+  TaskStatus,
 } from "@/lib/sellers";
+import { RECORD_TYPES, TASK_PRIORITIES, TASK_STATUSES } from "@/lib/sellers";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
@@ -56,6 +61,9 @@ interface SellerRow {
   nda_signed: boolean | null;
   ad_signed: boolean | null;
   folder_url: string | null;
+  close_date: string | null;
+  target_price: string | null;
+  sale_schedule: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -67,7 +75,21 @@ interface MinuteRow {
   meeting_date: string;
   attendees: string[] | null;
   content: string | null;
+  record_type: string;
   created_at: string;
+}
+
+interface TaskRow {
+  id: string;
+  seller_id: string;
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  assignee: string | null;
+  status: string;
+  priority: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface DocumentRow {
@@ -92,9 +114,25 @@ interface BuyerRow {
 }
 
 const SELLER_COLUMNS =
-  "id, company_name, company_id, industry, prefecture, description, profile, desired_terms, stage, priority, rank, assigned_to, mediator_type, intro_source, fee_estimate, nda_signed, ad_signed, folder_url, created_at, updated_at";
+  "id, company_name, company_id, industry, prefecture, description, profile, desired_terms, stage, priority, rank, assigned_to, mediator_type, intro_source, fee_estimate, nda_signed, ad_signed, folder_url, close_date, target_price, sale_schedule, created_at, updated_at";
 
 // ---- Row → aggregate helpers ----
+
+function narrowRecordType(v: string): RecordType {
+  if ((RECORD_TYPES as readonly string[]).includes(v)) return v as RecordType;
+  return "議事録";
+}
+
+function narrowTaskStatus(v: string): TaskStatus {
+  if ((TASK_STATUSES as readonly string[]).includes(v)) return v as TaskStatus;
+  return "未着手";
+}
+
+function narrowTaskPriority(v: string): TaskPriority {
+  if ((TASK_PRIORITIES as readonly string[]).includes(v))
+    return v as TaskPriority;
+  return "中";
+}
 
 function rowToMinute(row: MinuteRow): SellerMinute {
   return {
@@ -103,7 +141,23 @@ function rowToMinute(row: MinuteRow): SellerMinute {
     date: row.meeting_date,
     participants: Array.isArray(row.attendees) ? row.attendees : [],
     content: row.content ?? "",
+    recordType: narrowRecordType(row.record_type),
     createdAt: row.created_at,
+  };
+}
+
+function rowToTask(row: TaskRow): SellerTask {
+  return {
+    id: row.id,
+    sellerId: row.seller_id,
+    title: row.title,
+    ...(row.description ? { description: row.description } : {}),
+    ...(row.due_date ? { dueDate: row.due_date } : {}),
+    ...(row.assignee ? { assignee: row.assignee } : {}),
+    status: narrowTaskStatus(row.status),
+    priority: narrowTaskPriority(row.priority),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 
@@ -157,9 +211,13 @@ function rowToSeller(
     ndaSigned: row.nda_signed ?? false,
     adSigned: row.ad_signed ?? false,
     ...(row.folder_url ? { folderUrl: row.folder_url } : {}),
+    ...(row.close_date ? { closeDate: row.close_date } : {}),
+    ...(row.target_price ? { targetPrice: row.target_price } : {}),
+    ...(row.sale_schedule ? { saleSchedule: row.sale_schedule } : {}),
     minutes,
     documents,
     buyers,
+    tasks: [], // loaded separately
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -173,7 +231,7 @@ async function loadMinutesBySeller(
   if (sellerIds.length === 0) return new Map();
   const inList = sellerIds.map((id) => escapeSqlValue(id)).join(", ");
   const result = await executeSql<MinuteRow>(
-    `SELECT id, seller_id, title, meeting_date, attendees, content, created_at
+    `SELECT id, seller_id, title, meeting_date, attendees, content, record_type, created_at
      FROM ${tableRef("meeting_minutes")}
      WHERE seller_id IN (${inList})
      ORDER BY meeting_date DESC, created_at DESC`,
@@ -227,22 +285,45 @@ async function loadBuyersBySeller(
   return grouped;
 }
 
+async function loadTasksBySeller(
+  sellerIds: string[],
+): Promise<Map<string, SellerTask[]>> {
+  if (sellerIds.length === 0) return new Map();
+  const inList = sellerIds.map((id) => escapeSqlValue(id)).join(", ");
+  const result = await executeSql<TaskRow>(
+    `SELECT id, seller_id, title, description, due_date, assignee, status, priority, created_at, updated_at
+     FROM ${tableRef("seller_tasks")}
+     WHERE seller_id IN (${inList})
+     ORDER BY due_date NULLS LAST, created_at DESC`,
+  );
+  const grouped = new Map<string, SellerTask[]>();
+  for (const row of result.rows ?? []) {
+    const list = grouped.get(row.seller_id) ?? [];
+    list.push(rowToTask(row));
+    grouped.set(row.seller_id, list);
+  }
+  return grouped;
+}
+
 async function assembleSellers(rows: SellerRow[]): Promise<Seller[]> {
   if (rows.length === 0) return [];
   const ids = rows.map((r) => r.id);
-  const [minutesMap, documentsMap, buyersMap] = await Promise.all([
+  const [minutesMap, documentsMap, buyersMap, tasksMap] = await Promise.all([
     loadMinutesBySeller(ids),
     loadDocumentsBySeller(ids),
     loadBuyersBySeller(ids),
+    loadTasksBySeller(ids),
   ]);
-  return rows.map((row) =>
-    rowToSeller(
+  return rows.map((row) => {
+    const seller = rowToSeller(
       row,
       minutesMap.get(row.id) ?? [],
       documentsMap.get(row.id) ?? [],
       buyersMap.get(row.id) ?? [],
-    ),
-  );
+    );
+    seller.tasks = tasksMap.get(row.id) ?? [];
+    return seller;
+  });
 }
 
 // ---- Reads ----
@@ -272,7 +353,7 @@ export async function create(input: SellerInput): Promise<Seller> {
     `INSERT INTO ${tableRef("sellers")}
        (id, company_name, industry, prefecture, description, profile, desired_terms, stage,
         priority, rank, assigned_to, mediator_type, intro_source, fee_estimate,
-        nda_signed, ad_signed, folder_url)
+        nda_signed, ad_signed, folder_url, close_date, target_price, sale_schedule)
      VALUES (
        ${escapeSqlValue(id)},
        ${escapeSqlValue(input.companyName)},
@@ -290,7 +371,10 @@ export async function create(input: SellerInput): Promise<Seller> {
        ${escapeSqlValue(input.feeEstimate)},
        ${escapeSqlValue(input.ndaSigned ?? false)},
        ${escapeSqlValue(input.adSigned ?? false)},
-       ${escapeSqlValue(input.folderUrl)}
+       ${escapeSqlValue(input.folderUrl)},
+       ${escapeSqlValue(input.closeDate)},
+       ${escapeSqlValue(input.targetPrice)},
+       ${escapeSqlValue(input.saleSchedule)}
      )`,
   );
   if ((result.affected_rows ?? 0) < 1) {
@@ -344,6 +428,12 @@ export async function update(
     assignments.push(`ad_signed = ${patch.adSigned ? "TRUE" : "FALSE"}`);
   if (patch.folderUrl !== undefined)
     assignments.push(`folder_url = ${escapeSqlValue(patch.folderUrl)}`);
+  if (patch.closeDate !== undefined)
+    assignments.push(`close_date = ${escapeSqlValue(patch.closeDate)}`);
+  if (patch.targetPrice !== undefined)
+    assignments.push(`target_price = ${escapeSqlValue(patch.targetPrice)}`);
+  if (patch.saleSchedule !== undefined)
+    assignments.push(`sale_schedule = ${escapeSqlValue(patch.saleSchedule)}`);
 
   if (assignments.length === 0) return findById(id);
   assignments.push("updated_at = now()");
@@ -373,14 +463,15 @@ export async function addMinute(
   const id = crypto.randomUUID();
   await executeSql(
     `INSERT INTO ${tableRef("meeting_minutes")}
-       (id, seller_id, title, meeting_date, attendees, content)
+       (id, seller_id, title, meeting_date, attendees, content, record_type)
      VALUES (
        ${escapeSqlValue(id)},
        ${escapeSqlValue(sellerId)},
        ${escapeSqlValue(input.title)},
        ${escapeSqlValue(input.date)},
        ${escapeSqlValue(input.participants, "ARRAY", "_text")},
-       ${escapeSqlValue(input.content)}
+       ${escapeSqlValue(input.content)},
+       ${escapeSqlValue(input.recordType ?? "議事録")}
      )`,
   );
   return findById(sellerId);
@@ -508,6 +599,72 @@ export async function deleteBuyer(
   await executeSql(
     `DELETE FROM ${tableRef("seller_buyer_candidates")}
      WHERE id = ${escapeSqlValue(buyerId)}
+       AND seller_id = ${escapeSqlValue(sellerId)}`,
+  );
+  return findById(sellerId);
+}
+
+// ---- Task sub-resource ----
+
+export async function addTask(
+  sellerId: string,
+  input: Omit<SellerTask, "id" | "sellerId" | "createdAt" | "updatedAt">,
+): Promise<Seller | null> {
+  const id = crypto.randomUUID();
+  await executeSql(
+    `INSERT INTO ${tableRef("seller_tasks")}
+       (id, seller_id, title, description, due_date, assignee, status, priority)
+     VALUES (
+       ${escapeSqlValue(id)},
+       ${escapeSqlValue(sellerId)},
+       ${escapeSqlValue(input.title)},
+       ${escapeSqlValue(input.description)},
+       ${escapeSqlValue(input.dueDate)},
+       ${escapeSqlValue(input.assignee)},
+       ${escapeSqlValue(input.status)},
+       ${escapeSqlValue(input.priority)}
+     )`,
+  );
+  return findById(sellerId);
+}
+
+export async function updateTask(
+  sellerId: string,
+  taskId: string,
+  patch: Partial<Omit<SellerTask, "id" | "sellerId" | "createdAt">>,
+): Promise<Seller | null> {
+  const assignments: string[] = [];
+  if (patch.title !== undefined)
+    assignments.push(`title = ${escapeSqlValue(patch.title)}`);
+  if (patch.description !== undefined)
+    assignments.push(`description = ${escapeSqlValue(patch.description)}`);
+  if (patch.dueDate !== undefined)
+    assignments.push(`due_date = ${escapeSqlValue(patch.dueDate)}`);
+  if (patch.assignee !== undefined)
+    assignments.push(`assignee = ${escapeSqlValue(patch.assignee)}`);
+  if (patch.status !== undefined)
+    assignments.push(`status = ${escapeSqlValue(patch.status)}`);
+  if (patch.priority !== undefined)
+    assignments.push(`priority = ${escapeSqlValue(patch.priority)}`);
+
+  if (assignments.length === 0) return findById(sellerId);
+  assignments.push("updated_at = now()");
+
+  await executeSql(
+    `UPDATE ${tableRef("seller_tasks")} SET ${assignments.join(", ")}
+     WHERE id = ${escapeSqlValue(taskId)}
+       AND seller_id = ${escapeSqlValue(sellerId)}`,
+  );
+  return findById(sellerId);
+}
+
+export async function deleteTask(
+  sellerId: string,
+  taskId: string,
+): Promise<Seller | null> {
+  await executeSql(
+    `DELETE FROM ${tableRef("seller_tasks")}
+     WHERE id = ${escapeSqlValue(taskId)}
        AND seller_id = ${escapeSqlValue(sellerId)}`,
   );
   return findById(sellerId);

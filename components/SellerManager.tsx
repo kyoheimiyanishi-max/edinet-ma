@@ -22,6 +22,19 @@ type SellerStage =
 
 type SellerRank = "A" | "B" | "C" | "D";
 type MediatorType = "仲介" | "買FA" | "FA" | "両面";
+type RecordType = "議事録" | "メール" | "Slack" | "メモ" | "電話";
+type TaskStatus = "未着手" | "進行中" | "完了" | "保留";
+type TaskPriority = "高" | "中" | "低";
+
+const RECORD_TYPES: RecordType[] = [
+  "議事録",
+  "メール",
+  "Slack",
+  "メモ",
+  "電話",
+];
+const TASK_STATUSES: TaskStatus[] = ["未着手", "進行中", "完了", "保留"];
+const TASK_PRIORITIES: TaskPriority[] = ["高", "中", "低"];
 
 interface BuyerCandidate {
   id: string;
@@ -41,7 +54,21 @@ interface SellerMinute {
   date: string;
   participants: string[];
   content: string;
+  recordType: RecordType;
   createdAt: string;
+}
+
+interface SellerTask {
+  id: string;
+  sellerId: string;
+  title: string;
+  description?: string;
+  dueDate?: string;
+  assignee?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface SellerDocument {
@@ -71,9 +98,14 @@ interface Seller {
   ndaSigned: boolean;
   adSigned: boolean;
   folderUrl?: string;
+  // 売却関連
+  closeDate?: string;
+  targetPrice?: string;
+  saleSchedule?: string;
   minutes: SellerMinute[];
   documents: SellerDocument[];
   buyers: BuyerCandidate[];
+  tasks: SellerTask[];
   createdAt: string;
   updatedAt: string;
 }
@@ -101,6 +133,37 @@ const SELLER_STAGES: SellerStage[] = [
 
 const SELLER_RANKS: SellerRank[] = ["A", "B", "C", "D"];
 const MEDIATOR_TYPES: MediatorType[] = ["仲介", "買FA", "FA", "両面"];
+
+const SELLER_INDUSTRIES = [
+  "IT・ソフトウェア",
+  "SaaS",
+  "EC・通販",
+  "AI・機械学習",
+  "Webメディア",
+  "デジタルマーケティング",
+  "人材・HR",
+  "教育・EdTech",
+  "医療・ヘルスケア",
+  "介護・福祉",
+  "製造業",
+  "建設・不動産",
+  "食品・飲料",
+  "農業・水産",
+  "物流・運輸",
+  "金融・保険",
+  "コンサルティング",
+  "小売・サービス",
+  "飲食・外食",
+  "美容・エステ",
+  "旅行・ホテル",
+  "エンタメ・メディア",
+  "広告・PR",
+  "ゲーム・アプリ",
+  "通信・インフラ",
+  "エネルギー・環境",
+  "自動車・モビリティ",
+  "その他",
+];
 
 const RANK_COLORS: Record<SellerRank, string> = {
   A: "bg-rose-100 text-rose-700",
@@ -139,7 +202,7 @@ const BUYER_STATUS_COLORS: Record<BuyerStatus, string> = {
   見送り: "bg-rose-100 text-rose-700",
 };
 
-type Tab = "profile" | "minutes" | "documents" | "buyers";
+type Tab = "profile" | "minutes" | "documents" | "buyers" | "tasks";
 
 const EMPTY_SELLER_FORM = {
   companyName: "",
@@ -159,6 +222,9 @@ const EMPTY_SELLER_FORM = {
   ndaSigned: false,
   adSigned: false,
   folderUrl: "",
+  closeDate: "",
+  targetPrice: "",
+  saleSchedule: "",
 };
 
 export default function SellerManager() {
@@ -172,6 +238,8 @@ export default function SellerManager() {
   const [filterPriority, setFilterPriority] = useState<"" | "★">("");
   const [filterAssignee, setFilterAssignee] = useState<string>("");
   const [filterMediator, setFilterMediator] = useState<MediatorType | "">("");
+  const [filterCloseDateFrom, setFilterCloseDateFrom] = useState("");
+  const [filterCloseDateTo, setFilterCloseDateTo] = useState("");
   const [showNewForm, setShowNewForm] = useState(false);
   const [newForm, setNewForm] = useState(EMPTY_SELLER_FORM);
   const [activeTab, setActiveTab] = useState<Tab>("profile");
@@ -241,6 +309,16 @@ export default function SellerManager() {
       if (filterPriority && s.priority !== filterPriority) return false;
       if (filterAssignee && s.assignedTo !== filterAssignee) return false;
       if (filterMediator && s.mediatorType !== filterMediator) return false;
+      if (
+        filterCloseDateFrom &&
+        (!s.closeDate || s.closeDate < filterCloseDateFrom)
+      )
+        return false;
+      if (
+        filterCloseDateTo &&
+        (!s.closeDate || s.closeDate > filterCloseDateTo)
+      )
+        return false;
       return true;
     });
   }, [
@@ -251,6 +329,8 @@ export default function SellerManager() {
     filterPriority,
     filterAssignee,
     filterMediator,
+    filterCloseDateFrom,
+    filterCloseDateTo,
   ]);
 
   async function handleCreateSeller(e: React.FormEvent) {
@@ -337,11 +417,25 @@ export default function SellerManager() {
                 onChange={(v) => setNewForm({ ...newForm, companyName: v })}
                 required
               />
-              <Input
-                label="業種"
-                value={newForm.industry}
-                onChange={(v) => setNewForm({ ...newForm, industry: v })}
-              />
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">
+                  業種
+                </label>
+                <select
+                  value={newForm.industry}
+                  onChange={(e) =>
+                    setNewForm({ ...newForm, industry: e.target.value })
+                  }
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">選択してください</option>
+                  {SELLER_INDUSTRIES.map((ind) => (
+                    <option key={ind} value={ind}>
+                      {ind}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <Input
                 label="所在地"
                 value={newForm.prefecture}
@@ -464,11 +558,37 @@ export default function SellerManager() {
             ))}
           </select>
         </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="block text-[10px] text-slate-400 mb-0.5">
+              クローズ予定日 from
+            </label>
+            <input
+              type="date"
+              value={filterCloseDateFrom}
+              onChange={(e) => setFilterCloseDateFrom(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white"
+            />
+          </div>
+          <div>
+            <label className="block text-[10px] text-slate-400 mb-0.5">
+              クローズ予定日 to
+            </label>
+            <input
+              type="date"
+              value={filterCloseDateTo}
+              onChange={(e) => setFilterCloseDateTo(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white"
+            />
+          </div>
+        </div>
         {(filterStage ||
           filterRank ||
           filterPriority ||
           filterAssignee ||
-          filterMediator) && (
+          filterMediator ||
+          filterCloseDateFrom ||
+          filterCloseDateTo) && (
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <span className="font-medium">{filtered.length} 件</span>
             <button
@@ -479,6 +599,8 @@ export default function SellerManager() {
                 setFilterPriority("");
                 setFilterAssignee("");
                 setFilterMediator("");
+                setFilterCloseDateFrom("");
+                setFilterCloseDateTo("");
               }}
               className="px-2 py-0.5 rounded text-rose-600 hover:bg-rose-50 font-medium"
             >
@@ -662,9 +784,10 @@ function SellerDetail({
           {(
             [
               ["profile", `概要`],
-              ["minutes", `議事録 (${seller.minutes.length})`],
+              ["minutes", `記録 (${seller.minutes.length})`],
               ["documents", `資料 (${seller.documents.length})`],
               ["buyers", `買い手 (${seller.buyers.length})`],
+              ["tasks", `タスク (${seller.tasks.length})`],
             ] as const
           ).map(([key, label]) => (
             <button
@@ -701,6 +824,9 @@ function SellerDetail({
         {activeTab === "buyers" && (
           <BuyersPanel seller={seller} onRefresh={onRefresh} />
         )}
+        {activeTab === "tasks" && (
+          <TasksPanel seller={seller} onRefresh={onRefresh} />
+        )}
       </div>
     </div>
   );
@@ -734,6 +860,9 @@ function ProfilePanel({
     ndaSigned: seller.ndaSigned,
     adSigned: seller.adSigned,
     folderUrl: seller.folderUrl ?? "",
+    closeDate: seller.closeDate ?? "",
+    targetPrice: seller.targetPrice ?? "",
+    saleSchedule: seller.saleSchedule ?? "",
   });
 
   async function handleSave() {
@@ -749,6 +878,9 @@ function ProfilePanel({
         introSource: form.introSource || undefined,
         feeEstimate: form.feeEstimate || undefined,
         folderUrl: form.folderUrl || undefined,
+        closeDate: form.closeDate || undefined,
+        targetPrice: form.targetPrice || undefined,
+        saleSchedule: form.saleSchedule || undefined,
       }),
     });
     setEditing(false);
@@ -906,6 +1038,53 @@ function ProfilePanel({
             className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
           />
         </div>
+        {/* 売却関連 (マスト項目) */}
+        <div className="bg-blue-50/50 rounded-xl p-4 space-y-3 border border-blue-100">
+          <p className="text-xs font-semibold text-blue-700">売却関連 (必須)</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">
+                売却金額目標 *
+              </label>
+              <input
+                type="text"
+                value={form.targetPrice}
+                onChange={(e) =>
+                  setForm({ ...form, targetPrice: e.target.value })
+                }
+                placeholder="例: 5億円～10億円"
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">
+                売却予定スケジュール *
+              </label>
+              <input
+                type="text"
+                value={form.saleSchedule}
+                onChange={(e) =>
+                  setForm({ ...form, saleSchedule: e.target.value })
+                }
+                placeholder="例: 2026年上期"
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">
+                クローズ予定日
+              </label>
+              <input
+                type="date"
+                value={form.closeDate}
+                onChange={(e) =>
+                  setForm({ ...form, closeDate: e.target.value })
+                }
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+              />
+            </div>
+          </div>
+        </div>
         <Textarea
           label="概要"
           value={form.description}
@@ -999,6 +1178,20 @@ function StructuredMetaCard({ seller }: { seller: Seller }) {
     label: "AD契約",
     value: seller.adSigned ? "✓ 締結済" : "未",
   });
+  if (seller.targetPrice)
+    items.push({
+      label: "売却金額目標",
+      value: (
+        <span className="text-emerald-700 font-bold">{seller.targetPrice}</span>
+      ),
+    });
+  if (seller.saleSchedule)
+    items.push({ label: "売却スケジュール", value: seller.saleSchedule });
+  if (seller.closeDate)
+    items.push({
+      label: "クローズ予定日",
+      value: <span className="font-mono">{seller.closeDate}</span>,
+    });
 
   if (items.length === 0 && !seller.folderUrl) return null;
 
@@ -1291,6 +1484,7 @@ function MinutesPanel({
     date: new Date().toISOString().split("T")[0],
     participantsText: "",
     content: "",
+    recordType: "議事録" as RecordType,
   });
 
   async function handleAdd(e: React.FormEvent) {
@@ -1307,6 +1501,7 @@ function MinutesPanel({
           .map((s) => s.trim())
           .filter(Boolean),
         content: form.content,
+        recordType: form.recordType,
       }),
     });
     setForm({
@@ -1314,6 +1509,7 @@ function MinutesPanel({
       date: new Date().toISOString().split("T")[0],
       participantsText: "",
       content: "",
+      recordType: "議事録",
     });
     setShowForm(false);
     await onRefresh();
@@ -1334,7 +1530,7 @@ function MinutesPanel({
           onClick={() => setShowForm(!showForm)}
           className="text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium"
         >
-          + 議事録追加
+          + 記録追加
         </button>
       </div>
 
@@ -1349,7 +1545,28 @@ function MinutesPanel({
             onChange={(v) => setForm({ ...form, title: v })}
             required
           />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">
+                種別
+              </label>
+              <select
+                value={form.recordType}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    recordType: e.target.value as RecordType,
+                  })
+                }
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+              >
+                {RECORD_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
             <Input
               label="日付"
               type="date"
@@ -1389,7 +1606,7 @@ function MinutesPanel({
 
       {seller.minutes.length === 0 ? (
         <div className="text-center py-8 text-sm text-slate-400">
-          議事録がありません
+          記録がありません（議事録・メール・Slack・メモ・電話）
         </div>
       ) : (
         <div className="space-y-2">
@@ -1404,7 +1621,14 @@ function MinutesPanel({
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-slate-800">{m.title}</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-bold shrink-0">
+                        {m.recordType}
+                      </span>
+                      <p className="font-semibold text-slate-800 truncate">
+                        {m.title}
+                      </p>
+                    </div>
                     <div className="flex items-center gap-3 mt-0.5 text-xs text-slate-500">
                       <span>{m.date}</span>
                       {m.participants.length > 0 && (
@@ -1858,6 +2082,256 @@ function Textarea({
         placeholder={placeholder}
         className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
       />
+    </div>
+  );
+}
+
+function TasksPanel({
+  seller,
+  onRefresh,
+}: {
+  seller: Seller;
+  onRefresh: () => Promise<void>;
+}) {
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    dueDate: "",
+    assignee: "",
+    status: "未着手" as TaskStatus,
+    priority: "中" as TaskPriority,
+  });
+
+  async function handleAdd(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.title.trim()) return;
+    await fetch(`/api/sellers/${seller.id}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: form.title.trim(),
+        description: form.description.trim() || undefined,
+        dueDate: form.dueDate || undefined,
+        assignee: form.assignee.trim() || undefined,
+        status: form.status,
+        priority: form.priority,
+      }),
+    });
+    setForm({
+      title: "",
+      description: "",
+      dueDate: "",
+      assignee: "",
+      status: "未着手",
+      priority: "中",
+    });
+    setShowForm(false);
+    await onRefresh();
+  }
+
+  async function handleStatusChange(taskId: string, newStatus: TaskStatus) {
+    await fetch(`/api/sellers/${seller.id}/tasks`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ taskId, status: newStatus }),
+    });
+    await onRefresh();
+  }
+
+  async function handleDelete(taskId: string) {
+    if (!confirm("このタスクを削除しますか？")) return;
+    await fetch(`/api/sellers/${seller.id}/tasks`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ taskId }),
+    });
+    await onRefresh();
+  }
+
+  const priorityColors: Record<TaskPriority, string> = {
+    高: "bg-rose-100 text-rose-700",
+    中: "bg-amber-100 text-amber-700",
+    低: "bg-slate-100 text-slate-600",
+  };
+  const statusColors: Record<TaskStatus, string> = {
+    未着手: "bg-slate-100 text-slate-600",
+    進行中: "bg-blue-100 text-blue-700",
+    完了: "bg-emerald-100 text-emerald-700",
+    保留: "bg-rose-100 text-rose-700",
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium"
+        >
+          + タスク追加
+        </button>
+      </div>
+      {showForm && (
+        <form
+          onSubmit={handleAdd}
+          className="bg-blue-50/50 border border-blue-200 rounded-xl p-4 space-y-3"
+        >
+          <Input
+            label="タスク名 *"
+            value={form.title}
+            onChange={(v) => setForm({ ...form, title: v })}
+            required
+          />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Input
+              label="期限"
+              type="date"
+              value={form.dueDate}
+              onChange={(v) => setForm({ ...form, dueDate: v })}
+            />
+            <Input
+              label="担当者"
+              value={form.assignee}
+              onChange={(v) => setForm({ ...form, assignee: v })}
+            />
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">
+                優先度
+              </label>
+              <select
+                value={form.priority}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    priority: e.target.value as TaskPriority,
+                  })
+                }
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+              >
+                {TASK_PRIORITIES.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">
+                状態
+              </label>
+              <select
+                value={form.status}
+                onChange={(e) =>
+                  setForm({ ...form, status: e.target.value as TaskStatus })
+                }
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+              >
+                {TASK_STATUSES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <Textarea
+            label="説明"
+            value={form.description}
+            onChange={(v) => setForm({ ...form, description: v })}
+            rows={2}
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="px-4 py-2 text-sm text-slate-500"
+            >
+              キャンセル
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl"
+            >
+              追加
+            </button>
+          </div>
+        </form>
+      )}
+      {seller.tasks.length === 0 ? (
+        <div className="text-center py-8 text-sm text-slate-400">
+          タスクがありません
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {seller.tasks.map((t) => (
+            <div
+              key={t.id}
+              className={`border rounded-xl p-4 ${t.status === "完了" ? "border-slate-100 opacity-60" : "border-slate-200"}`}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${priorityColors[t.priority]}`}
+                    >
+                      {t.priority}
+                    </span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${statusColors[t.status]}`}
+                    >
+                      {t.status}
+                    </span>
+                    <p className="font-semibold text-slate-800 truncate">
+                      {t.title}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                    {t.dueDate && (
+                      <span
+                        className={
+                          t.dueDate < new Date().toISOString().slice(0, 10) &&
+                          t.status !== "完了"
+                            ? "text-rose-600 font-bold"
+                            : ""
+                        }
+                      >
+                        期限: {t.dueDate}
+                      </span>
+                    )}
+                    {t.assignee && <span>担当: {t.assignee}</span>}
+                  </div>
+                  {t.description && (
+                    <p className="text-xs text-slate-500 mt-1">
+                      {t.description}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <select
+                    value={t.status}
+                    onChange={(e) =>
+                      handleStatusChange(t.id, e.target.value as TaskStatus)
+                    }
+                    className="text-xs px-2 py-1 rounded border border-slate-200 bg-white"
+                  >
+                    {TASK_STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => handleDelete(t.id)}
+                    className="text-xs text-slate-400 hover:text-red-600 px-1"
+                  >
+                    削除
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -29,6 +29,9 @@ export async function POST(req: Request) {
     ndaSigned: body.ndaSigned ?? false,
     adSigned: body.adSigned ?? false,
     folderUrl: body.folderUrl?.trim() || undefined,
+    closeDate: body.closeDate || undefined,
+    targetPrice: body.targetPrice?.trim() || undefined,
+    saleSchedule: body.saleSchedule?.trim() || undefined,
   });
   return NextResponse.json(seller, { status: 201 });
 }

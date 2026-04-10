@@ -21,6 +21,7 @@ export async function POST(req: Request, ctx: Ctx) {
       date: body.date || new Date().toISOString().split("T")[0],
       participants: Array.isArray(body.participants) ? body.participants : [],
       content: body.content ?? "",
+      recordType: body.recordType ?? "議事録",
     });
     if (!seller) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
