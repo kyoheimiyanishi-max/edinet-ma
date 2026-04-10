@@ -30,6 +30,7 @@ interface BuyerPatchBody {
  */
 export async function PATCH(req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
+  const user = await getCurrentUser();
   const body = (await req.json()) as BuyerPatchBody;
 
   const patch: Partial<CompanyInput> = {};
@@ -59,5 +60,6 @@ export async function PATCH(req: Request, ctx: Ctx) {
   if (!updated) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
+  await writeAudit(user, "update", "company_buyer", id);
   return NextResponse.json(updated);
 }

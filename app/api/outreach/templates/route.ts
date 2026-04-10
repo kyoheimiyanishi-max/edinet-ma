@@ -24,6 +24,12 @@ export async function POST(req: Request) {
     body: body.body,
     description: body.description?.trim(),
   });
-  await writeAudit(user, "create", "outreach_template", created.id, created.name);
+  await writeAudit(
+    user,
+    "create",
+    "outreach_template",
+    created.id,
+    created.name,
+  );
   return NextResponse.json(created, { status: 201 });
 }

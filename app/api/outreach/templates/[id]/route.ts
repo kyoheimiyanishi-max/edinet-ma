@@ -36,7 +36,14 @@ export async function PUT(req: Request, ctx: Ctx) {
         updated as unknown as Record<string, unknown>,
       )
     : null;
-  await writeAudit(user, "update", "outreach_template", id, updated.name, changes);
+  await writeAudit(
+    user,
+    "update",
+    "outreach_template",
+    id,
+    updated.name,
+    changes,
+  );
   return NextResponse.json(updated);
 }
 

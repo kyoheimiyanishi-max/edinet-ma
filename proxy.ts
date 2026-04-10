@@ -51,13 +51,49 @@ async function authJsProxy(request: NextRequest): Promise<NextResponse> {
 
 // ---- Basic Auth mode (fallback) ----
 
+/**
+ * Basic Auth — 2 つのモードに対応:
+ *
+ *   1. 複数ユーザーモード (推奨):
+ *      APP_AUTH_USERS = {"tanaka":"pass1","yamada":"pass2",...}
+ *      社員ごとにアカウントを発行でき、監査ログにユーザー名が残る。
+ *
+ *   2. 共有ユーザーモード (従来互換):
+ *      APP_AUTH_USER = edinet-ma
+ *      APP_AUTH_PASSWORD = xxx
+ */
+
+let parsedUsers: Record<string, string> | null = null;
+
+function getAuthUsers(): Record<string, string> {
+  if (parsedUsers) return parsedUsers;
+  // 複数ユーザーモード
+  const usersJson = process.env.APP_AUTH_USERS;
+  if (usersJson) {
+    try {
+      parsedUsers = JSON.parse(usersJson) as Record<string, string>;
+      return parsedUsers;
+    } catch {
+      console.error("[proxy] APP_AUTH_USERS の JSON パースに失敗");
+    }
+  }
+  // 共有ユーザーモード (fallback)
+  const singleUser = process.env.APP_AUTH_USER;
+  const singlePass = process.env.APP_AUTH_PASSWORD;
+  if (singleUser && singlePass) {
+    parsedUsers = { [singleUser]: singlePass };
+    return parsedUsers;
+  }
+  parsedUsers = {};
+  return parsedUsers;
+}
+
 function basicAuthProxy(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
   if (isPublicPath(pathname)) return NextResponse.next();
 
-  const expectedUser = process.env.APP_AUTH_USER;
-  const expectedPass = process.env.APP_AUTH_PASSWORD;
-  if (!expectedUser && !expectedPass) return NextResponse.next();
+  const users = getAuthUsers();
+  if (Object.keys(users).length === 0) return NextResponse.next();
 
   const header = request.headers.get("authorization");
   if (!header || !header.toLowerCase().startsWith("basic ")) {
@@ -76,10 +112,16 @@ function basicAuthProxy(request: NextRequest): NextResponse {
   const user = decoded.slice(0, idx);
   const pass = decoded.slice(idx + 1);
 
-  if (!constantTimeEqual(user, expectedUser ?? "")) return unauthorized();
-  if (!constantTimeEqual(pass, expectedPass ?? "")) return unauthorized();
+  const expected = users[user];
+  if (!expected || !constantTimeEqual(pass, expected)) {
+    return unauthorized();
+  }
 
-  return NextResponse.next();
+  // ユーザー情報をヘッダーに付与 (監査ログで使用)
+  const response = NextResponse.next();
+  response.headers.set("x-user-email", user);
+  response.headers.set("x-user-name", user);
+  return response;
 }
 
 function unauthorized(): NextResponse {
