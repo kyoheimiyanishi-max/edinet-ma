@@ -148,7 +148,15 @@ async function refreshIfNeeded(): Promise<TokenState> {
       // Re-read from the store in case another process/instance
       // already refreshed while we were queueing.
       if (!cached) {
-        const fromStore = await store.read();
+        let fromStore: TokenState | null = null;
+        try {
+          fromStore = await store.read();
+        } catch (e) {
+          console.warn(
+            "[d6e/auth] token store read failed inside refresh path:",
+            (e as Error).message,
+          );
+        }
         if (fromStore) {
           cached = fromStore;
           if (fromStore.expiresAt > now + PRE_REFRESH_WINDOW_SECONDS) {
@@ -220,7 +228,17 @@ export async function getAccessToken(override?: string): Promise<string> {
 
   // Cold start: try store → env bootstrap.
   if (!cached) {
-    const fromStore = await getTokenStore().read();
+    let fromStore: TokenState | null = null;
+    try {
+      fromStore = await getTokenStore().read();
+    } catch (e) {
+      // Redis (Upstash) が一時的に到達不能なときは env bootstrap に落とす。
+      // 恒久的な故障はこの後の refresh 呼び出しで顕在化する。
+      console.warn(
+        "[d6e/auth] token store read failed, falling back to env bootstrap:",
+        (e as Error).message,
+      );
+    }
     if (fromStore) {
       cached = fromStore;
     } else {
