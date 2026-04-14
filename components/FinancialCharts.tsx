@@ -44,14 +44,14 @@ function formatOkuYen(value: number): string {
 }
 
 const COLORS = {
-  revenue: "#3b82f6",
-  operatingIncome: "#10b981",
-  netIncome: "#8b5cf6",
-  totalAssets: "#f59e0b",
-  equity: "#06b6d4",
-  cash: "#84cc16",
-  roe: "#ef4444",
-  roa: "#3b82f6",
+  revenue: "#1d4ed8",
+  operatingIncome: "#3b82f6",
+  netIncome: "#93c5fd",
+  totalAssets: "#047857",
+  equity: "#10b981",
+  cash: "#6ee7b7",
+  roe: "#b91c1c",
+  roa: "#fca5a5",
   marketCap: "#6366f1",
   salary: "#ec4899",
 };
