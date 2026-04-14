@@ -4,7 +4,7 @@ import { searchUnified, type ListedFilter } from "@/lib/unified-company";
 import type { UnifiedCompany } from "@/lib/unified-company";
 import { creditColor, formatYen, formatYenM } from "@/lib/edinetdb";
 import { formatCapital } from "@/lib/gbiz";
-import { fetchMarketCap } from "@/lib/market";
+import { fetchMarketCap, fetchMarketSegment } from "@/lib/market";
 
 // 売上 (百万円) を「N億円 / N兆円 / N百万円」表記に
 const formatRevenueMillion = (m: number | null | undefined): string =>
@@ -35,8 +35,39 @@ interface Props {
     revenue_oku_to?: string;
     /** 内部留保 (純資産) 下限 (億円) */
     equity_oku_from?: string;
+    /** 上場市場フィルタ: prime / standard / growth / other / "" */
+    market?: string;
     page?: string;
   }>;
+}
+
+type MarketFilter = "" | "prime" | "standard" | "growth" | "other";
+
+function parseMarket(value: string | undefined): MarketFilter {
+  if (
+    value === "prime" ||
+    value === "standard" ||
+    value === "growth" ||
+    value === "other"
+  ) {
+    return value;
+  }
+  return "";
+}
+
+const MARKET_LABEL: Record<Exclude<MarketFilter, "">, string> = {
+  prime: "東証プライム",
+  standard: "東証スタンダード",
+  growth: "東証グロース",
+  other: "その他 (名証/札証/福証)",
+};
+
+function classifyMarket(label: string | null): MarketFilter | "unknown" {
+  if (!label) return "unknown";
+  if (label === "東証プライム") return "prime";
+  if (label === "東証スタンダード") return "standard";
+  if (label === "東証グロース") return "growth";
+  return "other";
 }
 
 const PAGE_SIZE = 30;
@@ -75,6 +106,7 @@ async function UnifiedResults({
   revenueOkuFrom,
   revenueOkuTo,
   equityOkuFrom,
+  market,
   page,
 }: {
   q?: string;
@@ -99,6 +131,7 @@ async function UnifiedResults({
   revenueOkuTo?: number;
   /** 内部留保下限 (億円) */
   equityOkuFrom?: number;
+  market: MarketFilter;
   page: number;
 }) {
   // 億円 → 百万円 (×100)
@@ -172,19 +205,45 @@ async function UnifiedResults({
     );
   }
 
-  // 上場企業の時価総額を並列フェッチ (kabutan キャッシュ付き)
-  const listedCompanies = result.companies.filter(
+  // 上場企業の時価総額 + 市場区分を並列フェッチ (kabutan キャッシュ付き)。
+  // 市場フィルタが指定されているときは、非上場企業は定義上一致しないので先に除外。
+  const prefilteredForMarket =
+    market === ""
+      ? result.companies
+      : result.companies.filter((c) => c.isListed);
+
+  const listedCompanies = prefilteredForMarket.filter(
     (c) => c.isListed && c.secCode,
   );
   const marketCaps = new Map<string, number | null>();
+  const marketSegments = new Map<string, string | null>();
   if (listedCompanies.length > 0) {
-    const caps = await Promise.all(
-      listedCompanies.map((c) => fetchMarketCap(c.secCode)),
+    const pairs = await Promise.all(
+      listedCompanies.map((c) =>
+        Promise.all([
+          fetchMarketCap(c.secCode).catch(() => null),
+          fetchMarketSegment(c.secCode).catch(() => null),
+        ]),
+      ),
     );
     listedCompanies.forEach((c, i) => {
-      marketCaps.set(c.id, caps[i]);
+      marketCaps.set(c.id, pairs[i][0]);
+      marketSegments.set(c.id, pairs[i][1]);
     });
   }
+
+  // 市場フィルタを適用 (kabutan が未取得の企業は一致扱いで落とす)
+  const filteredCompanies =
+    market === ""
+      ? prefilteredForMarket
+      : prefilteredForMarket.filter(
+          (c) => classifyMarket(marketSegments.get(c.id) ?? null) === market,
+        );
+
+  const filteredListedCount = filteredCompanies.filter(
+    (c) => c.isListed,
+  ).length;
+  const filteredUnlistedCount = filteredCompanies.length - filteredListedCount;
 
   return (
     <div className="space-y-4">
@@ -192,34 +251,59 @@ async function UnifiedResults({
         <span>
           ヒット:{" "}
           <span className="font-semibold text-slate-700">
-            {result.meta.mergedTotal.toLocaleString()}
+            {filteredCompanies.length.toLocaleString()}
           </span>{" "}
           件
+          {market !== "" &&
+            filteredCompanies.length !== result.meta.mergedTotal && (
+              <span className="text-xs text-slate-400 ml-1">
+                (フィルタ前 {result.meta.mergedTotal.toLocaleString()})
+              </span>
+            )}
         </span>
         <span className="text-slate-300">|</span>
         <span className="inline-flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-          上場 {result.meta.listedCount.toLocaleString()}
+          上場 {filteredListedCount.toLocaleString()}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-          非上場 {result.meta.unlistedCount.toLocaleString()}
+          非上場 {filteredUnlistedCount.toLocaleString()}
         </span>
+        {market !== "" && (
+          <>
+            <span className="text-slate-300">|</span>
+            <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-medium">
+              市場: {MARKET_LABEL[market]}
+            </span>
+          </>
+        )}
         <span className="text-slate-300">|</span>
         <span className="text-slate-400">
           EDINET {result.meta.edinetTotal} / gBizINFO {result.meta.gbizTotal}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {result.companies.map((c) => (
-          <UnifiedCard
-            key={c.id}
-            company={c}
-            marketCap={marketCaps.get(c.id) ?? null}
-          />
-        ))}
-      </div>
+      {filteredCompanies.length === 0 && market !== "" ? (
+        <div className="text-center py-10 px-6 text-slate-500 bg-white rounded-2xl border border-slate-200/60 shadow-sm">
+          このページに「{MARKET_LABEL[market]}」上場企業はありませんでした。
+          <span className="block text-xs text-slate-400 mt-1">
+            ※
+            市場フィルタはページ取得後に適用されます。次ページに進むか、より広い検索条件を試してください。
+          </span>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredCompanies.map((c) => (
+            <UnifiedCard
+              key={c.id}
+              company={c}
+              marketCap={marketCaps.get(c.id) ?? null}
+              marketSegment={marketSegments.get(c.id) ?? null}
+            />
+          ))}
+        </div>
+      )}
 
       {/* ページネーション */}
       {result.meta.edinetTotal > PAGE_SIZE && (
@@ -230,6 +314,7 @@ async function UnifiedResults({
           q={q}
           listed={listed}
           industry={industry}
+          market={market}
         />
       )}
     </div>
@@ -243,6 +328,7 @@ function Pagination({
   q,
   listed,
   industry,
+  market,
 }: {
   currentPage: number;
   totalItems: number;
@@ -250,6 +336,7 @@ function Pagination({
   q?: string;
   listed?: string;
   industry?: string;
+  market?: string;
 }) {
   const totalPages = Math.ceil(totalItems / pageSize);
   if (totalPages <= 1) return null;
@@ -269,6 +356,7 @@ function Pagination({
     if (q) qs.set("q", q);
     if (listed) qs.set("listed", listed);
     if (industry) qs.set("industry", industry);
+    if (market) qs.set("market", market);
     qs.set("page", String(p));
     return `/search?${qs}`;
   }
@@ -339,9 +427,11 @@ function Pagination({
 function UnifiedCard({
   company: c,
   marketCap,
+  marketSegment,
 }: {
   company: UnifiedCompany;
   marketCap: number | null;
+  marketSegment?: string | null;
 }) {
   const accentColor = c.isListed ? "blue" : "purple";
   const detailHref = `/company/${c.id}`;
@@ -372,6 +462,11 @@ function UnifiedCard({
             {c.source === "both" && (
               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">
                 EDINET+gBiz
+              </span>
+            )}
+            {marketSegment && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700">
+                {marketSegment}
               </span>
             )}
             <span className="text-xs text-slate-400 font-mono truncate">
@@ -497,6 +592,7 @@ export default async function SearchPage({ searchParams }: Props) {
   const revenueOkuFrom = parseIntOrUndefined(params.revenue_oku_from);
   const revenueOkuTo = parseIntOrUndefined(params.revenue_oku_to);
   const equityOkuFrom = parseIntOrUndefined(params.equity_oku_from);
+  const market = parseMarket(params.market);
 
   // UnifiedSearchForm は submit 時に必ず page=1 を付けるので、page パラメータの
   // 有無で「ユーザーが検索ボタンを押したか」を判別する。これにより空欄で
@@ -523,7 +619,8 @@ export default async function SearchPage({ searchParams }: Props) {
     revenueOkuFrom != null ||
     revenueOkuTo != null ||
     equityOkuFrom != null ||
-    listed === "listed";
+    listed === "listed" ||
+    market !== "";
 
   return (
     <div className="space-y-6">
@@ -553,6 +650,7 @@ export default async function SearchPage({ searchParams }: Props) {
             defaultRevenueOkuFrom={params.revenue_oku_from}
             defaultRevenueOkuTo={params.revenue_oku_to}
             defaultEquityOkuFrom={params.equity_oku_from}
+            defaultMarket={market}
             currentYear={CURRENT_YEAR}
           />
         </Suspense>
@@ -580,6 +678,7 @@ export default async function SearchPage({ searchParams }: Props) {
             revenueOkuFrom={revenueOkuFrom}
             revenueOkuTo={revenueOkuTo}
             equityOkuFrom={equityOkuFrom}
+            market={market}
             page={page}
           />
         </Suspense>

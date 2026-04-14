@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import CompanyAutosuggest from "./CompanyAutosuggest";
 
 const INDUSTRIES = [
   "水産・農林業",
@@ -90,6 +91,15 @@ const PREFECTURES = [
 ];
 
 export type ListedFilter = "all" | "listed" | "unlisted";
+export type MarketFilter = "" | "prime" | "standard" | "growth" | "other";
+
+const MARKET_OPTIONS: { value: MarketFilter; label: string }[] = [
+  { value: "", label: "全市場" },
+  { value: "prime", label: "東証プライム" },
+  { value: "standard", label: "東証スタンダード" },
+  { value: "growth", label: "東証グロース" },
+  { value: "other", label: "その他 (名証/札証/福証)" },
+];
 
 interface Props {
   defaultQ?: string;
@@ -111,6 +121,7 @@ interface Props {
   defaultRevenueOkuFrom?: string;
   defaultRevenueOkuTo?: string;
   defaultEquityOkuFrom?: string;
+  defaultMarket?: MarketFilter;
   currentYear: number;
 }
 
@@ -134,6 +145,7 @@ export default function UnifiedSearchForm({
   defaultRevenueOkuFrom,
   defaultRevenueOkuTo,
   defaultEquityOkuFrom,
+  defaultMarket,
   currentYear,
 }: Props) {
   const router = useRouter();
@@ -190,6 +202,12 @@ export default function UnifiedSearchForm({
   const [equityOkuFrom, setEquityOkuFrom] = useState(
     sp.get("equity_oku_from") ?? defaultEquityOkuFrom ?? "",
   );
+  const [market, setMarket] = useState<MarketFilter>(() => {
+    const raw = sp.get("market") ?? defaultMarket ?? "";
+    return (
+      MARKET_OPTIONS.some((o) => o.value === raw) ? raw : ""
+    ) as MarketFilter;
+  });
 
   const buildUrl = () => {
     const qs = new URLSearchParams();
@@ -212,6 +230,7 @@ export default function UnifiedSearchForm({
     if (revenueOkuFrom) qs.set("revenue_oku_from", revenueOkuFrom);
     if (revenueOkuTo) qs.set("revenue_oku_to", revenueOkuTo);
     if (equityOkuFrom) qs.set("equity_oku_from", equityOkuFrom);
+    if (market) qs.set("market", market);
     qs.set("page", "1");
     return `/search?${qs}`;
   };
@@ -241,6 +260,7 @@ export default function UnifiedSearchForm({
     setRevenueOkuFrom("");
     setRevenueOkuTo("");
     setEquityOkuFrom("");
+    setMarket("");
     router.push("/search?listed=all&page=1");
   };
 
@@ -277,14 +297,13 @@ export default function UnifiedSearchForm({
       <div className="flex flex-wrap gap-3 items-end">
         <div className="flex-1 min-w-48">
           <label className="block text-xs font-medium text-slate-500 mb-1.5">
-            企業名
+            企業名・証券コード
           </label>
-          <input
-            type="text"
+          <CompanyAutosuggest
             value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="例: トヨタ、メルカリ、AI"
-            className={`w-full ${inputClass}`}
+            onChange={setQ}
+            onSubmit={() => router.push(buildUrl())}
+            placeholder="例: トヨタ、メルカリ、7203"
           />
         </div>
 
@@ -319,6 +338,24 @@ export default function UnifiedSearchForm({
             {PREFECTURES.map((p) => (
               <option key={p} value={p}>
                 {p}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-500 mb-1.5">
+            上場市場
+          </label>
+          <select
+            value={market}
+            onChange={(e) => setMarket(e.target.value as MarketFilter)}
+            className={inputClass}
+            title="東証/名証/札証/福証 の市場区分で絞り込み (上場企業のみ)"
+          >
+            {MARKET_OPTIONS.map((o) => (
+              <option key={o.value || "all"} value={o.value}>
+                {o.label}
               </option>
             ))}
           </select>

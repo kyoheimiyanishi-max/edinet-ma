@@ -172,3 +172,74 @@ export function getCodelistInfo(): {
   const cl = load();
   return cl ? { count: cl.count, generatedAt: cl.generatedAt } : null;
 }
+
+export interface SuggestHit {
+  edinetCode: string;
+  name: string;
+  secCode?: string;
+  corporateNumber?: string;
+  industry?: string;
+  isListed: boolean;
+  score: number;
+}
+
+/**
+ * 企業名 / 証券コードで EDINET コードリストをサジェスト検索する。
+ * - 4〜5桁数字クエリ → 証券コードの前方一致 (末尾 0 を補って照合)
+ * - それ以外 → 正規化後の会社名 前方一致 > 部分一致
+ * 返り値はスコア降順 (上場優先・名前昇順)。
+ */
+export function suggestCompanies(query: string, limit = 10): SuggestHit[] {
+  const cl = load();
+  if (!cl) return [];
+  const trimmed = query.trim();
+  if (trimmed.length < 1) return [];
+
+  const isNumeric = /^\d{1,5}$/.test(trimmed);
+  const hits: SuggestHit[] = [];
+
+  if (isNumeric) {
+    // 証券コードは格納時 5桁 (末尾 0 パディング)。4桁入力を 5桁に延長して比較。
+    const padded = trimmed.length === 4 ? `${trimmed}0` : trimmed;
+    for (const entry of cl.byEdinetCode.values()) {
+      if (!entry.secCode) continue;
+      if (entry.secCode === padded) {
+        hits.push({ ...toHit(entry), score: 1 });
+      } else if (entry.secCode.startsWith(trimmed)) {
+        hits.push({ ...toHit(entry), score: 0.9 });
+      }
+    }
+  } else {
+    const normQ = normalizeName(trimmed);
+    if (!normQ) return [];
+    for (const entry of cl.byEdinetCode.values()) {
+      const normN = normalizeName(entry.name);
+      if (!normN) continue;
+      let score = 0;
+      if (normN === normQ) score = 1;
+      else if (normN.startsWith(normQ)) score = 0.9;
+      else if (normN.includes(normQ)) score = 0.75;
+      if (score > 0) {
+        hits.push({ ...toHit(entry), score });
+      }
+    }
+  }
+
+  hits.sort((a, b) => {
+    if (a.score !== b.score) return b.score - a.score;
+    if (a.isListed !== b.isListed) return a.isListed ? -1 : 1;
+    return a.name.localeCompare(b.name, "ja");
+  });
+  return hits.slice(0, limit);
+}
+
+function toHit(entry: EdinetCodelistEntry): Omit<SuggestHit, "score"> {
+  return {
+    edinetCode: entry.edinetCode,
+    name: entry.name,
+    secCode: entry.secCode,
+    corporateNumber: entry.corporateNumber,
+    industry: entry.industry,
+    isListed: entry.listingStatus === "listed" || Boolean(entry.secCode),
+  };
+}
