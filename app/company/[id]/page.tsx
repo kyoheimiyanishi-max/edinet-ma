@@ -42,6 +42,7 @@ import CompanyAnalysis from "@/components/CompanyAnalysis";
 import { CompanyAnalysisProvider } from "@/components/CompanyAnalysisContext";
 import CompanyOverviewText from "@/components/CompanyOverviewText";
 import AddToSellerButton from "@/components/AddToSellerButton";
+import WatchlistToggle from "@/components/WatchlistToggle";
 import AiRunButton from "@/components/AiRunButton";
 import { notFound, redirect } from "next/navigation";
 import { parseCompanyId } from "@/lib/unified-company";
@@ -1242,11 +1243,28 @@ export default async function CompanyPage({ params, searchParams }: Props) {
               >
                 {company.credit_rating} ({company.credit_score}pt)
               </span>
-              <AddToSellerButton
-                companyName={company.name}
-                companyCode={company.edinet_code}
-                industry={company.industry}
-              />
+              <div className="flex items-center gap-2">
+                <WatchlistToggle
+                  edinetCode={company.edinet_code}
+                  corporateNumber={
+                    parsed.kind === "corporate"
+                      ? parsed.corporateNumber
+                      : (parsed.corporateNumber ?? undefined)
+                  }
+                />
+                <a
+                  href={`/api/companies/${company.edinet_code}/export`}
+                  title="財務履歴と役員一覧を CSV (Excel 互換) でダウンロード"
+                  className="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold inline-flex items-center gap-1"
+                >
+                  📥 CSV
+                </a>
+                <AddToSellerButton
+                  companyName={company.name}
+                  companyCode={company.edinet_code}
+                  industry={company.industry}
+                />
+              </div>
             </div>
           </div>
           {wd?.description && (

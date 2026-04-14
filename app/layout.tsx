@@ -26,6 +26,7 @@ type NavItem =
 const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "ダッシュボード", exact: true },
   { href: "/search", label: "企業検索" },
+  { href: "/watchlist", label: "ウォッチリスト" },
   { href: "/shareholders", label: "株主名検索" },
   { href: "/deals", label: "売主管理" },
   { href: "/buyers", label: "買い手管理" },
