@@ -132,9 +132,42 @@ async function UnifiedResults({
   });
 
   if (result.companies.length === 0) {
+    const hasAnyInput = Boolean(
+      q ||
+      industry ||
+      year ||
+      yearTo ||
+      capitalFrom ||
+      capitalTo ||
+      employeesFrom ||
+      employeesTo ||
+      prefecture ||
+      business ||
+      subsidy ||
+      patent ||
+      commendation ||
+      finance ||
+      exist ||
+      revenueOkuFrom != null ||
+      revenueOkuTo != null ||
+      equityOkuFrom != null,
+    );
+    const isUnlistedNoInput = listed === "unlisted" && !hasAnyInput;
     return (
-      <div className="text-center py-10 text-slate-400 bg-white rounded-2xl border border-slate-200/60 shadow-sm">
-        条件に該当する企業が見つかりませんでした
+      <div className="text-center py-10 px-6 text-slate-500 bg-white rounded-2xl border border-slate-200/60 shadow-sm space-y-2">
+        {isUnlistedNoInput ? (
+          <>
+            <p className="font-medium text-slate-600">
+              非上場のみの検索には 企業名 か 絞り込み条件 が必要です
+            </p>
+            <p className="text-xs text-slate-400">
+              gBizINFO API の仕様上、企業名
+              (部分一致可)・業種・都道府県・事業項目・資本金・従業員数・設立年などのいずれかを指定してください
+            </p>
+          </>
+        ) : (
+          <p>条件に該当する企業が見つかりませんでした</p>
+        )}
       </div>
     );
   }

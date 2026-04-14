@@ -1,5 +1,5 @@
-import OutreachManager from "@/components/OutreachManager";
+import { redirect } from "next/navigation";
 
 export default function OutreachPage() {
-  return <OutreachManager />;
+  redirect("/buyers?tab=outreach");
 }

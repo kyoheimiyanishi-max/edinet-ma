@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import NavLink from "@/components/NavLink";
+import NavDropdown from "@/components/NavDropdown";
 import ChatWidget from "@/components/ChatWidget";
 import "./globals.css";
 
@@ -14,25 +15,42 @@ export const metadata: Metadata = {
   description: "M&Aに関するあらゆる情報を網羅するデータベース",
 };
 
-const NAV_ITEMS = [
+type NavItem =
+  | { kind?: "link"; href: string; label: string; exact?: boolean }
+  | {
+      kind: "dropdown";
+      label: string;
+      items: { href: string; label: string }[];
+    };
+
+const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "ダッシュボード", exact: true },
   { href: "/search", label: "企業検索" },
   { href: "/shareholders", label: "株主名検索" },
   { href: "/deals", label: "売主管理" },
-  { href: "/buyers", label: "買手開拓" },
-  { href: "/outreach", label: "送付管理" },
-  { href: "/time", label: "工数" },
-  { href: "/events", label: "イベント" },
+  { href: "/buyers", label: "買い手管理" },
   { href: "/kpi", label: "KPI" },
+  {
+    kind: "dropdown",
+    label: "ネットワーク",
+    items: [
+      { href: "/events", label: "イベント" },
+      { href: "/people", label: "人物DB" },
+      { href: "/communities", label: "コミュニティ" },
+      { href: "/seminars", label: "セミナー" },
+    ],
+  },
+  {
+    kind: "dropdown",
+    label: "アライアンス",
+    items: [
+      { href: "/tax-advisors", label: "税理士・会計士" },
+      { href: "/banks", label: "銀行・金融機関" },
+      { href: "/ma-advisors", label: "M&A会社" },
+      { href: "/financial-planners", label: "Financial Planner" },
+    ],
+  },
   { href: "/news", label: "ニュース" },
-  { href: "/people", label: "人物DB" },
-  { href: "/communities", label: "コミュニティ" },
-  { href: "/seminars", label: "セミナー" },
-  { href: "/tax-advisors", label: "税理士・会計士" },
-  { href: "/banks", label: "銀行・金融機関" },
-  { href: "/ma-advisors", label: "M&A会社" },
-  { href: "/financial-planners", label: "Financial Planner" },
-  { href: "/activity", label: "活動ログ" },
   { href: "/settings", label: "設定" },
 ];
 
@@ -76,11 +94,19 @@ export default async function RootLayout({
           </div>
           <nav className="max-w-7xl mx-auto px-4 sm:px-6 pb-2">
             <div className="flex gap-1 overflow-x-auto scrollbar-hide pb-1">
-              {NAV_ITEMS.map((item) => (
-                <NavLink key={item.href} href={item.href} exact={item.exact}>
-                  {item.label}
-                </NavLink>
-              ))}
+              {NAV_ITEMS.map((item) =>
+                item.kind === "dropdown" ? (
+                  <NavDropdown
+                    key={item.label}
+                    label={item.label}
+                    items={item.items}
+                  />
+                ) : (
+                  <NavLink key={item.href} href={item.href} exact={item.exact}>
+                    {item.label}
+                  </NavLink>
+                ),
+              )}
             </div>
           </nav>
         </header>

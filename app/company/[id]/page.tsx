@@ -666,8 +666,7 @@ async function GroupCompaniesSection({
     if (wdOnly.length === 0) {
       return (
         <p className="text-sm text-slate-400 text-center py-4">
-          「AI実行」ボタンを押すと Wikipedia・EDINET有報を AI
-          で解析してグループ会社を抽出します
+          未実行 — 「AI実行」を押すと表示されます
         </p>
       );
     }
@@ -677,7 +676,7 @@ async function GroupCompaniesSection({
     return (
       <div className="space-y-4">
         <p className="text-[11px] text-slate-400">
-          Wikidata のみ表示中。「AI実行」で Wikipedia/EDINET AI抽出を追加
+          Wikidata のみ表示中。上部の「AI実行」で Wikipedia/EDINET AI抽出を追加
         </p>
         {parents0.length > 0 && (
           <GroupSection title="親会社" companies={parents0} />
@@ -813,23 +812,34 @@ async function EnrichedSections({
   return (
     <>
       {/* 事業内容 */}
-      {enriched.websiteMeta?.bodyText && (
-        <SectionCard title="事業内容" badge="公式サイトから取得">
-          <div className="space-y-3">
-            {enriched.websiteMeta.bodyText
-              .split("\n\n")
-              .filter((t) => t.trim())
-              .map((p, i) => (
-                <p key={i} className="text-sm text-slate-700 leading-relaxed">
-                  {p}
-                </p>
-              ))}
-          </div>
-          <div className="mt-4">
-            <SourceLink url={enriched.websiteMeta.url} name="公式サイト" />
-          </div>
-        </SectionCard>
-      )}
+      <SectionCard
+        title="事業内容"
+        badge={
+          enriched.websiteMeta?.bodyText ? "公式サイトから取得" : "データなし"
+        }
+      >
+        {enriched.websiteMeta?.bodyText ? (
+          <>
+            <div className="space-y-3">
+              {enriched.websiteMeta.bodyText
+                .split("\n\n")
+                .filter((t) => t.trim())
+                .map((p, i) => (
+                  <p key={i} className="text-sm text-slate-700 leading-relaxed">
+                    {p}
+                  </p>
+                ))}
+            </div>
+            <div className="mt-4">
+              <SourceLink url={enriched.websiteMeta.url} name="公式サイト" />
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-slate-400 text-center py-4">
+            公式サイトから事業内容が取得できませんでした
+          </p>
+        )}
+      </SectionCard>
 
       {/* 特許情報 */}
       <Suspense
@@ -884,26 +894,40 @@ async function EnrichedSections({
       </Suspense>
 
       {/* 採用・カルチャー */}
-      {wantedlyResults.length > 0 && (
-        <SectionCard title="採用・カルチャー" badge="Wantedly">
+      <SectionCard
+        title="採用・カルチャー"
+        badge={wantedlyResults.length > 0 ? "Wantedly" : "データなし"}
+      >
+        {wantedlyResults.length > 0 ? (
           <div className="space-y-2">
             {wantedlyResults.map((r, i) => (
               <WebResultCard key={i} result={r} />
             ))}
           </div>
-        </SectionCard>
-      )}
+        ) : (
+          <p className="text-sm text-slate-400 text-center py-4">
+            Wantedly の該当情報が見つかりませんでした
+          </p>
+        )}
+      </SectionCard>
 
       {/* 求人情報 */}
-      {jobResults.length > 0 && (
-        <SectionCard title="求人情報" badge={`${jobResults.length} 件`}>
+      <SectionCard
+        title="求人情報"
+        badge={jobResults.length > 0 ? `${jobResults.length} 件` : "データなし"}
+      >
+        {jobResults.length > 0 ? (
           <div className="space-y-2">
             {jobResults.map((r, i) => (
               <WebResultCard key={i} result={r} />
             ))}
           </div>
-        </SectionCard>
-      )}
+        ) : (
+          <p className="text-sm text-slate-400 text-center py-4">
+            求人情報が見つかりませんでした
+          </p>
+        )}
+      </SectionCard>
 
       {/* note 記事 */}
       <SectionCard
@@ -983,11 +1007,19 @@ async function EnrichedSections({
       </SectionCard>
 
       {/* 関連リンク */}
-      {enriched.referenceLinks.length > 0 && (
-        <SectionCard
-          title="関連リンク"
-          badge={`${enriched.referenceLinks.length} サイト`}
-        >
+      <SectionCard
+        title="関連リンク"
+        badge={
+          enriched.referenceLinks.length > 0
+            ? `${enriched.referenceLinks.length} サイト`
+            : "データなし"
+        }
+      >
+        {enriched.referenceLinks.length === 0 ? (
+          <p className="text-sm text-slate-400 text-center py-4">
+            関連リンクが見つかりませんでした
+          </p>
+        ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
             {enriched.referenceLinks.map((link, i) => (
               <a
@@ -1017,8 +1049,8 @@ async function EnrichedSections({
               </a>
             ))}
           </div>
-        </SectionCard>
-      )}
+        )}
+      </SectionCard>
     </>
   );
 }
@@ -1367,15 +1399,16 @@ export default async function CompanyPage({ params, searchParams }: Props) {
             </div>
           </SectionCard>
 
-          {/* ===== 会社基本情報 (Wikidata由来) ===== */}
-          {(wd?.inceptionDate ||
-            wd?.founder ||
-            wd?.ceo ||
-            wd?.employeeCount != null ||
-            wd?.parentOrg ||
-            wd?.parentCompany ||
-            company.name_en) && (
-            <SectionCard title="会社基本情報" badge="Wikidata">
+          {/* ===== 会社基本情報 (Wikidata由来) + 主要役員 (EDINET 有報由来) ===== */}
+          <SectionCard title="会社基本情報" badge="Wikidata + EDINET">
+            {(wd?.inceptionDate ||
+              wd?.founder ||
+              wd?.ceo ||
+              wd?.employeeCount != null ||
+              wd?.parentOrg ||
+              wd?.parentCompany ||
+              company.name_en ||
+              wd?.officialWebsite) && (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {company.name_en && (
                   <MetricCard label="英語名" value={company.name_en} />
@@ -1418,13 +1451,101 @@ export default async function CompanyPage({ params, searchParams }: Props) {
                   </div>
                 )}
               </div>
-              {wd?.sourceUrl && (
-                <div className="mt-3">
-                  <SourceLink url={wd.sourceUrl} name="Wikidata" />
-                </div>
+            )}
+            {wd?.sourceUrl && (
+              <div className="mt-3">
+                <SourceLink url={wd.sourceUrl} name="Wikidata" />
+              </div>
+            )}
+
+            {/* 主要役員 (EDINET 有報由来) — 常に表示 */}
+            <div className="mt-6 pt-5 border-t border-slate-100">
+              <div className="flex items-center gap-2.5 mb-3">
+                <h4 className="text-sm font-semibold text-slate-700">
+                  主要役員
+                </h4>
+                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
+                  {officers.length > 0 ? `${officers.length}名` : "EDINET"}
+                </span>
+              </div>
+              {officers.length === 0 ? (
+                <p className="text-sm text-slate-400 text-center py-4">
+                  有価証券報告書から役員情報が取得できませんでした
+                </p>
+              ) : (
+                <>
+                  <div className="overflow-x-auto -mx-6 px-6">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
+                          <th className="pb-3 pr-4 font-medium">役職</th>
+                          <th className="pb-3 pr-4 font-medium">氏名</th>
+                          <th className="pb-3 pr-4 font-medium">生年月日</th>
+                          <th className="pb-3 pr-4 font-medium text-right">
+                            保有株数
+                          </th>
+                          <th className="pb-3 pr-4 font-medium">属性</th>
+                          <th className="pb-3 font-medium">経歴・略歴</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {officers.map((o, i) => (
+                          <tr
+                            key={`officer-${i}-${o.name}`}
+                            className="hover:bg-blue-50/50"
+                          >
+                            <td className="py-3 pr-4 text-slate-700 font-medium text-xs whitespace-nowrap">
+                              {o.position}
+                            </td>
+                            <td className="py-3 pr-4 text-slate-800 font-medium whitespace-nowrap">
+                              {o.name}
+                            </td>
+                            <td className="py-3 pr-4 text-xs text-slate-500 whitespace-nowrap font-mono">
+                              {o.birth_date || "-"}
+                            </td>
+                            <td className="py-3 pr-4 text-xs text-slate-600 whitespace-nowrap text-right font-mono">
+                              {o.shares_held != null
+                                ? `${o.shares_held.toLocaleString()}株`
+                                : "-"}
+                            </td>
+                            <td className="py-3 pr-4 whitespace-nowrap">
+                              <div className="flex flex-wrap gap-1">
+                                {o.is_representative && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 font-bold">
+                                    代表
+                                  </span>
+                                )}
+                                {o.is_outside && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                                    社外
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-3 text-xs text-slate-500 leading-relaxed max-w-md">
+                              {o.career || "-"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="mt-3 pt-2 border-t border-slate-100">
+                    {f?.edinet_filing_url ? (
+                      <SourceLink
+                        url={f.edinet_filing_url}
+                        name={`有価証券報告書 (${f.fiscal_year}年度)`}
+                      />
+                    ) : (
+                      <p className="text-[10px] text-slate-400">
+                        出典: 有価証券報告書（EDINET）
+                      </p>
+                    )}
+                  </div>
+                </>
               )}
-            </SectionCard>
-          )}
+            </div>
+          </SectionCard>
 
           {/* ===== グループ会社・関連企業 ===== */}
           <SectionCard
@@ -1457,102 +1578,132 @@ export default async function CompanyPage({ params, searchParams }: Props) {
           <CompanyAnalysis />
 
           {/* ===== 財務推移チャート ===== */}
-          {chartData.length > 0 && (
-            <SectionCard
-              title="財務推移"
-              badge={
-                chartData.length > 1
+          <SectionCard
+            title="財務推移"
+            badge={
+              chartData.length === 0
+                ? "データなし"
+                : chartData.length > 1
                   ? `${chartData[0].fiscal_year}〜${chartData[chartData.length - 1].fiscal_year}年`
                   : `${chartData[0].fiscal_year}年`
-              }
-            >
+            }
+          >
+            {chartData.length === 0 ? (
+              <p className="text-sm text-slate-400 text-center py-4">
+                財務推移データが取得できませんでした
+              </p>
+            ) : (
               <FinancialCharts data={chartData} />
-            </SectionCard>
-          )}
+            )}
+          </SectionCard>
 
           {/* ===== P/L ===== */}
-          {f && (
-            <SectionCard
-              title="損益計算書 (P/L)"
-              badge={`${f.fiscal_year}年度`}
-            >
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                <MetricCard label="売上高" value={formatYen(f.revenue)} />
-                <MetricCard
-                  label="営業利益"
-                  value={formatYen(f.operating_income)}
-                />
-                <MetricCard label="純利益" value={formatYen(f.net_income)} />
-                <MetricCard
-                  label="EPS（1株利益）"
-                  value={f.eps != null ? `${f.eps.toFixed(1)}円` : "-"}
-                />
-                {f.avg_annual_salary != null && (
+          <SectionCard
+            title="損益計算書 (P/L)"
+            badge={f ? `${f.fiscal_year}年度` : "データなし"}
+          >
+            {f ? (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  <MetricCard label="売上高" value={formatYen(f.revenue)} />
                   <MetricCard
-                    label="平均年収"
-                    value={formatYen(f.avg_annual_salary)}
-                    sub={
-                      f.avg_age != null ? `平均年齢 ${f.avg_age}歳` : undefined
-                    }
+                    label="営業利益"
+                    value={formatYen(f.operating_income)}
                   />
-                )}
-              </div>
-              {f.edinet_filing_url && (
-                <div className="mt-4 pt-3 border-t border-slate-100">
-                  <SourceLink
-                    url={f.edinet_filing_url}
-                    name={`有価証券報告書 (${f.fiscal_year}年度)`}
+                  <MetricCard label="純利益" value={formatYen(f.net_income)} />
+                  <MetricCard
+                    label="EPS（1株利益）"
+                    value={f.eps != null ? `${f.eps.toFixed(1)}円` : "-"}
                   />
+                  {f.avg_annual_salary != null && (
+                    <MetricCard
+                      label="平均年収"
+                      value={formatYen(f.avg_annual_salary)}
+                      sub={
+                        f.avg_age != null
+                          ? `平均年齢 ${f.avg_age}歳`
+                          : undefined
+                      }
+                    />
+                  )}
                 </div>
-              )}
-            </SectionCard>
-          )}
+                {f.edinet_filing_url && (
+                  <div className="mt-4 pt-3 border-t border-slate-100">
+                    <SourceLink
+                      url={f.edinet_filing_url}
+                      name={`有価証券報告書 (${f.fiscal_year}年度)`}
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-slate-400 text-center py-4">
+                損益計算書データが取得できませんでした
+              </p>
+            )}
+          </SectionCard>
 
           {/* ===== B/S ===== */}
-          {f && (
-            <SectionCard
-              title="貸借対照表 (B/S)"
-              badge={`${f.fiscal_year}年度`}
-            >
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                <MetricCard label="総資産" value={formatYen(f.total_assets)} />
-                <MetricCard label="自己資本" value={formatYen(f.equity)} />
-                <MetricCard label="現金・現預金" value={formatYen(f.cash)} />
-                <MetricCard
-                  label="自己資本比率"
-                  value={formatPct(f.equity_ratio_official)}
-                />
-                <MetricCard
-                  label="BPS（1株純資産）"
-                  value={f.bps != null ? `${f.bps.toFixed(1)}円` : "-"}
-                />
-                {f.roe != null && (
+          <SectionCard
+            title="貸借対照表 (B/S)"
+            badge={f ? `${f.fiscal_year}年度` : "データなし"}
+          >
+            {f ? (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   <MetricCard
-                    label="ROE（自己資本利益率）"
-                    value={formatPct(f.roe)}
+                    label="総資産"
+                    value={formatYen(f.total_assets)}
                   />
-                )}
-                {f.roa != null && (
+                  <MetricCard label="自己資本" value={formatYen(f.equity)} />
+                  <MetricCard label="現金・現預金" value={formatYen(f.cash)} />
                   <MetricCard
-                    label="ROA（総資産利益率）"
-                    value={formatPct(f.roa)}
+                    label="自己資本比率"
+                    value={formatPct(f.equity_ratio_official)}
                   />
-                )}
-              </div>
-              {f.edinet_filing_url && (
-                <div className="mt-4 pt-3 border-t border-slate-100">
-                  <SourceLink
-                    url={f.edinet_filing_url}
-                    name={`有価証券報告書 (${f.fiscal_year}年度)`}
+                  <MetricCard
+                    label="BPS（1株純資産）"
+                    value={f.bps != null ? `${f.bps.toFixed(1)}円` : "-"}
                   />
+                  {f.roe != null && (
+                    <MetricCard
+                      label="ROE（自己資本利益率）"
+                      value={formatPct(f.roe)}
+                    />
+                  )}
+                  {f.roa != null && (
+                    <MetricCard
+                      label="ROA（総資産利益率）"
+                      value={formatPct(f.roa)}
+                    />
+                  )}
                 </div>
-              )}
-            </SectionCard>
-          )}
+                {f.edinet_filing_url && (
+                  <div className="mt-4 pt-3 border-t border-slate-100">
+                    <SourceLink
+                      url={f.edinet_filing_url}
+                      name={`有価証券報告書 (${f.fiscal_year}年度)`}
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-slate-400 text-center py-4">
+                貸借対照表データが取得できませんでした
+              </p>
+            )}
+          </SectionCard>
 
           {/* ===== 財務指標（計算値） ===== */}
-          {f && (f.revenue || f.operating_income || f.total_assets) && (
-            <SectionCard title="財務指標" badge={`${f.fiscal_year}年度`}>
+          <SectionCard
+            title="財務指標"
+            badge={
+              f && (f.revenue || f.operating_income || f.total_assets)
+                ? `${f.fiscal_year}年度`
+                : "データなし"
+            }
+          >
+            {f && (f.revenue || f.operating_income || f.total_assets) ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {f.revenue != null && f.operating_income != null && (
                   <MetricCard
@@ -1617,20 +1768,24 @@ export default async function CompanyPage({ params, searchParams }: Props) {
                   />
                 )}
               </div>
-            </SectionCard>
-          )}
+            ) : (
+              <p className="text-sm text-slate-400 text-center py-4">
+                財務指標の計算に必要なデータが取得できませんでした
+              </p>
+            )}
+          </SectionCard>
 
           {/* ===== 最新決算 ===== */}
-          {e && (
-            <SectionCard
-              title="最新決算"
-              badge={`${e.fiscal_year_end} Q${e.quarter}`}
-              action={
-                e.pdf_url ? (
-                  <ExternalLink href={e.pdf_url}>決算短信 PDF</ExternalLink>
-                ) : undefined
-              }
-            >
+          <SectionCard
+            title="最新決算"
+            badge={e ? `${e.fiscal_year_end} Q${e.quarter}` : "データなし"}
+            action={
+              e?.pdf_url ? (
+                <ExternalLink href={e.pdf_url}>決算短信 PDF</ExternalLink>
+              ) : undefined
+            }
+          >
+            {e ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <MetricCard
                   label="売上高"
@@ -1674,82 +1829,12 @@ export default async function CompanyPage({ params, searchParams }: Props) {
                   }
                 />
               </div>
-            </SectionCard>
-          )}
-
-          {/* ===== 主要役員 (EDINET 有報 由来) ===== */}
-          {officers.length > 0 && (
-            <SectionCard title="主要役員" badge={`${officers.length}名`}>
-              <div className="overflow-x-auto -mx-6 px-6">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
-                      <th className="pb-3 pr-4 font-medium">役職</th>
-                      <th className="pb-3 pr-4 font-medium">氏名</th>
-                      <th className="pb-3 pr-4 font-medium">生年月日</th>
-                      <th className="pb-3 pr-4 font-medium text-right">
-                        保有株数
-                      </th>
-                      <th className="pb-3 pr-4 font-medium">属性</th>
-                      <th className="pb-3 font-medium">経歴・略歴</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {officers.map((o, i) => (
-                      <tr
-                        key={`officer-${i}-${o.name}`}
-                        className="hover:bg-blue-50/50"
-                      >
-                        <td className="py-3 pr-4 text-slate-700 font-medium text-xs whitespace-nowrap">
-                          {o.position}
-                        </td>
-                        <td className="py-3 pr-4 text-slate-800 font-medium whitespace-nowrap">
-                          {o.name}
-                        </td>
-                        <td className="py-3 pr-4 text-xs text-slate-500 whitespace-nowrap font-mono">
-                          {o.birth_date || "-"}
-                        </td>
-                        <td className="py-3 pr-4 text-xs text-slate-600 whitespace-nowrap text-right font-mono">
-                          {o.shares_held != null
-                            ? `${o.shares_held.toLocaleString()}株`
-                            : "-"}
-                        </td>
-                        <td className="py-3 pr-4 whitespace-nowrap">
-                          <div className="flex flex-wrap gap-1">
-                            {o.is_representative && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 font-bold">
-                                代表
-                              </span>
-                            )}
-                            {o.is_outside && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">
-                                社外
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-3 text-xs text-slate-500 leading-relaxed max-w-md">
-                          {o.career || "-"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="mt-3 pt-2 border-t border-slate-100">
-                {f?.edinet_filing_url ? (
-                  <SourceLink
-                    url={f.edinet_filing_url}
-                    name={`有価証券報告書 (${f.fiscal_year}年度)`}
-                  />
-                ) : (
-                  <p className="text-[10px] text-slate-400">
-                    出典: 有価証券報告書（EDINET）
-                  </p>
-                )}
-              </div>
-            </SectionCard>
-          )}
+            ) : (
+              <p className="text-sm text-slate-400 text-center py-4">
+                最新決算データが取得できませんでした
+              </p>
+            )}
+          </SectionCard>
 
           {/* ===== 株主構成サマリー ===== */}
           <SectionCard
@@ -1855,8 +1940,19 @@ export default async function CompanyPage({ params, searchParams }: Props) {
           </SectionCard>
 
           {/* ===== 報告履歴 ===== */}
-          {shareholders.length > latestHolders.length && (
-            <SectionCard title="報告履歴" badge={`${shareholders.length} 件`}>
+          <SectionCard
+            title="報告履歴"
+            badge={
+              shareholders.length > latestHolders.length
+                ? `${shareholders.length} 件`
+                : "データなし"
+            }
+          >
+            {shareholders.length <= latestHolders.length ? (
+              <p className="text-sm text-slate-400 text-center py-4">
+                追加の報告履歴はありません
+              </p>
+            ) : (
               <div className="overflow-x-auto -mx-6 px-6">
                 <table className="w-full text-sm">
                   <thead>
@@ -1904,8 +2000,8 @@ export default async function CompanyPage({ params, searchParams }: Props) {
                   </tbody>
                 </table>
               </div>
-            </SectionCard>
-          )}
+            )}
+          </SectionCard>
 
           {/* ===== 競合企業 ===== */}
           <Suspense

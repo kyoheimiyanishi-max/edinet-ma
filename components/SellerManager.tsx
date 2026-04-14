@@ -350,13 +350,6 @@ export default function SellerManager() {
     }
   }
 
-  async function handleDeleteSeller(id: string) {
-    if (!confirm("この売主と関連データを削除しますか？")) return;
-    await fetch(`/api/sellers/${id}`, { method: "DELETE" });
-    if (selectedId === id) setSelectedId(null);
-    await fetchSellers();
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -718,7 +711,6 @@ export default function SellerManager() {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               onRefresh={refreshAll}
-              onDelete={() => handleDeleteSeller(selected.id)}
             />
           ) : (
             <div className="text-center py-20 text-slate-400 bg-white rounded-2xl border border-slate-200/60">
@@ -740,7 +732,6 @@ function SellerDetail({
   activeTab,
   setActiveTab,
   onRefresh,
-  onDelete,
 }: {
   seller: Seller;
   projects: ProjectSummary[];
@@ -748,7 +739,6 @@ function SellerDetail({
   activeTab: Tab;
   setActiveTab: (t: Tab) => void;
   onRefresh: () => Promise<void>;
-  onDelete: () => void;
 }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
@@ -771,12 +761,6 @@ function SellerDetail({
               {seller.prefecture && <span>{seller.prefecture}</span>}
             </div>
           </div>
-          <button
-            onClick={onDelete}
-            className="text-xs px-3 py-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50"
-          >
-            削除
-          </button>
         </div>
 
         {/* Tabs */}

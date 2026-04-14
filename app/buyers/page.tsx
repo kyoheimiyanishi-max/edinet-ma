@@ -1,10 +1,12 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import {
   search as searchCompanies,
   BUYER_PROSPECT_STATUSES,
   type BuyerProspectStatus,
 } from "@/lib/d6e/repos/companies";
 import BuyerProspectsTable from "@/components/BuyerProspectsTable";
+import OutreachManager from "@/components/OutreachManager";
 
 interface Props {
   searchParams: Promise<{
@@ -12,6 +14,7 @@ interface Props {
     status?: string;
     assignee?: string;
     strong?: string;
+    tab?: string;
   }>;
 }
 
@@ -32,10 +35,23 @@ const STATUS_COLORS: Record<BuyerProspectStatus, string> = {
 
 export default async function BuyersPage({ searchParams }: Props) {
   const params = await searchParams;
+  const tab = params.tab === "outreach" ? "outreach" : "prospects";
   const q = params.q;
   const status = params.status as BuyerProspectStatus | undefined;
   const assignee = params.assignee;
   const strongOnly = params.strong === "1";
+
+  if (tab === "outreach") {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-bold text-slate-800">買い手管理</h2>
+        </div>
+        <BuyersTabs active="outreach" />
+        <OutreachManager />
+      </div>
+    );
+  }
 
   // 全買手プロスペクトを取得 (上限引き上げ)
   const all = await searchCompanies({
@@ -62,11 +78,13 @@ export default async function BuyersPage({ searchParams }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-slate-800">買手開拓</h2>
+        <h2 className="text-xl font-bold text-slate-800">買い手管理</h2>
         <p className="text-sm text-slate-500 mt-1">
           売主案件にマッチする買い手候補企業を一元管理。アプローチ状況・NDA・担当者で絞り込み可能
         </p>
       </div>
+
+      <BuyersTabs active="prospects" />
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -180,6 +198,30 @@ export default async function BuyersPage({ searchParams }: Props) {
           statusColors={STATUS_COLORS}
         />
       </Suspense>
+    </div>
+  );
+}
+
+function BuyersTabs({ active }: { active: "prospects" | "outreach" }) {
+  const tabs = [
+    { key: "prospects", label: "買い手プロスペクト", href: "/buyers" },
+    { key: "outreach", label: "送付管理", href: "/buyers?tab=outreach" },
+  ] as const;
+  return (
+    <div className="flex gap-1 border-b border-slate-200">
+      {tabs.map((t) => (
+        <Link
+          key={t.key}
+          href={t.href}
+          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+            active === t.key
+              ? "border-blue-600 text-blue-700"
+              : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+          }`}
+        >
+          {t.label}
+        </Link>
+      ))}
     </div>
   );
 }

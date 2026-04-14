@@ -62,12 +62,27 @@ export default async function KpiDashboardPage() {
   const closedSellers = sellers.filter((s) => s.stage === "成約").length;
 
   // ---- 買手プロスペクト ----
-  const buyerFunnel: Record<string, number> = {};
-  buyers.forEach((b) => {
-    const k = b.buyerStatus ?? "未分類";
-    buyerFunnel[k] = (buyerFunnel[k] ?? 0) + 1;
-  });
   const strongBuyers = buyers.filter((b) => b.strongBuyer).length;
+
+  // ---- 買い手開拓ファネル (売主パイプラインの主要マイルストーン) ----
+  const buyerSelectionCount = sellers.filter(
+    (s) => s.stage === "買い手選定",
+  ).length;
+  const entrepreneurContacts = sellers.length;
+  const introCount = sellers.filter((s) => s.introSource?.trim()).length;
+  const ndaSignedCount = sellers.filter((s) => s.ndaSigned).length;
+  const advisoryContractCount = sellers.filter((s) => s.adSigned).length;
+  const imCreatedCount = sellers.filter((s) => s.documents.length > 0).length;
+  const buyerFunnelMilestones: { label: string; value: number | string }[] = [
+    { label: "買い手選定", value: buyerSelectionCount },
+    { label: "起業家接点数", value: entrepreneurContacts },
+    { label: "紹介数", value: introCount },
+    { label: "NDA締結数", value: ndaSignedCount },
+    { label: "アドバイザリー契約", value: advisoryContractCount },
+    { label: "IM資料作成", value: imCreatedCount },
+    { label: "ROI", value: "—" },
+    { label: "DD請求", value: "—" },
+  ];
 
   // ---- 送付活動 ----
   const outreachThisWeek = outreachLogs.filter(
@@ -144,6 +159,22 @@ export default async function KpiDashboardPage() {
 
       {/* Seller funnel */}
       <Section title="売主ファネル (Stage)">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          <MiniStat
+            label="起業家接点数"
+            value={sellers.length.toLocaleString()}
+          />
+          <MiniStat label="アクティブ" value={activeSellers.toLocaleString()} />
+          <MiniStat label="成約" value={closedSellers.toLocaleString()} />
+          <MiniStat
+            label="成約率"
+            value={
+              sellers.length > 0
+                ? `${((closedSellers / sellers.length) * 100).toFixed(1)}%`
+                : "—"
+            }
+          />
+        </div>
         <div className="space-y-2">
           {SELLER_STAGES.map((stage) => {
             const count = sellerFunnel[stage];
@@ -175,20 +206,20 @@ export default async function KpiDashboardPage() {
 
       {/* Buyer funnel */}
       <Section title="買手開拓状況">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {Object.entries(buyerFunnel)
-            .sort((a, b) => b[1] - a[1])
-            .map(([status, count]) => (
-              <div
-                key={status}
-                className="bg-slate-50 rounded-xl p-3 text-center"
-              >
-                <p className="text-xs text-slate-500 font-medium">{status}</p>
-                <p className="text-xl font-bold text-slate-800 mt-1">
-                  {count.toLocaleString()}
-                </p>
-              </div>
-            ))}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          {buyerFunnelMilestones.map((m) => (
+            <div
+              key={m.label}
+              className="bg-slate-50 rounded-xl p-3 text-center"
+            >
+              <p className="text-xs text-slate-500 font-medium">{m.label}</p>
+              <p className="text-xl font-bold text-slate-800 mt-1">
+                {typeof m.value === "number"
+                  ? m.value.toLocaleString()
+                  : m.value}
+              </p>
+            </div>
+          ))}
         </div>
       </Section>
 

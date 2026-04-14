@@ -339,220 +339,218 @@ export default function UnifiedSearchForm({
         </button>
       </div>
 
-      {/* gBizINFO 詳細フィルター: 「上場のみ」のとき以外は出す */}
-      {listed !== "listed" && (
-        <div className="space-y-3 pt-3 border-t border-slate-100">
-          <div className="flex flex-wrap gap-3 items-end">
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                設立年 以降
-              </label>
-              <select
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                className={inputClass}
-              >
-                <option value="">指定なし</option>
-                {Array.from({ length: 30 }, (_, i) => currentYear - i).map(
-                  (y) => (
-                    <option key={y} value={y}>
-                      {y}年以降
-                      {y >= currentYear - 3
-                        ? " (創業期)"
-                        : y >= currentYear - 7
-                          ? " (成長期)"
-                          : ""}
-                    </option>
-                  ),
-                )}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                設立年 以前
-              </label>
-              <select
-                value={yearTo}
-                onChange={(e) => setYearTo(e.target.value)}
-                className={inputClass}
-              >
-                <option value="">指定なし</option>
-                {Array.from({ length: 30 }, (_, i) => currentYear - i).map(
-                  (y) => (
-                    <option key={y} value={y}>
-                      {y}年以前
-                    </option>
-                  ),
-                )}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                資本金 下限（円）
-              </label>
-              <input
-                type="number"
-                value={capitalFrom}
-                onChange={(e) => setCapitalFrom(e.target.value)}
-                placeholder="例: 1000000"
-                className={`w-40 ${inputClass}`}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                資本金 上限（円）
-              </label>
-              <input
-                type="number"
-                value={capitalTo}
-                onChange={(e) => setCapitalTo(e.target.value)}
-                placeholder="例: 10000000"
-                className={`w-40 ${inputClass}`}
-              />
-            </div>
+      {/* 詳細フィルター (全タブ共通) */}
+      <div className="space-y-3 pt-3 border-t border-slate-100">
+        <div className="flex flex-wrap gap-3 items-end">
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              設立年 以降
+            </label>
+            <select
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">指定なし</option>
+              {Array.from({ length: 30 }, (_, i) => currentYear - i).map(
+                (y) => (
+                  <option key={y} value={y}>
+                    {y}年以降
+                    {y >= currentYear - 3
+                      ? " (創業期)"
+                      : y >= currentYear - 7
+                        ? " (成長期)"
+                        : ""}
+                  </option>
+                ),
+              )}
+            </select>
           </div>
-
-          <div className="flex flex-wrap gap-3 items-end">
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                従業員数 下限
-              </label>
-              <input
-                type="number"
-                value={employeesFrom}
-                onChange={(e) => setEmployeesFrom(e.target.value)}
-                placeholder="例: 10"
-                className={`w-32 ${inputClass}`}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                従業員数 上限
-              </label>
-              <input
-                type="number"
-                value={employeesTo}
-                onChange={(e) => setEmployeesTo(e.target.value)}
-                placeholder="例: 50"
-                className={`w-32 ${inputClass}`}
-              />
-            </div>
-            <div className="flex-1 min-w-48">
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                事業項目
-              </label>
-              <input
-                type="text"
-                value={business}
-                onChange={(e) => setBusiness(e.target.value)}
-                placeholder="例: ソフトウェア、コンサルティング"
-                className={`w-full ${inputClass}`}
-              />
-            </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              設立年 以前
+            </label>
+            <select
+              value={yearTo}
+              onChange={(e) => setYearTo(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">指定なし</option>
+              {Array.from({ length: 30 }, (_, i) => currentYear - i).map(
+                (y) => (
+                  <option key={y} value={y}>
+                    {y}年以前
+                  </option>
+                ),
+              )}
+            </select>
           </div>
-
-          {/* 売上 / 内部留保 (EDINET screener API 経由) */}
-          <div className="flex flex-wrap gap-3 items-end">
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                売上 下限（億円）
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={revenueOkuFrom}
-                onChange={(e) => setRevenueOkuFrom(e.target.value)}
-                placeholder="例: 10"
-                className={`w-32 ${inputClass}`}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                売上 上限（億円）
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={revenueOkuTo}
-                onChange={(e) => setRevenueOkuTo(e.target.value)}
-                placeholder="例: 1000"
-                className={`w-32 ${inputClass}`}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1.5">
-                内部留保 下限（億円）
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={equityOkuFrom}
-                onChange={(e) => setEquityOkuFrom(e.target.value)}
-                placeholder="例: 5"
-                className={`w-32 ${inputClass}`}
-              />
-              <p className="text-[10px] text-slate-400 mt-0.5">
-                ※ EDINET 純資産で代理 (上場のみ)
-              </p>
-            </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              資本金 下限（円）
+            </label>
+            <input
+              type="number"
+              value={capitalFrom}
+              onChange={(e) => setCapitalFrom(e.target.value)}
+              placeholder="例: 1000000"
+              className={`w-40 ${inputClass}`}
+            />
           </div>
-
-          <div className="flex flex-wrap gap-x-5 gap-y-2 items-center">
-            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={exist}
-                onChange={(e) => setExist(e.target.checked)}
-                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
-              />
-              存続中のみ（閉鎖除外）
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              資本金 上限（円）
             </label>
-            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={subsidy}
-                onChange={(e) => setSubsidy(e.target.checked)}
-                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
-              />
-              補助金受給
-            </label>
-            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={patent}
-                onChange={(e) => setPatent(e.target.checked)}
-                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
-              />
-              特許保有
-            </label>
-            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={commendation}
-                onChange={(e) => setCommendation(e.target.checked)}
-                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
-              />
-              表彰あり
-            </label>
-            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={finance}
-                onChange={(e) => setFinance(e.target.checked)}
-                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
-              />
-              財務情報あり
-            </label>
+            <input
+              type="number"
+              value={capitalTo}
+              onChange={(e) => setCapitalTo(e.target.value)}
+              placeholder="例: 10000000"
+              className={`w-40 ${inputClass}`}
+            />
           </div>
         </div>
-      )}
+
+        <div className="flex flex-wrap gap-3 items-end">
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              従業員数 下限
+            </label>
+            <input
+              type="number"
+              value={employeesFrom}
+              onChange={(e) => setEmployeesFrom(e.target.value)}
+              placeholder="例: 10"
+              className={`w-32 ${inputClass}`}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              従業員数 上限
+            </label>
+            <input
+              type="number"
+              value={employeesTo}
+              onChange={(e) => setEmployeesTo(e.target.value)}
+              placeholder="例: 50"
+              className={`w-32 ${inputClass}`}
+            />
+          </div>
+          <div className="flex-1 min-w-48">
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              事業項目
+            </label>
+            <input
+              type="text"
+              value={business}
+              onChange={(e) => setBusiness(e.target.value)}
+              placeholder="例: BPO、SaaS、アウトソーシング（AIが類義語展開）"
+              className={`w-full ${inputClass}`}
+            />
+          </div>
+        </div>
+
+        {/* 売上 / 内部留保 (EDINET screener API 経由) */}
+        <div className="flex flex-wrap gap-3 items-end">
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              売上 下限（億円）
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={revenueOkuFrom}
+              onChange={(e) => setRevenueOkuFrom(e.target.value)}
+              placeholder="例: 10"
+              className={`w-32 ${inputClass}`}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              売上 上限（億円）
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={revenueOkuTo}
+              onChange={(e) => setRevenueOkuTo(e.target.value)}
+              placeholder="例: 1000"
+              className={`w-32 ${inputClass}`}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">
+              内部留保 下限（億円）
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={equityOkuFrom}
+              onChange={(e) => setEquityOkuFrom(e.target.value)}
+              placeholder="例: 5"
+              className={`w-32 ${inputClass}`}
+            />
+            <p className="text-[10px] text-slate-400 mt-0.5">
+              ※ EDINET 純資産で代理 (上場のみ)
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-x-5 gap-y-2 items-center">
+          <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={exist}
+              onChange={(e) => setExist(e.target.checked)}
+              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
+            />
+            存続中のみ（閉鎖除外）
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={subsidy}
+              onChange={(e) => setSubsidy(e.target.checked)}
+              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
+            />
+            補助金受給
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={patent}
+              onChange={(e) => setPatent(e.target.checked)}
+              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
+            />
+            特許保有
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={commendation}
+              onChange={(e) => setCommendation(e.target.checked)}
+              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
+            />
+            表彰あり
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={finance}
+              onChange={(e) => setFinance(e.target.checked)}
+              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500/40"
+            />
+            財務情報あり
+          </label>
+        </div>
+      </div>
 
       <p className="text-xs text-slate-400">
         {listed === "listed"
-          ? "EDINET 上場企業データベース。企業名・業種・都道府県で絞り込み可能。"
+          ? "EDINET 上場企業データベース + gBizINFO で絞り込み。"
           : listed === "unlisted"
             ? "gBizINFO 500万社以上の法人データから上場会社を除外して検索。"
-            : ""}
+            : "EDINET 上場 + gBizINFO 非上場を横断検索。"}
       </p>
     </form>
   );

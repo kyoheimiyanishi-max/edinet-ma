@@ -1,5 +1,5 @@
-import TimeEntryManager from "@/components/TimeEntryManager";
+import { redirect } from "next/navigation";
 
 export default function TimePage() {
-  return <TimeEntryManager />;
+  redirect("/settings?tab=time");
 }

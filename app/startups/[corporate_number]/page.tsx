@@ -1169,7 +1169,7 @@ export default async function StartupDetailPage({ params }: Props) {
     return (
       <div className="space-y-6">
         <Link
-          href="/startups"
+          href="/search"
           className="inline-flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors"
         >
           <svg
@@ -1185,7 +1185,7 @@ export default async function StartupDetailPage({ params }: Props) {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          スタートアップ一覧に戻る
+          検索に戻る
         </Link>
 
         {/* ===== Header ===== */}
@@ -2068,7 +2068,7 @@ export default async function StartupDetailPage({ params }: Props) {
     return (
       <div className="space-y-4">
         <Link
-          href="/startups"
+          href="/search"
           className="inline-flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors"
         >
           <svg
@@ -2084,7 +2084,7 @@ export default async function StartupDetailPage({ params }: Props) {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          戻る
+          検索に戻る
         </Link>
         <div className="bg-red-50 border border-red-200/60 rounded-2xl p-6 text-red-700 text-sm space-y-1">
           <p>企業情報の取得に失敗しました。法人番号: {corporate_number}</p>
