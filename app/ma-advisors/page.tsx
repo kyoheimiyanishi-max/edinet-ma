@@ -10,6 +10,10 @@ import { PREFECTURES } from "@/lib/gbiz";
 import { normalizeCompanyLookupUrl } from "@/lib/company-lookup-url";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
+import ContactStatusSelect from "@/components/ContactStatusSelect";
+import ContactStatusBadgeEditable from "@/components/ContactStatusBadgeEditable";
+import type { AllianceContactStatus } from "@/lib/alliance-contact-status";
+import { CONTACT_STATUS_LABELS } from "@/lib/alliance-contact-status";
 
 interface Props {
   searchParams: Promise<{
@@ -19,6 +23,7 @@ interface Props {
     service?: string;
     listed?: string;
     targetSize?: string;
+    contactStatus?: string;
   }>;
 }
 
@@ -37,6 +42,7 @@ async function TypeFilter({
   service,
   listed,
   targetSize,
+  contactStatus,
 }: {
   current?: string;
   searchQ?: string;
@@ -44,6 +50,7 @@ async function TypeFilter({
   service?: string;
   listed?: string;
   targetSize?: string;
+  contactStatus?: string;
 }) {
   const types = await getPresentMaAdvisorTypes();
   const buildHref = (type?: string) => {
@@ -54,6 +61,7 @@ async function TypeFilter({
     if (service) params.set("service", service);
     if (listed) params.set("listed", listed);
     if (targetSize) params.set("targetSize", targetSize);
+    if (contactStatus) params.set("contactStatus", contactStatus);
     return `/ma-advisors?${params}`;
   };
 
@@ -114,6 +122,11 @@ function AdvisorCard({ advisor }: { advisor: MaAdvisor }) {
           )}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
+          <ContactStatusBadgeEditable
+            entityType="ma_advisor"
+            entityId={advisor.id}
+            initialStatus={advisor.contactStatus}
+          />
           {advisor.listed && (
             <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-700">
               上場
@@ -170,6 +183,9 @@ export default async function MaAdvisorsPage({ searchParams }: Props) {
   const service = params.service;
   const listed = params.listed === "1" ? "1" : undefined;
   const targetSize = params.targetSize;
+  const contactStatus = params.contactStatus as
+    | AllianceContactStatus
+    | undefined;
 
   const [advisors, allServices, allTargetSizes] = await Promise.all([
     searchMaAdvisors({
@@ -179,6 +195,7 @@ export default async function MaAdvisorsPage({ searchParams }: Props) {
       service,
       listedOnly: listed === "1",
       targetSize,
+      contactStatus,
     }),
     getAllMaAdvisorServices(),
     getAllMaAdvisorTargetSizes(),
@@ -212,6 +229,7 @@ export default async function MaAdvisorsPage({ searchParams }: Props) {
           service={service}
           listed={listed}
           targetSize={targetSize}
+          contactStatus={contactStatus}
         />
         <Suspense>
           <PrefectureSelect
@@ -224,19 +242,22 @@ export default async function MaAdvisorsPage({ searchParams }: Props) {
               ...(service ? { service } : {}),
               ...(listed ? { listed } : {}),
               ...(targetSize ? { targetSize } : {}),
+              ...(contactStatus ? { contactStatus } : {}),
             }}
           />
         </Suspense>
 
         <form
           action="/ma-advisors"
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end"
+          className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end"
         >
           {q && <input type="hidden" name="q" value={q} />}
           {type && <input type="hidden" name="type" value={type} />}
           {prefecture && (
             <input type="hidden" name="prefecture" value={prefecture} />
           )}
+
+          <ContactStatusSelect current={contactStatus} />
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-slate-500">
@@ -294,7 +315,7 @@ export default async function MaAdvisorsPage({ searchParams }: Props) {
           </div>
         </form>
 
-        {(service || listed || targetSize) && (
+        {(service || listed || targetSize || contactStatus) && (
           <a
             href={`/ma-advisors${
               q || type || prefecture
@@ -328,6 +349,11 @@ export default async function MaAdvisorsPage({ searchParams }: Props) {
             <span className="text-slate-400 ml-1">/ {targetSize}</span>
           )}
           {listed && <span className="text-slate-400 ml-1">/ 上場のみ</span>}
+          {contactStatus && (
+            <span className="text-slate-400 ml-1">
+              / {CONTACT_STATUS_LABELS[contactStatus]}
+            </span>
+          )}
         </span>
       </div>
 

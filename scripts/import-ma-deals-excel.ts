@@ -205,7 +205,7 @@ async function main(): Promise<void> {
   }
 
   let inserted = 0;
-  let skipped = 0;
+  const skipped = 0;
   let failed = 0;
 
   for (const d of deals) {

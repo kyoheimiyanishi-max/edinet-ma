@@ -37,6 +37,7 @@ import {
 import { FinancialCharts } from "@/components/FinancialCharts";
 import type { FinancialChartData } from "@/components/FinancialCharts";
 import Link from "next/link";
+import Image from "next/image";
 import { Suspense } from "react";
 import CompanyAnalysis from "@/components/CompanyAnalysis";
 import { CompanyAnalysisProvider } from "@/components/CompanyAnalysisContext";
@@ -47,10 +48,18 @@ import AiRunButton from "@/components/AiRunButton";
 import { notFound, redirect } from "next/navigation";
 import { parseCompanyId } from "@/lib/unified-company";
 import { getByName as findEdinetByName } from "@/lib/edinet-codelist";
+import type { Deal } from "@/lib/deals";
+import {
+  formatAmount as formatDealAmount,
+  getDealsByBuyer,
+  getDealStatusColor,
+  getDealCategoryColor,
+} from "@/lib/deals";
+import { findByBuyer as findDealsByBuyerD6e } from "@/lib/d6e/repos/ma-deals";
 
 interface Props {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ ai?: string }>;
+  searchParams: Promise<{ ai?: string; from?: string }>;
 }
 
 // ---- Shared UI ----
@@ -645,6 +654,143 @@ async function WebFallbackSection({
   );
 }
 
+// ---- M&A History section ----
+
+async function fetchBuyerDeals(companyName: string): Promise<Deal[]> {
+  // d6e を試行し、失敗時はローカル JSON にフォールバック
+  let deals: Deal[];
+  try {
+    const d6eDeals = await findDealsByBuyerD6e(companyName);
+    deals = d6eDeals.length > 0 ? d6eDeals : await getDealsByBuyer(companyName);
+  } catch {
+    deals = await getDealsByBuyer(companyName);
+  }
+  // ターゲット名が類似するエントリを重複排除（情報量が多い方を優先）
+  const normalize = (s: string) =>
+    s.replace(/株式会社|（株）|（.*?）|\(.*?\)/g, "").trim();
+  const grouped = new Map<string, Deal>();
+  for (const d of deals) {
+    const key = normalize(d.target);
+    const existing = grouped.get(key);
+    if (!existing) {
+      grouped.set(key, d);
+    } else {
+      // amount が大きい方（＝より詳細なデータ）を優先
+      if (d.amount > existing.amount) grouped.set(key, d);
+    }
+  }
+  return Array.from(grouped.values()).sort((a, b) =>
+    (b.date || "").localeCompare(a.date || ""),
+  );
+}
+
+async function MaHistorySection({ companyName }: { companyName: string }) {
+  const deals = await fetchBuyerDeals(companyName);
+
+  if (deals.length === 0) {
+    return (
+      <p className="text-sm text-slate-400 text-center py-4">
+        この企業が買手となったM&A案件のデータはありません
+      </p>
+    );
+  }
+
+  const totalAmount = deals.reduce((sum, d) => sum + d.amount, 0);
+  const completedDeals = deals.filter((d) => d.status === "完了");
+
+  return (
+    <div className="space-y-4">
+      {/* サマリー指標 */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-100">
+          <p className="text-xs text-slate-400 mb-1 font-medium">M&A実績数</p>
+          <p className="font-semibold text-slate-800">
+            {deals.length}
+            <span className="text-sm font-normal text-slate-500 ml-1">社</span>
+          </p>
+        </div>
+        <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-100">
+          <p className="text-xs text-slate-400 mb-1 font-medium">成約済み</p>
+          <p className="font-semibold text-slate-800">
+            {completedDeals.length}
+            <span className="text-sm font-normal text-slate-500 ml-1">社</span>
+          </p>
+        </div>
+        <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-100">
+          <p className="text-xs text-slate-400 mb-1 font-medium">
+            累計取得金額
+          </p>
+          <p className="font-semibold text-slate-800">
+            {totalAmount > 0 ? formatDealAmount(totalAmount) : "-"}
+          </p>
+        </div>
+        <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-100">
+          <p className="text-xs text-slate-400 mb-1 font-medium">直近案件</p>
+          <p className="font-semibold text-slate-800 text-sm">
+            {deals[0].date || "-"}
+          </p>
+        </div>
+      </div>
+
+      {/* ディール一覧テーブル */}
+      <div className="overflow-x-auto -mx-6 px-6">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-slate-100 text-left text-xs text-slate-400 uppercase tracking-wider">
+              <th className="pb-3 pr-4 font-medium">日付</th>
+              <th className="pb-3 pr-4 font-medium">対象企業</th>
+              <th className="pb-3 pr-4 font-medium text-right">取得金額</th>
+              <th className="pb-3 pr-4 font-medium text-right">保有比率</th>
+              <th className="pb-3 pr-4 font-medium">カテゴリ</th>
+              <th className="pb-3 pr-4 font-medium">ステータス</th>
+              <th className="pb-3 font-medium">概要</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {deals.map((deal) => (
+              <tr key={deal.id} className="hover:bg-blue-50/50">
+                <td className="py-3 pr-4 text-xs text-slate-500 whitespace-nowrap font-mono">
+                  {deal.date || "-"}
+                </td>
+                <td className="py-3 pr-4 text-slate-800 font-medium whitespace-nowrap">
+                  {deal.target}
+                </td>
+                <td className="py-3 pr-4 text-right font-mono text-slate-700 whitespace-nowrap">
+                  {deal.amount > 0 ? formatDealAmount(deal.amount) : "-"}
+                </td>
+                <td className="py-3 pr-4 text-right font-mono text-slate-700 whitespace-nowrap">
+                  {deal.holdingPct != null ? `${deal.holdingPct}%` : "-"}
+                </td>
+                <td className="py-3 pr-4 whitespace-nowrap">
+                  {deal.category && (
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getDealCategoryColor(deal.category)}`}
+                    >
+                      {deal.category}
+                    </span>
+                  )}
+                </td>
+                <td className="py-3 pr-4 whitespace-nowrap">
+                  {deal.status && (
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getDealStatusColor(deal.status)}`}
+                    >
+                      {deal.status}
+                    </span>
+                  )}
+                </td>
+                <td className="py-3 text-xs text-slate-500 leading-relaxed max-w-sm">
+                  {deal.summary}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 // ---- Group companies section ----
 
 async function GroupCompaniesSection({
@@ -949,9 +1095,11 @@ async function EnrichedSections({
               className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 hover:bg-green-50/50 hover:border-green-200 transition-all group"
             >
               {article.eyecatch && (
-                <img
+                <Image
                   src={article.eyecatch}
                   alt=""
+                  width={64}
+                  height={64}
                   className="w-16 h-16 rounded-lg object-cover shrink-0"
                 />
               )}
@@ -1062,6 +1210,18 @@ export default async function CompanyPage({ params, searchParams }: Props) {
   const { id } = await params;
   const sp = await searchParams;
   const aiEnabled = sp.ai === "1";
+  const BACK_MAP: Record<string, { href: string; label: string }> = {
+    buyers: { href: "/buyers", label: "買手管理に戻る" },
+    shareholders: { href: "/shareholders", label: "株主名検索に戻る" },
+    watchlist: { href: "/watchlist", label: "ウォッチリストに戻る" },
+    settings: { href: "/settings", label: "設定に戻る" },
+  };
+  const back = BACK_MAP[sp.from ?? ""] ?? {
+    href: "/search",
+    label: "企業一覧に戻る",
+  };
+  const backHref = back.href;
+  const backLabel = back.label;
 
   // id は EDINETコード (E+5桁) または 法人番号 (13桁数字) を受け付ける。
   // 法人番号の場合は edinet-codelist でマッピングを引き、EDINETコードが
@@ -1071,7 +1231,11 @@ export default async function CompanyPage({ params, searchParams }: Props) {
 
   if (parsed.kind === "corporate" && !parsed.edinetCode) {
     // EDINET 未登録の法人番号は startups ページ (gBizINFO ビュー) へリダイレクト
-    redirect(`/startups/${parsed.corporateNumber}${aiEnabled ? "?ai=1" : ""}`);
+    const qs = new URLSearchParams();
+    if (aiEnabled) qs.set("ai", "1");
+    if (sp.from) qs.set("from", sp.from);
+    const qstr = qs.toString();
+    redirect(`/startups/${parsed.corporateNumber}${qstr ? `?${qstr}` : ""}`);
   }
 
   const code =
@@ -1159,7 +1323,7 @@ export default async function CompanyPage({ params, searchParams }: Props) {
     return (
       <div className="space-y-6">
         <Link
-          href="/search"
+          href={backHref}
           className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
         >
           <svg
@@ -1175,7 +1339,7 @@ export default async function CompanyPage({ params, searchParams }: Props) {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          企業一覧に戻る
+          {backLabel}
         </Link>
 
         {/* ===== Header ===== */}
@@ -1563,6 +1727,20 @@ export default async function CompanyPage({ params, searchParams }: Props) {
                 </>
               )}
             </div>
+          </SectionCard>
+
+          {/* ===== M&A実績（買手として） ===== */}
+          <SectionCard title="M&A実績" badge="買手として">
+            <Suspense
+              fallback={
+                <div className="space-y-3">
+                  <div className="shimmer h-16 rounded-xl" />
+                  <div className="shimmer h-32 rounded-xl" />
+                </div>
+              }
+            >
+              <MaHistorySection companyName={company.name} />
+            </Suspense>
           </SectionCard>
 
           {/* ===== グループ会社・関連企業 ===== */}
@@ -2132,6 +2310,16 @@ export default async function CompanyPage({ params, searchParams }: Props) {
     const isNotFound = err instanceof EdinetApiError && err.status === 404;
     const isNoKey = err instanceof Error && err.message === "NO_API_KEY";
 
+    // EDINET DB API に該当企業が無い (有報提出義務者以外等) が法人番号を
+    // 持っている場合は gBizINFO ビュー (/startups/) へフォールバック
+    if (isNotFound && parsed.corporateNumber) {
+      const qs = new URLSearchParams();
+      if (aiEnabled) qs.set("ai", "1");
+      if (sp.from) qs.set("from", sp.from);
+      const qstr = qs.toString();
+      redirect(`/startups/${parsed.corporateNumber}${qstr ? `?${qstr}` : ""}`);
+    }
+
     let title = "企業データの取得に失敗しました";
     let detail = "EDINETコードを確認してください。";
 
@@ -2152,7 +2340,7 @@ export default async function CompanyPage({ params, searchParams }: Props) {
     return (
       <div className="space-y-4">
         <Link
-          href="/search"
+          href={backHref}
           className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
         >
           <svg
@@ -2168,7 +2356,7 @@ export default async function CompanyPage({ params, searchParams }: Props) {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          戻る
+          {backLabel}
         </Link>
         <div
           className={`rounded-2xl p-6 border ${

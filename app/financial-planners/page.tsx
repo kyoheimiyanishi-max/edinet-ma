@@ -10,6 +10,10 @@ import { PREFECTURES } from "@/lib/gbiz";
 import { normalizeCompanyLookupUrl } from "@/lib/company-lookup-url";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
+import ContactStatusSelect from "@/components/ContactStatusSelect";
+import ContactStatusBadgeEditable from "@/components/ContactStatusBadgeEditable";
+import type { AllianceContactStatus } from "@/lib/alliance-contact-status";
+import { CONTACT_STATUS_LABELS } from "@/lib/alliance-contact-status";
 
 interface Props {
   searchParams: Promise<{
@@ -19,6 +23,7 @@ interface Props {
     service?: string;
     listed?: string;
     targetClients?: string;
+    contactStatus?: string;
   }>;
 }
 
@@ -38,6 +43,7 @@ async function TypeFilter({
   service,
   listed,
   targetClients,
+  contactStatus,
 }: {
   current?: string;
   searchQ?: string;
@@ -45,6 +51,7 @@ async function TypeFilter({
   service?: string;
   listed?: string;
   targetClients?: string;
+  contactStatus?: string;
 }) {
   const types = await getPresentFpTypes();
   const buildHref = (type?: string) => {
@@ -55,6 +62,7 @@ async function TypeFilter({
     if (service) params.set("service", service);
     if (listed) params.set("listed", listed);
     if (targetClients) params.set("targetClients", targetClients);
+    if (contactStatus) params.set("contactStatus", contactStatus);
     return `/financial-planners?${params}`;
   };
 
@@ -115,6 +123,11 @@ function PlannerCard({ planner }: { planner: FinancialPlanner }) {
           )}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
+          <ContactStatusBadgeEditable
+            entityType="financial_planner"
+            entityId={planner.id}
+            initialStatus={planner.contactStatus}
+          />
           {planner.listed && (
             <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-700">
               上場
@@ -184,6 +197,7 @@ export default async function FinancialPlannersPage({ searchParams }: Props) {
   const service = sp.service;
   const listed = sp.listed === "1" ? "1" : undefined;
   const targetClients = sp.targetClients;
+  const contactStatus = sp.contactStatus as AllianceContactStatus | undefined;
 
   const [planners, allServices, allTargetClients] = await Promise.all([
     searchFinancialPlanners({
@@ -193,6 +207,7 @@ export default async function FinancialPlannersPage({ searchParams }: Props) {
       service,
       listedOnly: listed === "1",
       targetClients,
+      contactStatus,
     }),
     getAllFpServices(),
     getAllFpTargetClients(),
@@ -226,6 +241,7 @@ export default async function FinancialPlannersPage({ searchParams }: Props) {
           service={service}
           listed={listed}
           targetClients={targetClients}
+          contactStatus={contactStatus}
         />
         <Suspense>
           <PrefectureSelect
@@ -238,19 +254,22 @@ export default async function FinancialPlannersPage({ searchParams }: Props) {
               ...(service ? { service } : {}),
               ...(listed ? { listed } : {}),
               ...(targetClients ? { targetClients } : {}),
+              ...(contactStatus ? { contactStatus } : {}),
             }}
           />
         </Suspense>
 
         <form
           action="/financial-planners"
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end"
+          className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end"
         >
           {q && <input type="hidden" name="q" value={q} />}
           {type && <input type="hidden" name="type" value={type} />}
           {prefecture && (
             <input type="hidden" name="prefecture" value={prefecture} />
           )}
+
+          <ContactStatusSelect current={contactStatus} />
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-slate-500">
@@ -308,7 +327,7 @@ export default async function FinancialPlannersPage({ searchParams }: Props) {
           </div>
         </form>
 
-        {(service || listed || targetClients) && (
+        {(service || listed || targetClients || contactStatus) && (
           <a
             href={`/financial-planners${
               q || type || prefecture
@@ -342,6 +361,11 @@ export default async function FinancialPlannersPage({ searchParams }: Props) {
             <span className="text-slate-400 ml-1">/ {targetClients}</span>
           )}
           {listed && <span className="text-slate-400 ml-1">/ 上場のみ</span>}
+          {contactStatus && (
+            <span className="text-slate-400 ml-1">
+              / {CONTACT_STATUS_LABELS[contactStatus]}
+            </span>
+          )}
         </span>
       </div>
 

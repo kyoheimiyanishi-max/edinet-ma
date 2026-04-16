@@ -24,19 +24,18 @@ type NavItem =
     };
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/", label: "ダッシュボード", exact: true },
+  { href: "/", label: "ホーム", exact: true },
   { href: "/search", label: "企業検索" },
   { href: "/watchlist", label: "ウォッチリスト" },
   { href: "/shareholders", label: "株主名検索" },
   { href: "/deals", label: "売主管理" },
-  { href: "/buyers", label: "買い手管理" },
+  { href: "/buyers", label: "買手管理" },
   { href: "/kpi", label: "KPI" },
   {
     kind: "dropdown",
     label: "ネットワーク",
     items: [
       { href: "/events", label: "イベント" },
-      { href: "/people", label: "人物DB" },
       { href: "/communities", label: "コミュニティ" },
       { href: "/seminars", label: "セミナー" },
     ],
@@ -74,7 +73,7 @@ export default async function RootLayout({
   return (
     <html lang="ja" className={`${geist.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased">
-        <header className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white shadow-lg">
+        <header className="sticky top-0 z-50 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white shadow-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

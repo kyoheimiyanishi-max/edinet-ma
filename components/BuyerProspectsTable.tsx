@@ -126,7 +126,7 @@ export default function BuyerProspectsTable({
                     <div className="min-w-0">
                       {c.corporateNumber ? (
                         <a
-                          href={`/company/${c.corporateNumber}`}
+                          href={`/company/${c.corporateNumber}?from=buyers`}
                           className="font-medium text-slate-800 hover:text-blue-600 truncate block max-w-[240px]"
                         >
                           {c.name}

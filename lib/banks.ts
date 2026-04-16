@@ -1,5 +1,7 @@
 import banksData from "@/data/banks.json";
 
+import type { AllianceContactStatus } from "./alliance-contact-status";
+
 // ---- Types ----
 //
 // d6e is now the source of truth for banks data — see
@@ -27,6 +29,7 @@ export interface Bank {
   url?: string;
   totalAssets?: string;
   maTeam?: string;
+  contactStatus: AllianceContactStatus;
 }
 
 export const BANK_TYPES: readonly BankType[] = [
@@ -46,6 +49,7 @@ export interface BankFilters {
   prefecture?: string;
   service?: string;
   hasMaTeam?: boolean;
+  contactStatus?: AllianceContactStatus;
 }
 
 // ---- Seed data ----

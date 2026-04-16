@@ -9,7 +9,7 @@ import { FP_TYPES } from "@/lib/financial-planners";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
-import { toFpType } from "./_enums";
+import { toAllianceContactStatus, toFpType } from "./_enums";
 
 /**
  * d6e-backed repository for the `financial_planners` table.
@@ -26,10 +26,11 @@ interface FinancialPlannerRow {
   prefecture: string | null;
   website_url: string | null;
   listed: boolean | null;
+  contact_status: string | null;
 }
 
 const SELECT_COLUMNS =
-  "id, name, fp_type, description, services, certifications, target_clients, prefecture, website_url, listed";
+  "id, name, fp_type, description, services, certifications, target_clients, prefecture, website_url, listed, contact_status";
 
 function rowToPlanner(row: FinancialPlannerRow): FinancialPlanner {
   return {
@@ -45,6 +46,7 @@ function rowToPlanner(row: FinancialPlannerRow): FinancialPlanner {
     ...(row.prefecture ? { prefecture: row.prefecture } : {}),
     ...(row.website_url ? { url: row.website_url } : {}),
     ...(row.listed !== null ? { listed: row.listed } : {}),
+    contactStatus: toAllianceContactStatus(row.contact_status),
   };
 }
 
@@ -58,6 +60,7 @@ export interface FinancialPlannerInput {
   prefecture?: string;
   url?: string;
   listed?: boolean;
+  contactStatus?: string;
 }
 
 function inputToColumnsAndValues(input: FinancialPlannerInput): {
@@ -75,6 +78,7 @@ function inputToColumnsAndValues(input: FinancialPlannerInput): {
       "prefecture",
       "website_url",
       "listed",
+      "contact_status",
     ],
     values: [
       escapeSqlValue(input.name),
@@ -86,6 +90,7 @@ function inputToColumnsAndValues(input: FinancialPlannerInput): {
       escapeSqlValue(input.prefecture),
       escapeSqlValue(input.url),
       escapeSqlValue(input.listed ?? false),
+      escapeSqlValue(input.contactStatus ?? "none"),
     ],
   };
 }
@@ -144,6 +149,9 @@ export async function search(
         p.targetClients !== undefined &&
         p.targetClients.toLowerCase().includes(tc),
     );
+  }
+  if (filters.contactStatus) {
+    results = results.filter((p) => p.contactStatus === filters.contactStatus);
   }
   if (filters.query && filters.query.trim()) {
     const q = filters.query.trim().toLowerCase();
@@ -236,6 +244,8 @@ export async function update(
     assignments.push(`website_url = ${escapeSqlValue(patch.url)}`);
   if (patch.listed !== undefined)
     assignments.push(`listed = ${patch.listed ? "TRUE" : "FALSE"}`);
+  if (patch.contactStatus !== undefined)
+    assignments.push(`contact_status = ${escapeSqlValue(patch.contactStatus)}`);
 
   if (assignments.length === 0) return findById(id);
   assignments.push("updated_at = now()");

@@ -11,6 +11,7 @@ export interface Deal {
   category: string;
   status: string;
   summary: string;
+  holdingPct?: number | null;
 }
 
 const DATA_PATH = path.join(process.cwd(), "data", "deals.json");
@@ -43,6 +44,24 @@ export function getDealStatusColor(status: string): string {
     検討中: "bg-slate-100 text-slate-600",
   };
   return colors[status] || "bg-slate-100 text-slate-600";
+}
+
+/**
+ * 買手企業名でディールをフィルタ。
+ * company.name (例: "ルネサスエレクトロニクス株式会社") と deals.buyer
+ * (例: "ルネサスエレクトロニクス") の部分一致で判定する。
+ */
+export async function getDealsByBuyer(buyerName: string): Promise<Deal[]> {
+  const all = await getAllDeals();
+  const short = buyerName
+    .replace(/株式会社|（株）|有限会社|合同会社/g, "")
+    .trim();
+  return all.filter((d) => {
+    const dBuyer = d.buyer
+      .replace(/株式会社|（株）|有限会社|合同会社/g, "")
+      .trim();
+    return dBuyer.includes(short) || short.includes(dBuyer);
+  });
 }
 
 export function getDealCategoryColor(category: string): string {

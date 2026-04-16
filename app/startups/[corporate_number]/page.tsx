@@ -27,11 +27,13 @@ import { searchNews, formatPubDate } from "@/lib/news";
 import CompanyEmployeeSection from "@/components/CompanyEmployeeSection";
 import { FinancialCharts } from "@/components/FinancialCharts";
 import type { FinancialChartData } from "@/components/FinancialCharts";
+import { getByCorporateNumber } from "@/lib/edinet-codelist";
 import Link from "next/link";
 import { Suspense } from "react";
 
 interface Props {
   params: Promise<{ corporate_number: string }>;
+  searchParams: Promise<{ from?: string }>;
 }
 
 // ---- Shared UI components ----
@@ -1022,8 +1024,23 @@ function EnrichedSkeleton() {
 
 // ---- Main page ----
 
-export default async function StartupDetailPage({ params }: Props) {
+const BACK_MAP: Record<string, { href: string; label: string }> = {
+  buyers: { href: "/buyers", label: "買手管理に戻る" },
+  shareholders: { href: "/shareholders", label: "株主名検索に戻る" },
+  watchlist: { href: "/watchlist", label: "ウォッチリストに戻る" },
+  settings: { href: "/settings", label: "設定に戻る" },
+};
+
+export default async function StartupDetailPage({
+  params,
+  searchParams,
+}: Props) {
   const { corporate_number } = await params;
+  const sp = await searchParams;
+  const back = BACK_MAP[sp.from ?? ""] ?? {
+    href: "/search",
+    label: "検索に戻る",
+  };
 
   try {
     // Phase 1: All gBizINFO endpoints in parallel (all with catch for resilience)
@@ -1169,7 +1186,7 @@ export default async function StartupDetailPage({ params }: Props) {
     return (
       <div className="space-y-6">
         <Link
-          href="/search"
+          href={back.href}
           className="inline-flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors"
         >
           <svg
@@ -1185,7 +1202,7 @@ export default async function StartupDetailPage({ params }: Props) {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          検索に戻る
+          {back.label}
         </Link>
 
         {/* ===== Header ===== */}
@@ -2064,11 +2081,107 @@ export default async function StartupDetailPage({ params }: Props) {
       </div>
     );
   } catch (err) {
+    // gBizINFO にデータが無い場合でも edinet-codelist に基本情報があれば
+    // 最低限の企業ページを表示する (Web検索・外部リンク付き)
+    const codelistEntry = getByCorporateNumber(corporate_number);
+    if (codelistEntry) {
+      const companyName = codelistEntry.name;
+      return (
+        <div className="space-y-6">
+          <Link
+            href={back.href}
+            className="inline-flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            {back.label}
+          </Link>
+
+          {/* Header */}
+          <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6">
+            <h2 className="text-2xl font-bold text-slate-800">{companyName}</h2>
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <span className="text-xs font-mono px-2 py-1 bg-slate-100 rounded-lg text-slate-500">
+                {corporate_number}
+              </span>
+              {codelistEntry.edinetCode && (
+                <span className="text-xs font-mono px-2 py-1 bg-blue-50 rounded-lg text-blue-600">
+                  {codelistEntry.edinetCode}
+                </span>
+              )}
+              {codelistEntry.industry && (
+                <span className="text-xs px-2 py-1 bg-purple-50 rounded-lg text-purple-600">
+                  {codelistEntry.industry}
+                </span>
+              )}
+            </div>
+            <div className="mt-4 p-3 bg-amber-50/80 rounded-xl border border-amber-200/60 text-sm text-amber-700">
+              EDINET DB・gBizINFO
+              にデータが登録されていないため、公開情報から取得した情報を表示しています。
+            </div>
+          </div>
+
+          {/* External Links */}
+          <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-4">
+            <div className="flex flex-wrap gap-3">
+              <ExternalLink
+                href={`https://www.houjin-bangou.nta.go.jp/henkorireki-johoto.html?selHouzinNo=${corporate_number}`}
+              >
+                国税庁（法人番号）
+              </ExternalLink>
+              <ExternalLink
+                href={`https://info.gbiz.go.jp/hojin/ichiran?hojinBango=${corporate_number}`}
+              >
+                gBizINFO
+              </ExternalLink>
+              <ExternalLink
+                href={`https://www.wantedly.com/search?q=${encodeURIComponent(companyName)}&t=company`}
+              >
+                Wantedly
+              </ExternalLink>
+              <ExternalLink
+                href={`https://www.j-platpat.inpit.go.jp/c1800/PU/JP/jpn/applicant?applicant=${encodeURIComponent(companyName)}`}
+              >
+                J-PlatPat（特許）
+              </ExternalLink>
+            </div>
+          </div>
+
+          {/* Company News */}
+          <SectionCard title="関連ニュース" badge="自動検索">
+            <Suspense fallback={<div className="shimmer h-32 rounded-xl" />}>
+              <CompanyNewsSection companyName={companyName} />
+            </Suspense>
+          </SectionCard>
+
+          {/* Enriched sections */}
+          <Suspense fallback={<EnrichedSkeleton />}>
+            <EnrichedSections
+              name={companyName}
+              corporateNumber={corporate_number}
+              hasDescription={false}
+            />
+          </Suspense>
+        </div>
+      );
+    }
+
     const msg = err instanceof Error ? err.message : String(err);
     return (
       <div className="space-y-4">
         <Link
-          href="/search"
+          href={back.href}
           className="inline-flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors"
         >
           <svg
@@ -2084,7 +2197,7 @@ export default async function StartupDetailPage({ params }: Props) {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          検索に戻る
+          {back.label}
         </Link>
         <div className="bg-red-50 border border-red-200/60 rounded-2xl p-6 text-red-700 text-sm space-y-1">
           <p>企業情報の取得に失敗しました。法人番号: {corporate_number}</p>

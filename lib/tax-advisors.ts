@@ -1,5 +1,7 @@
 import advisorsData from "@/data/tax-advisors.json";
 
+import type { AllianceContactStatus } from "./alliance-contact-status";
+
 // ---- Types ----
 //
 // d6e is the source of truth for tax advisors data — see
@@ -26,6 +28,7 @@ export interface TaxAdvisor {
   url?: string;
   size?: string;
   notableServices?: string[];
+  contactStatus: AllianceContactStatus;
 }
 
 export const ADVISOR_TYPES: readonly AdvisorType[] = [
@@ -43,6 +46,7 @@ export interface AdvisorFilters {
   prefecture?: string;
   specialty?: string;
   size?: string;
+  contactStatus?: AllianceContactStatus;
 }
 
 // ---- Seed data ----

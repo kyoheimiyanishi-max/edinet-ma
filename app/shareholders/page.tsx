@@ -187,7 +187,7 @@ async function Results({ filters, page }: { filters: Filters; page: number }) {
                 <tr key={i} className="hover:bg-blue-50/50">
                   <td className="px-5 py-3.5">
                     <Link
-                      href={`/company/${r.issuer_edinet_code}`}
+                      href={`/company/${r.issuer_edinet_code}?from=shareholders`}
                       className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                     >
                       {r.issuer_name}

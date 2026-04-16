@@ -9,7 +9,7 @@ import { ADVISOR_TYPES } from "@/lib/tax-advisors";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
-import { toAdvisorType } from "./_enums";
+import { toAdvisorType, toAllianceContactStatus } from "./_enums";
 
 /**
  * d6e-backed repository for the `tax_advisors` table.
@@ -29,10 +29,11 @@ interface TaxAdvisorRow {
   website_url: string | null;
   firm_size: string | null;
   notable_services: string[] | null;
+  contact_status: string | null;
 }
 
 const SELECT_COLUMNS =
-  "id, name, advisor_type, description, specialties, prefecture, website_url, firm_size, notable_services";
+  "id, name, advisor_type, description, specialties, prefecture, website_url, firm_size, notable_services, contact_status";
 
 function rowToAdvisor(row: TaxAdvisorRow): TaxAdvisor {
   return {
@@ -47,6 +48,7 @@ function rowToAdvisor(row: TaxAdvisorRow): TaxAdvisor {
     ...(Array.isArray(row.notable_services) && row.notable_services.length > 0
       ? { notableServices: row.notable_services }
       : {}),
+    contactStatus: toAllianceContactStatus(row.contact_status),
   };
 }
 
@@ -59,6 +61,7 @@ export interface TaxAdvisorInput {
   url?: string;
   size?: string;
   notableServices?: string[];
+  contactStatus?: string;
 }
 
 function inputToValuesAndColumns(input: TaxAdvisorInput): {
@@ -75,6 +78,7 @@ function inputToValuesAndColumns(input: TaxAdvisorInput): {
       "website_url",
       "firm_size",
       "notable_services",
+      "contact_status",
     ],
     values: [
       escapeSqlValue(input.name),
@@ -85,6 +89,7 @@ function inputToValuesAndColumns(input: TaxAdvisorInput): {
       escapeSqlValue(input.url),
       escapeSqlValue(input.size),
       escapeSqlValue(input.notableServices ?? [], "jsonb"),
+      escapeSqlValue(input.contactStatus ?? "none"),
     ],
   };
 }
@@ -141,6 +146,9 @@ export async function search(
     results = results.filter(
       (a) => a.size !== undefined && a.size.toLowerCase().includes(sz),
     );
+  }
+  if (filters.contactStatus) {
+    results = results.filter((a) => a.contactStatus === filters.contactStatus);
   }
   if (filters.query && filters.query.trim()) {
     const q = filters.query.trim().toLowerCase();
@@ -250,6 +258,8 @@ export async function update(
     assignments.push(
       `notable_services = ${escapeSqlValue(patch.notableServices, "jsonb")}`,
     );
+  if (patch.contactStatus !== undefined)
+    assignments.push(`contact_status = ${escapeSqlValue(patch.contactStatus)}`);
 
   if (assignments.length === 0) {
     return findById(id);

@@ -66,7 +66,7 @@ export default function WatchlistCard({
 
   if (removed) return null;
 
-  const detailHref = `/company/${entry.corporateNumber || entry.edinetCode || entry.companyId}`;
+  const detailHref = `/company/${entry.corporateNumber || entry.edinetCode || entry.companyId}?from=watchlist`;
 
   const onUnwatch = async () => {
     if (!confirm(`「${entry.name}」をウォッチリストから外しますか？`)) return;

@@ -122,7 +122,8 @@ export default function EventsManager() {
     });
   }, [events, filter]);
 
-  const today = formatDate(new Date());
+  const now = useMemo(() => Date.now(), []);
+  const today = formatDate(new Date(now));
   const upcoming = filtered.filter(
     (e) => e.date >= today && e.status === "予定",
   );

@@ -12,6 +12,10 @@ import "server-only";
  * logic.
  */
 
+import {
+  ALLIANCE_CONTACT_STATUSES,
+  type AllianceContactStatus,
+} from "@/lib/alliance-contact-status";
 import { BANK_TYPES, type BankType } from "@/lib/banks";
 import { COMMUNITY_TYPES, type CommunityType } from "@/lib/communities";
 import { FP_TYPES, type FpType } from "@/lib/financial-planners";
@@ -45,6 +49,12 @@ function narrow<T extends string>(
     `[d6e enum] unexpected ${label} value ${JSON.stringify(value)} — falling back to ${JSON.stringify(fallback)}`,
   );
   return fallback;
+}
+
+export function toAllianceContactStatus(
+  v: string | null | undefined,
+): AllianceContactStatus {
+  return narrow(v, ALLIANCE_CONTACT_STATUSES, "none", "AllianceContactStatus");
 }
 
 export function toBankType(v: string | null | undefined): BankType {

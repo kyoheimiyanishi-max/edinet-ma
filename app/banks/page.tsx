@@ -9,6 +9,10 @@ import { PREFECTURES } from "@/lib/gbiz";
 import { normalizeCompanyLookupUrl } from "@/lib/company-lookup-url";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
+import ContactStatusSelect from "@/components/ContactStatusSelect";
+import ContactStatusBadgeEditable from "@/components/ContactStatusBadgeEditable";
+import type { AllianceContactStatus } from "@/lib/alliance-contact-status";
+import { CONTACT_STATUS_LABELS } from "@/lib/alliance-contact-status";
 
 interface Props {
   searchParams: Promise<{
@@ -17,6 +21,7 @@ interface Props {
     prefecture?: string;
     service?: string;
     hasMaTeam?: string;
+    contactStatus?: string;
   }>;
 }
 
@@ -37,12 +42,14 @@ async function TypeFilter({
   prefecture,
   service,
   hasMaTeam,
+  contactStatus,
 }: {
   current?: string;
   searchQ?: string;
   prefecture?: string;
   service?: string;
   hasMaTeam?: string;
+  contactStatus?: string;
 }) {
   const types = await getAllTypes();
   const buildHref = (type?: string) => {
@@ -52,6 +59,7 @@ async function TypeFilter({
     if (prefecture) params.set("prefecture", prefecture);
     if (service) params.set("service", service);
     if (hasMaTeam) params.set("hasMaTeam", hasMaTeam);
+    if (contactStatus) params.set("contactStatus", contactStatus);
     return `/banks?${params}`;
   };
 
@@ -111,11 +119,18 @@ function BankCard({ bank }: { bank: Bank }) {
             <p className="font-semibold text-slate-800">{bank.name}</p>
           )}
         </div>
-        <span
-          className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold shrink-0 ${badgeColor}`}
-        >
-          {bank.type}
-        </span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <ContactStatusBadgeEditable
+            entityType="bank"
+            entityId={bank.id}
+            initialStatus={bank.contactStatus}
+          />
+          <span
+            className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}`}
+          >
+            {bank.type}
+          </span>
+        </div>
       </div>
 
       <p className="mt-2 text-sm text-slate-500 line-clamp-3">
@@ -166,6 +181,9 @@ export default async function BanksPage({ searchParams }: Props) {
   const prefecture = params.prefecture;
   const service = params.service;
   const hasMaTeam = params.hasMaTeam === "1" ? "1" : undefined;
+  const contactStatus = params.contactStatus as
+    | AllianceContactStatus
+    | undefined;
   const [banks, allServices] = await Promise.all([
     searchBanks({
       query: q,
@@ -173,6 +191,7 @@ export default async function BanksPage({ searchParams }: Props) {
       prefecture,
       service,
       hasMaTeam: hasMaTeam === "1",
+      contactStatus,
     }),
     getAllMaServices(),
   ]);
@@ -204,6 +223,7 @@ export default async function BanksPage({ searchParams }: Props) {
           prefecture={prefecture}
           service={service}
           hasMaTeam={hasMaTeam}
+          contactStatus={contactStatus}
         />
         <Suspense>
           <PrefectureSelect
@@ -215,6 +235,7 @@ export default async function BanksPage({ searchParams }: Props) {
               ...(type ? { type } : {}),
               ...(service ? { service } : {}),
               ...(hasMaTeam ? { hasMaTeam } : {}),
+              ...(contactStatus ? { contactStatus } : {}),
             }}
           />
         </Suspense>
@@ -222,7 +243,7 @@ export default async function BanksPage({ searchParams }: Props) {
         {/* M&A service + has team */}
         <form
           action="/banks"
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end"
+          className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end"
         >
           {q && <input type="hidden" name="q" value={q} />}
           {type && <input type="hidden" name="type" value={type} />}
@@ -230,7 +251,9 @@ export default async function BanksPage({ searchParams }: Props) {
             <input type="hidden" name="prefecture" value={prefecture} />
           )}
 
-          <div className="space-y-1.5 sm:col-span-2">
+          <ContactStatusSelect current={contactStatus} />
+
+          <div className="space-y-1.5">
             <label className="text-xs font-semibold text-slate-500">
               M&Aサービス
             </label>
@@ -268,7 +291,7 @@ export default async function BanksPage({ searchParams }: Props) {
           </div>
         </form>
 
-        {(service || hasMaTeam) && (
+        {(service || hasMaTeam || contactStatus) && (
           <a
             href={`/banks${
               q || type || prefecture
@@ -298,6 +321,11 @@ export default async function BanksPage({ searchParams }: Props) {
           {service && <span className="text-slate-400 ml-1">/ {service}</span>}
           {hasMaTeam && (
             <span className="text-slate-400 ml-1">/ 専門部隊あり</span>
+          )}
+          {contactStatus && (
+            <span className="text-slate-400 ml-1">
+              / {CONTACT_STATUS_LABELS[contactStatus]}
+            </span>
           )}
         </span>
       </div>

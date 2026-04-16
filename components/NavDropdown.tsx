@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 interface Item {
@@ -25,7 +25,7 @@ export default function NavDropdown({ label, items }: Props) {
 
   const isActive = items.some((it) => pathname.startsWith(it.href));
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setMounted(true);
   }, []);
 
@@ -64,7 +64,7 @@ export default function NavDropdown({ label, items }: Props) {
   }, [open]);
 
   useEffect(() => {
-    setOpen(false);
+    startTransition(() => setOpen(false));
   }, [pathname]);
 
   return (

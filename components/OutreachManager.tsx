@@ -151,15 +151,16 @@ export default function OutreachManager() {
     });
   }, [logs, filter]);
 
+  const now = useMemo(() => Date.now(), []);
   const stats = useMemo(() => {
     const total = logs.length;
     const replied = logs.filter((l) => l.status === "replied").length;
     const sent7d = logs.filter((l) => {
       const d = new Date(l.sentAt);
-      return Date.now() - d.getTime() < 7 * 24 * 3600 * 1000;
+      return now - d.getTime() < 7 * 24 * 3600 * 1000;
     }).length;
     return { total, replied, sent7d };
-  }, [logs]);
+  }, [logs, now]);
 
   return (
     <div className="space-y-6">

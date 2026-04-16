@@ -35,6 +35,7 @@ interface MaDealRow {
   deal_status: string | null;
   summary: string;
   source_url: string | null;
+  holding_pct: string | number | null;
 }
 
 const SELECT_COLUMNS =
@@ -51,6 +52,11 @@ function rowToDeal(row: MaDealRow): Deal {
     category: row.deal_category ?? "",
     status: row.deal_status ?? "",
     summary: row.summary,
+    // holding_pct カラムが追加されたら row.holding_pct を参照
+    holdingPct:
+      "holding_pct" in row && row.holding_pct != null
+        ? Number(row.holding_pct)
+        : null,
   };
 }
 
@@ -100,6 +106,23 @@ export async function findByNaturalKey(
   );
   const row = result.rows?.[0];
   return row ? rowToDeal(row) : null;
+}
+
+/**
+ * 買手名(部分一致)でディールを取得する。
+ * LIKE 検索のため、「株式会社」を除去した短縮名を渡すことを推奨。
+ */
+export async function findByBuyer(buyerName: string): Promise<Deal[]> {
+  const short = buyerName
+    .replace(/株式会社|（株）|有限会社|合同会社/g, "")
+    .trim();
+  const result = await executeSql<MaDealRow>(
+    `SELECT ${SELECT_COLUMNS} FROM ${tableRef("ma_deals")}
+     WHERE buyer_name ILIKE ${escapeSqlValue(`%${short}%`)}
+        OR buyer ILIKE ${escapeSqlValue(`%${short}%`)}
+     ORDER BY deal_date DESC NULLS LAST`,
+  );
+  return (result.rows ?? []).map(rowToDeal);
 }
 
 // ---- Writes ----

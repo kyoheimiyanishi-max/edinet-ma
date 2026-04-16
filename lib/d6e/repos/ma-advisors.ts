@@ -9,7 +9,7 @@ import { MA_ADVISOR_TYPES } from "@/lib/ma-advisors";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
-import { toMaAdvisorType } from "./_enums";
+import { toAllianceContactStatus, toMaAdvisorType } from "./_enums";
 
 /**
  * d6e-backed repository for the `ma_advisors` table (curated M&A
@@ -26,10 +26,11 @@ interface MaAdvisorRow {
   website_url: string | null;
   listed: boolean | null;
   target_size: string | null;
+  contact_status: string | null;
 }
 
 const SELECT_COLUMNS =
-  "id, name, advisor_type, description, services, prefecture, website_url, listed, target_size";
+  "id, name, advisor_type, description, services, prefecture, website_url, listed, target_size, contact_status";
 
 function rowToAdvisor(row: MaAdvisorRow): MaAdvisor {
   return {
@@ -42,6 +43,7 @@ function rowToAdvisor(row: MaAdvisorRow): MaAdvisor {
     ...(row.website_url ? { url: row.website_url } : {}),
     ...(row.listed !== null ? { listed: row.listed } : {}),
     ...(row.target_size ? { targetSize: row.target_size } : {}),
+    contactStatus: toAllianceContactStatus(row.contact_status),
   };
 }
 
@@ -54,6 +56,7 @@ export interface MaAdvisorInput {
   url?: string;
   listed?: boolean;
   targetSize?: string;
+  contactStatus?: string;
 }
 
 function inputToColumnsAndValues(input: MaAdvisorInput): {
@@ -70,6 +73,7 @@ function inputToColumnsAndValues(input: MaAdvisorInput): {
       "website_url",
       "listed",
       "target_size",
+      "contact_status",
     ],
     values: [
       escapeSqlValue(input.name),
@@ -80,6 +84,7 @@ function inputToColumnsAndValues(input: MaAdvisorInput): {
       escapeSqlValue(input.url),
       escapeSqlValue(input.listed ?? false),
       escapeSqlValue(input.targetSize),
+      escapeSqlValue(input.contactStatus ?? "none"),
     ],
   };
 }
@@ -131,6 +136,9 @@ export async function search(
   }
   if (filters.targetSize) {
     results = results.filter((a) => a.targetSize === filters.targetSize);
+  }
+  if (filters.contactStatus) {
+    results = results.filter((a) => a.contactStatus === filters.contactStatus);
   }
   if (filters.query && filters.query.trim()) {
     const q = filters.query.trim().toLowerCase();
@@ -214,6 +222,8 @@ export async function update(
     assignments.push(`listed = ${patch.listed ? "TRUE" : "FALSE"}`);
   if (patch.targetSize !== undefined)
     assignments.push(`target_size = ${escapeSqlValue(patch.targetSize)}`);
+  if (patch.contactStatus !== undefined)
+    assignments.push(`contact_status = ${escapeSqlValue(patch.contactStatus)}`);
 
   if (assignments.length === 0) return findById(id);
   assignments.push("updated_at = now()");

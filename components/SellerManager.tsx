@@ -202,6 +202,11 @@ const BUYER_STATUS_COLORS: Record<BuyerStatus, string> = {
   見送り: "bg-rose-100 text-rose-700",
 };
 
+interface EmployeeSummary {
+  id: string;
+  name: string;
+}
+
 type Tab = "profile" | "minutes" | "documents" | "buyers" | "tasks";
 
 const EMPTY_SELLER_FORM = {
@@ -230,6 +235,7 @@ const EMPTY_SELLER_FORM = {
 export default function SellerManager() {
   const [sellers, setSellers] = useState<Seller[]>([]);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
+  const [employees, setEmployees] = useState<EmployeeSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -256,6 +262,12 @@ export default function SellerManager() {
     setProjects(data);
   }, []);
 
+  const fetchEmployees = useCallback(async () => {
+    const res = await fetch("/api/employees");
+    const data: Array<{ id: string; name: string }> = await res.json();
+    setEmployees(data.map((e) => ({ id: e.id, name: e.name })));
+  }, []);
+
   const refreshAll = useCallback(async () => {
     await Promise.all([fetchSellers(), fetchProjects()]);
   }, [fetchSellers, fetchProjects]);
@@ -263,14 +275,25 @@ export default function SellerManager() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [sRes, pRes] = await Promise.all([
+      const [sRes, pRes, eRes] = await Promise.all([
         fetch("/api/sellers"),
         fetch("/api/projects"),
+        fetch("/api/employees"),
       ]);
-      const [sData, pData] = await Promise.all([sRes.json(), pRes.json()]);
+      const [sData, pData, eData] = await Promise.all([
+        sRes.json(),
+        pRes.json(),
+        eRes.json(),
+      ]);
       if (cancelled) return;
       setSellers(sData);
       setProjects(pData);
+      setEmployees(
+        (eData as Array<{ id: string; name: string }>).map((e) => ({
+          id: e.id,
+          name: e.name,
+        })),
+      );
       setLoading(false);
     })();
     return () => {
@@ -284,12 +307,8 @@ export default function SellerManager() {
   );
 
   const assigneeOptions = useMemo(() => {
-    const set = new Set<string>();
-    sellers.forEach((s) => {
-      if (s.assignedTo) set.add(s.assignedTo);
-    });
-    return Array.from(set).sort();
-  }, [sellers]);
+    return employees.map((e) => e.name).sort();
+  }, [employees]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -455,6 +474,25 @@ export default function SellerManager() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-500 mb-1">
+                  案件担当者
+                </label>
+                <select
+                  value={newForm.assignedTo}
+                  onChange={(e) =>
+                    setNewForm({ ...newForm, assignedTo: e.target.value })
+                  }
+                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">選択してください</option>
+                  {employees.map((emp) => (
+                    <option key={emp.id} value={emp.name}>
+                      {emp.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <Textarea
               label="概要"
@@ -543,7 +581,7 @@ export default function SellerManager() {
             onChange={(e) => setFilterAssignee(e.target.value)}
             className="px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">担当者 全て</option>
+            <option value="">案件担当者 全て</option>
             {assigneeOptions.map((a) => (
               <option key={a} value={a}>
                 {a}
@@ -658,12 +696,22 @@ export default function SellerManager() {
                           {s.mediatorType && ` / ${s.mediatorType}`}
                         </p>
                       )}
-                      {s.assignedTo && (
-                        <p className="text-[10px] text-slate-400 mt-0.5">
-                          担当: {s.assignedTo}
-                          {s.introSource && ` / 紹介: ${s.introSource}`}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                        {s.assignedTo ? (
+                          <span className="text-[11px] px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 font-medium">
+                            担当: {s.assignedTo}
+                          </span>
+                        ) : (
+                          <span className="text-[11px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-400">
+                            担当: 未設定
+                          </span>
+                        )}
+                        {s.introSource && (
+                          <span className="text-[10px] text-slate-400">
+                            紹介: {s.introSource}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <span
                       className={`text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0 ${STAGE_COLORS[s.stage]}`}
@@ -708,6 +756,7 @@ export default function SellerManager() {
               seller={selected}
               projects={projects.filter((p) => p.sellerId === selected.id)}
               unlinkedProjects={projects.filter((p) => !p.sellerId)}
+              employees={employees}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               onRefresh={refreshAll}
@@ -729,6 +778,7 @@ function SellerDetail({
   seller,
   projects,
   unlinkedProjects,
+  employees,
   activeTab,
   setActiveTab,
   onRefresh,
@@ -736,6 +786,7 @@ function SellerDetail({
   seller: Seller;
   projects: ProjectSummary[];
   unlinkedProjects: ProjectSummary[];
+  employees: EmployeeSummary[];
   activeTab: Tab;
   setActiveTab: (t: Tab) => void;
   onRefresh: () => Promise<void>;
@@ -796,6 +847,7 @@ function SellerDetail({
             seller={seller}
             projects={projects}
             unlinkedProjects={unlinkedProjects}
+            employees={employees}
             onRefresh={onRefresh}
           />
         )}
@@ -822,11 +874,13 @@ function ProfilePanel({
   seller,
   projects,
   unlinkedProjects,
+  employees,
   onRefresh,
 }: {
   seller: Seller;
   projects: ProjectSummary[];
   unlinkedProjects: ProjectSummary[];
+  employees: EmployeeSummary[];
   onRefresh: () => Promise<void>;
 }) {
   const [editing, setEditing] = useState(false);
@@ -949,14 +1003,20 @@ function ProfilePanel({
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">
-              担当者
+              案件担当者
             </label>
-            <input
-              type="text"
+            <select
               value={form.assignedTo}
               onChange={(e) => setForm({ ...form, assignedTo: e.target.value })}
               className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-            />
+            >
+              <option value="">-</option>
+              {employees.map((emp) => (
+                <option key={emp.id} value={emp.name}>
+                  {emp.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">

@@ -763,7 +763,7 @@ export default function EmployeeManager() {
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               <a
-                                href={`/company/${a.companyCode}`}
+                                href={`/company/${a.companyCode}?from=buyers`}
                                 className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors truncate"
                               >
                                 {a.companyName}

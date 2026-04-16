@@ -10,6 +10,10 @@ import { PREFECTURES } from "@/lib/gbiz";
 import { normalizeCompanyLookupUrl } from "@/lib/company-lookup-url";
 import SimpleSearchForm from "@/components/SimpleSearchForm";
 import PrefectureSelect from "@/components/PrefectureSelect";
+import ContactStatusSelect from "@/components/ContactStatusSelect";
+import ContactStatusBadgeEditable from "@/components/ContactStatusBadgeEditable";
+import type { AllianceContactStatus } from "@/lib/alliance-contact-status";
+import { CONTACT_STATUS_LABELS } from "@/lib/alliance-contact-status";
 
 interface Props {
   searchParams: Promise<{
@@ -18,6 +22,7 @@ interface Props {
     prefecture?: string;
     specialty?: string;
     size?: string;
+    contactStatus?: string;
   }>;
 }
 
@@ -36,12 +41,14 @@ async function TypeFilter({
   prefecture,
   specialty,
   size,
+  contactStatus,
 }: {
   current?: string;
   searchQ?: string;
   prefecture?: string;
   specialty?: string;
   size?: string;
+  contactStatus?: string;
 }) {
   const types = await getAllTypes();
   const buildHref = (type?: string) => {
@@ -51,6 +58,7 @@ async function TypeFilter({
     if (prefecture) params.set("prefecture", prefecture);
     if (specialty) params.set("specialty", specialty);
     if (size) params.set("size", size);
+    if (contactStatus) params.set("contactStatus", contactStatus);
     return `/tax-advisors?${params}`;
   };
 
@@ -110,11 +118,18 @@ function AdvisorCard({ advisor }: { advisor: TaxAdvisor }) {
             <p className="font-semibold text-slate-800">{advisor.name}</p>
           )}
         </div>
-        <span
-          className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold shrink-0 ${badgeColor}`}
-        >
-          {advisor.type}
-        </span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <ContactStatusBadgeEditable
+            entityType="tax_advisor"
+            entityId={advisor.id}
+            initialStatus={advisor.contactStatus}
+          />
+          <span
+            className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}`}
+          >
+            {advisor.type}
+          </span>
+        </div>
       </div>
 
       <p className="mt-2 text-sm text-slate-500 line-clamp-3">
@@ -159,6 +174,9 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
   const prefecture = params.prefecture;
   const specialty = params.specialty;
   const size = params.size;
+  const contactStatus = params.contactStatus as
+    | AllianceContactStatus
+    | undefined;
   const [advisors, allSpecialties, allSizes] = await Promise.all([
     searchAdvisors({
       query: q,
@@ -166,6 +184,7 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
       prefecture,
       specialty,
       size,
+      contactStatus,
     }),
     getAllSpecialties(),
     getAllSizes(),
@@ -198,6 +217,7 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
           prefecture={prefecture}
           specialty={specialty}
           size={size}
+          contactStatus={contactStatus}
         />
         <Suspense>
           <PrefectureSelect
@@ -209,6 +229,7 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
               ...(type ? { type } : {}),
               ...(specialty ? { specialty } : {}),
               ...(size ? { size } : {}),
+              ...(contactStatus ? { contactStatus } : {}),
             }}
           />
         </Suspense>
@@ -216,13 +237,15 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
         {/* Specialty + Size */}
         <form
           action="/tax-advisors"
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+          className="grid grid-cols-1 sm:grid-cols-4 gap-3"
         >
           {q && <input type="hidden" name="q" value={q} />}
           {type && <input type="hidden" name="type" value={type} />}
           {prefecture && (
             <input type="hidden" name="prefecture" value={prefecture} />
           )}
+
+          <ContactStatusSelect current={contactStatus} />
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-slate-500">
@@ -270,7 +293,7 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
           </div>
         </form>
 
-        {(specialty || size) && (
+        {(specialty || size || contactStatus) && (
           <a
             href={`/tax-advisors${
               q || type || prefecture
@@ -303,6 +326,11 @@ export default async function TaxAdvisorsPage({ searchParams }: Props) {
             <span className="text-slate-400 ml-1">/ {specialty}</span>
           )}
           {size && <span className="text-slate-400 ml-1">/ {size}</span>}
+          {contactStatus && (
+            <span className="text-slate-400 ml-1">
+              / {CONTACT_STATUS_LABELS[contactStatus]}
+            </span>
+          )}
         </span>
       </div>
 

@@ -1,5 +1,7 @@
 import advisorsData from "@/data/ma-advisors.json";
 
+import type { AllianceContactStatus } from "./alliance-contact-status";
+
 // ---- Types ----
 //
 // d6e is the source of truth for M&A advisor data — see
@@ -24,6 +26,7 @@ export interface MaAdvisor {
   url?: string;
   listed?: boolean;
   targetSize?: string;
+  contactStatus: AllianceContactStatus;
 }
 
 export const MA_ADVISOR_TYPES: readonly MaAdvisorType[] = [
@@ -41,6 +44,7 @@ export interface MaAdvisorFilters {
   service?: string;
   listedOnly?: boolean;
   targetSize?: string;
+  contactStatus?: AllianceContactStatus;
 }
 
 // ---- Seed data ----

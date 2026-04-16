@@ -675,7 +675,7 @@ export default function ProjectManager() {
                               className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 px-3 py-2"
                             >
                               <a
-                                href={`/company/${c.companyCode}`}
+                                href={`/company/${c.companyCode}?from=settings`}
                                 className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                               >
                                 {c.companyName}

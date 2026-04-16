@@ -5,7 +5,7 @@ import { BANK_TYPES } from "@/lib/banks";
 
 import { D6eApiError, executeSql } from "../client";
 import { escapeSqlValue, tableRef } from "../sql";
-import { toBankType } from "./_enums";
+import { toAllianceContactStatus, toBankType } from "./_enums";
 
 /**
  * d6e-backed repository for the `banks` table.
@@ -25,10 +25,11 @@ interface BankRow {
   website_url: string | null;
   total_assets: string | null;
   ma_team: string | null;
+  contact_status: string | null;
 }
 
 const SELECT_COLUMNS =
-  "id, name, bank_type, description, ma_services, prefecture, website_url, total_assets, ma_team";
+  "id, name, bank_type, description, ma_services, prefecture, website_url, total_assets, ma_team, contact_status";
 
 function rowToBank(row: BankRow): Bank {
   return {
@@ -41,6 +42,7 @@ function rowToBank(row: BankRow): Bank {
     ...(row.website_url ? { url: row.website_url } : {}),
     ...(row.total_assets ? { totalAssets: row.total_assets } : {}),
     ...(row.ma_team ? { maTeam: row.ma_team } : {}),
+    contactStatus: toAllianceContactStatus(row.contact_status),
   };
 }
 
@@ -53,6 +55,7 @@ export interface BankInput {
   url?: string;
   totalAssets?: string;
   maTeam?: string;
+  contactStatus?: string;
 }
 
 function inputToValuesAndColumns(input: BankInput): {
@@ -69,6 +72,7 @@ function inputToValuesAndColumns(input: BankInput): {
       "website_url",
       "total_assets",
       "ma_team",
+      "contact_status",
     ],
     values: [
       escapeSqlValue(input.name),
@@ -79,6 +83,7 @@ function inputToValuesAndColumns(input: BankInput): {
       escapeSqlValue(input.url),
       escapeSqlValue(input.totalAssets),
       escapeSqlValue(input.maTeam),
+      escapeSqlValue(input.contactStatus ?? "none"),
     ],
   };
 }
@@ -131,6 +136,9 @@ export async function search(filters: BankFilters = {}): Promise<Bank[]> {
   }
   if (filters.hasMaTeam) {
     results = results.filter((b) => Boolean(b.maTeam));
+  }
+  if (filters.contactStatus) {
+    results = results.filter((b) => b.contactStatus === filters.contactStatus);
   }
   if (filters.query && filters.query.trim()) {
     const q = filters.query.trim().toLowerCase();
@@ -228,6 +236,8 @@ export async function update(
     assignments.push(`total_assets = ${escapeSqlValue(patch.totalAssets)}`);
   if (patch.maTeam !== undefined)
     assignments.push(`ma_team = ${escapeSqlValue(patch.maTeam)}`);
+  if (patch.contactStatus !== undefined)
+    assignments.push(`contact_status = ${escapeSqlValue(patch.contactStatus)}`);
 
   if (assignments.length === 0) {
     return findById(id);

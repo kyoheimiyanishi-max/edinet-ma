@@ -1,5 +1,7 @@
 import plannersData from "@/data/financial-planners.json";
 
+import type { AllianceContactStatus } from "./alliance-contact-status";
+
 // ---- Types ----
 //
 // d6e is the source of truth for financial-planner data — see
@@ -26,6 +28,7 @@ export interface FinancialPlanner {
   prefecture?: string;
   url?: string;
   listed?: boolean;
+  contactStatus: AllianceContactStatus;
 }
 
 export const FP_TYPES: readonly FpType[] = [
@@ -44,6 +47,7 @@ export interface FpFilters {
   service?: string;
   listedOnly?: boolean;
   targetClients?: string;
+  contactStatus?: AllianceContactStatus;
 }
 
 // ---- Seed data ----
