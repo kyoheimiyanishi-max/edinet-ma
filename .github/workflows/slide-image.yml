@@ -1,0 +1,80 @@
+# ノンネーム資料生成 Docker image を GHCR に publish する CI
+#
+# トリガ:
+#   - main への push で slide/** が変更された場合 → :sha タグのみ
+#   - タグ push (例: slide-v0.1.0) → :<tag> + :latest を付与
+#   - 手動実行 (workflow_dispatch)
+#
+# 公開先:
+#   ghcr.io/<owner>/edinet-ma-nonname
+#   リポジトリ名は GITHUB_REPOSITORY_OWNER を使うため、gyact namespace なら
+#   ghcr.io/gyact/edinet-ma-nonname となる (public に設定)。
+#
+# セキュリティ:
+#   ユーザー入力 (github.ref など) は env: で env var に移して sh の
+#   パラメータ展開だけで扱う (run: の GitHub 式直接展開は避ける)。
+
+name: slide-image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "slide/**"
+      - ".github/workflows/slide-image.yml"
+    tags:
+      - "slide-v*"
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/edinet-ma-nonname
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive tags
+        id: tags
+        env:
+          GH_REF: ${{ github.ref }}
+          GH_SHA: ${{ github.sha }}
+        run: |
+          set -eu
+          short_sha="${GH_SHA:0:12}"
+          tags="${IMAGE_NAME}:sha-${short_sha}"
+          case "$GH_REF" in
+            refs/tags/slide-v*)
+              version="${GH_REF#refs/tags/slide-v}"
+              # 半角英数 + ドット + ハイフンのみを許可 (Docker tag 仕様の実用サブセット)
+              if [ -z "$(printf '%s' "$version" | tr -dc 'a-zA-Z0-9.-')" ] \
+                 || [ "$(printf '%s' "$version" | tr -dc 'a-zA-Z0-9.-')" != "$version" ]; then
+                echo "invalid tag version: $version" >&2
+                exit 1
+              fi
+              tags="${tags},${IMAGE_NAME}:v${version},${IMAGE_NAME}:latest"
+              ;;
+          esac
+          printf 'tags=%s\n' "$tags" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: slide
+          file: slide/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

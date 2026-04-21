@@ -1,0 +1,13 @@
+[project]
+name = "edinet-ma-slide"
+version = "0.1.0"
+description = "JP-Force 社内テンプレに則ったスライド自動生成 (ノンネーム資料ほか)"
+requires-python = ">=3.11"
+dependencies = [
+  "python-pptx>=1.0.2",
+]
+
+[tool.uv]
+# slide_generator.py を単体スクリプトとして実行するだけなので
+# パッケージビルドは行わない。
+package = false

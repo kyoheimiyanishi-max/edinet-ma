@@ -76,6 +76,7 @@ interface SellerDocument {
   title: string;
   content: string;
   uploadedAt: string;
+  storageFileId?: string;
 }
 
 interface Seller {
@@ -1711,6 +1712,8 @@ function DocumentsPanel({
 }) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", content: "" });
+  const [generatingNonname, setGeneratingNonname] = useState(false);
+  const [nonnameError, setNonnameError] = useState<string | null>(null);
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -1738,6 +1741,28 @@ function DocumentsPanel({
     await onRefresh();
   }
 
+  async function handleGenerateNonname() {
+    setGeneratingNonname(true);
+    setNonnameError(null);
+    try {
+      const res = await fetch(`/api/sellers/${seller.id}/nonname`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        setNonnameError(
+          body.error ?? `生成に失敗しました (status ${res.status})`,
+        );
+        return;
+      }
+      await onRefresh();
+    } catch (e) {
+      setNonnameError(e instanceof Error ? e.message : "生成に失敗しました");
+    } finally {
+      setGeneratingNonname(false);
+    }
+  }
+
   async function handleDelete(docId: string) {
     if (!confirm("削除しますか？")) return;
     await fetch(`/api/sellers/${seller.id}/documents?documentId=${docId}`, {
@@ -1748,7 +1773,14 @@ function DocumentsPanel({
 
   return (
     <div className="space-y-3">
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 flex-wrap">
+        <button
+          onClick={handleGenerateNonname}
+          disabled={generatingNonname}
+          className="text-xs px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 font-medium disabled:opacity-60 disabled:cursor-wait"
+        >
+          {generatingNonname ? "生成中…" : "ノンネーム資料を生成"}
+        </button>
         <label className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium cursor-pointer">
           テキストファイル読込
           <input
@@ -1765,6 +1797,11 @@ function DocumentsPanel({
           + 資料追加
         </button>
       </div>
+      {nonnameError && (
+        <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+          {nonnameError}
+        </div>
+      )}
 
       {showForm && (
         <form
@@ -1813,21 +1850,33 @@ function DocumentsPanel({
               <summary className="p-4 cursor-pointer flex items-center justify-between">
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-slate-800 truncate">
+                    {d.storageFileId ? "📎 " : ""}
                     {d.title}
                   </p>
                   <p className="text-xs text-slate-400 mt-0.5">
                     {new Date(d.uploadedAt).toLocaleString("ja-JP")}
                   </p>
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleDelete(d.id);
-                  }}
-                  className="text-xs text-slate-400 hover:text-red-600 ml-2"
-                >
-                  削除
-                </button>
+                <div className="flex items-center gap-2 ml-2">
+                  {d.storageFileId && (
+                    <a
+                      href={`/api/sellers/${seller.id}/documents/${d.id}/download`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs text-blue-600 hover:underline"
+                    >
+                      ダウンロード
+                    </a>
+                  )}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDelete(d.id);
+                    }}
+                    className="text-xs text-slate-400 hover:text-red-600"
+                  >
+                    削除
+                  </button>
+                </div>
               </summary>
               {d.content && (
                 <div className="px-4 pb-4 text-sm text-slate-700 whitespace-pre-wrap bg-slate-50 border-t border-slate-200">
