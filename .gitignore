@@ -44,3 +44,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# slide generator (uv venv / 生成物)
+/slide/.venv/
+/slide/output/*
+!/slide/output/.gitkeep
+__pycache__/
+*.pyc

@@ -1,0 +1,8 @@
+.venv/
+output/
+__pycache__/
+*.pyc
+uv.lock
+pyproject.toml
+.gitkeep
+example_spec.json

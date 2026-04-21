@@ -75,6 +75,8 @@ export interface SellerDocument {
   title: string;
   content: string;
   uploadedAt: string;
+  /** d6e storage_file.id を指す場合のみ non-null。テキストメモのみなら undefined */
+  storageFileId?: string;
 }
 
 export type SellerStage =
@@ -113,6 +115,13 @@ export interface Seller {
   closeDate?: string; // クローズ予定日 (YYYY-MM-DD)
   targetPrice?: string; // 売却金額目標 (例: 5億円～10億円)
   saleSchedule?: string; // 売却予定スケジュール (例: 2026年上期)
+  // ノンネーム資料用 (blind profile / teaser) — いずれも任意
+  revenueRange?: string; // 売上高レンジ (例: "5〜10億円")
+  operatingProfitRange?: string; // 営業利益レンジ
+  employeeRange?: string; // 従業員数レンジ (例: "30〜50名")
+  foundedYear?: number; // 設立年 (西暦)
+  saleReason?: string; // 売却理由
+  strengths?: string; // 強み・特色
   minutes: SellerMinute[];
   documents: SellerDocument[];
   buyers: BuyerCandidate[];
@@ -141,6 +150,12 @@ export type SellerInput = Pick<
   | "targetPrice"
   | "saleSchedule"
   | "folderUrl"
+  | "revenueRange"
+  | "operatingProfitRange"
+  | "employeeRange"
+  | "foundedYear"
+  | "saleReason"
+  | "strengths"
 > & {
   // これらは Seller 型上 required だが、Input では optional (デフォルト false)
   ndaSigned?: boolean;

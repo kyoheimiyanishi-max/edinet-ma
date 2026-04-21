@@ -64,6 +64,12 @@ interface SellerRow {
   close_date: string | null;
   target_price: string | null;
   sale_schedule: string | null;
+  revenue_range: string | null;
+  operating_profit_range: string | null;
+  employee_range: string | null;
+  founded_year: number | null;
+  sale_reason: string | null;
+  strengths: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -98,6 +104,7 @@ interface DocumentRow {
   title: string;
   content: string | null;
   uploaded_at: string;
+  storage_file_id: string | null;
 }
 
 interface BuyerRow {
@@ -114,7 +121,7 @@ interface BuyerRow {
 }
 
 const SELLER_COLUMNS =
-  "id, company_name, company_id, industry, prefecture, description, profile, desired_terms, stage, priority, rank, assigned_to, mediator_type, intro_source, fee_estimate, nda_signed, ad_signed, folder_url, close_date, target_price, sale_schedule, created_at, updated_at";
+  "id, company_name, company_id, industry, prefecture, description, profile, desired_terms, stage, priority, rank, assigned_to, mediator_type, intro_source, fee_estimate, nda_signed, ad_signed, folder_url, close_date, target_price, sale_schedule, revenue_range, operating_profit_range, employee_range, founded_year, sale_reason, strengths, created_at, updated_at";
 
 // ---- Row → aggregate helpers ----
 
@@ -167,6 +174,7 @@ function rowToDocument(row: DocumentRow): SellerDocument {
     title: row.title,
     content: row.content ?? "",
     uploadedAt: row.uploaded_at,
+    ...(row.storage_file_id ? { storageFileId: row.storage_file_id } : {}),
   };
 }
 
@@ -214,6 +222,14 @@ function rowToSeller(
     ...(row.close_date ? { closeDate: row.close_date } : {}),
     ...(row.target_price ? { targetPrice: row.target_price } : {}),
     ...(row.sale_schedule ? { saleSchedule: row.sale_schedule } : {}),
+    ...(row.revenue_range ? { revenueRange: row.revenue_range } : {}),
+    ...(row.operating_profit_range
+      ? { operatingProfitRange: row.operating_profit_range }
+      : {}),
+    ...(row.employee_range ? { employeeRange: row.employee_range } : {}),
+    ...(row.founded_year != null ? { foundedYear: row.founded_year } : {}),
+    ...(row.sale_reason ? { saleReason: row.sale_reason } : {}),
+    ...(row.strengths ? { strengths: row.strengths } : {}),
     minutes,
     documents,
     buyers,
@@ -251,7 +267,7 @@ async function loadDocumentsBySeller(
   if (sellerIds.length === 0) return new Map();
   const inList = sellerIds.map((id) => escapeSqlValue(id)).join(", ");
   const result = await executeSql<DocumentRow>(
-    `SELECT id, seller_id, title, content, uploaded_at
+    `SELECT id, seller_id, title, content, uploaded_at, storage_file_id
      FROM ${tableRef("seller_documents")}
      WHERE seller_id IN (${inList})
      ORDER BY uploaded_at DESC`,
@@ -353,7 +369,9 @@ export async function create(input: SellerInput): Promise<Seller> {
     `INSERT INTO ${tableRef("sellers")}
        (id, company_name, industry, prefecture, description, profile, desired_terms, stage,
         priority, rank, assigned_to, mediator_type, intro_source, fee_estimate,
-        nda_signed, ad_signed, folder_url, close_date, target_price, sale_schedule)
+        nda_signed, ad_signed, folder_url, close_date, target_price, sale_schedule,
+        revenue_range, operating_profit_range, employee_range, founded_year,
+        sale_reason, strengths)
      VALUES (
        ${escapeSqlValue(id)},
        ${escapeSqlValue(input.companyName)},
@@ -374,7 +392,13 @@ export async function create(input: SellerInput): Promise<Seller> {
        ${escapeSqlValue(input.folderUrl)},
        ${escapeSqlValue(input.closeDate)},
        ${escapeSqlValue(input.targetPrice)},
-       ${escapeSqlValue(input.saleSchedule)}
+       ${escapeSqlValue(input.saleSchedule)},
+       ${escapeSqlValue(input.revenueRange)},
+       ${escapeSqlValue(input.operatingProfitRange)},
+       ${escapeSqlValue(input.employeeRange)},
+       ${escapeSqlValue(input.foundedYear)},
+       ${escapeSqlValue(input.saleReason)},
+       ${escapeSqlValue(input.strengths)}
      )`,
   );
   if ((result.affected_rows ?? 0) < 1) {
@@ -434,6 +458,20 @@ export async function update(
     assignments.push(`target_price = ${escapeSqlValue(patch.targetPrice)}`);
   if (patch.saleSchedule !== undefined)
     assignments.push(`sale_schedule = ${escapeSqlValue(patch.saleSchedule)}`);
+  if (patch.revenueRange !== undefined)
+    assignments.push(`revenue_range = ${escapeSqlValue(patch.revenueRange)}`);
+  if (patch.operatingProfitRange !== undefined)
+    assignments.push(
+      `operating_profit_range = ${escapeSqlValue(patch.operatingProfitRange)}`,
+    );
+  if (patch.employeeRange !== undefined)
+    assignments.push(`employee_range = ${escapeSqlValue(patch.employeeRange)}`);
+  if (patch.foundedYear !== undefined)
+    assignments.push(`founded_year = ${escapeSqlValue(patch.foundedYear)}`);
+  if (patch.saleReason !== undefined)
+    assignments.push(`sale_reason = ${escapeSqlValue(patch.saleReason)}`);
+  if (patch.strengths !== undefined)
+    assignments.push(`strengths = ${escapeSqlValue(patch.strengths)}`);
 
   if (assignments.length === 0) return findById(id);
   assignments.push("updated_at = now()");
@@ -497,15 +535,33 @@ export async function addDocument(
 ): Promise<Seller | null> {
   const id = crypto.randomUUID();
   await executeSql(
-    `INSERT INTO ${tableRef("seller_documents")} (id, seller_id, title, content)
+    `INSERT INTO ${tableRef("seller_documents")}
+       (id, seller_id, title, content, storage_file_id)
      VALUES (
        ${escapeSqlValue(id)},
        ${escapeSqlValue(sellerId)},
        ${escapeSqlValue(input.title)},
-       ${escapeSqlValue(input.content)}
+       ${escapeSqlValue(input.content)},
+       ${escapeSqlValue(input.storageFileId)}
      )`,
   );
   return findById(sellerId);
+}
+
+/** 単一 document を取得 (seller スコープ検証込み) */
+export async function findDocumentById(
+  sellerId: string,
+  documentId: string,
+): Promise<SellerDocument | null> {
+  const result = await executeSql<DocumentRow>(
+    `SELECT id, seller_id, title, content, uploaded_at, storage_file_id
+     FROM ${tableRef("seller_documents")}
+     WHERE id = ${escapeSqlValue(documentId)}
+       AND seller_id = ${escapeSqlValue(sellerId)}
+     LIMIT 1`,
+  );
+  const row = (result.rows ?? [])[0];
+  return row ? rowToDocument(row) : null;
 }
 
 export async function deleteDocument(
