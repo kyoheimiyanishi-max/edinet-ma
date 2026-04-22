@@ -109,6 +109,21 @@ export async function findByNaturalKey(
 }
 
 /**
+ * 期間内 (両端包含) のニュース起点ディールを取得する。
+ * ma-ranking 集計で EDINET 臨報と UNION する際に使う。
+ */
+export async function findInRange(from: string, to: string): Promise<Deal[]> {
+  const result = await executeSql<MaDealRow>(
+    `SELECT ${SELECT_COLUMNS} FROM ${tableRef("ma_deals")}
+     WHERE deal_date IS NOT NULL
+       AND deal_date >= ${escapeSqlValue(from)}
+       AND deal_date <= ${escapeSqlValue(to)}
+     ORDER BY deal_date DESC`,
+  );
+  return (result.rows ?? []).map(rowToDeal);
+}
+
+/**
  * 買手名(部分一致)でディールを取得する。
  * LIKE 検索のため、「株式会社」を除去した短縮名を渡すことを推奨。
  */

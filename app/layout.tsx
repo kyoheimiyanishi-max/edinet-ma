@@ -30,6 +30,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/shareholders", label: "株主名検索" },
   { href: "/deals", label: "売主管理" },
   { href: "/buyers", label: "買手管理" },
+  { href: "/ma-ranking", label: "M&Aランキング" },
   { href: "/kpi", label: "KPI" },
   {
     kind: "dropdown",
